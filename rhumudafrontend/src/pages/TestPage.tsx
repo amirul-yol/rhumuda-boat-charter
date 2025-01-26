@@ -1,6 +1,7 @@
 import React from "react";
 import JettyPointDropdown from "../components/JettyPointDropdown";
 import BookingDatePicker from "../components/BookingDatePicker";
+import PassengerCounter from "../components/PassengerCounter";
 import { Box, Typography, Paper } from "@mui/material";
 
 const TestPage: React.FC = () => {
@@ -19,6 +20,7 @@ const TestPage: React.FC = () => {
         </Typography>
         <JettyPointDropdown />
         <BookingDatePicker />
+        <PassengerCounter />
       </Paper>
     </Box>
   );
