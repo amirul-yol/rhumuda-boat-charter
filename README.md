@@ -12,7 +12,7 @@ Rhumuda Charter Service - A comprehensive web-based booking platform designed fo
 
 Core Technologies:
 
-- React with TypeScript
+- React 
 - Material-UI
 - DayJS (date handling)
 
