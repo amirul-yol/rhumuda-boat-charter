@@ -7,13 +7,19 @@ const Header: React.FC = () => {
   return (
     <AppBar position="static" sx={{ backgroundColor: "white" }}>
       <Container maxWidth={false} disableGutters sx={{ px: SYSTEM_PADDING.x }}>
-        <Toolbar disableGutters>
+        <Toolbar
+          disableGutters
+          sx={{
+            minHeight: "150px",
+            height: "150px",
+          }}
+        >
           <Box
             component="img"
             src={logo}
             alt="Rhumuda Charter Logo"
             sx={{
-              height: 50,
+              height: 100,
               marginRight: 2,
             }}
           />
