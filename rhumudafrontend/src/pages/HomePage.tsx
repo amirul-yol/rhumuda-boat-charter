@@ -12,6 +12,20 @@ const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("boat");
+  const [categoryName, setCategoryName] = useState<string>("Boat Charter");
+
+  const handleCategorySelect = async (category: string) => {
+    setSelectedCategory(category);
+    try {
+      const response = await fetch(`http://localhost:8080/api/package-categories/${
+        category === "boat" ? 1 : category === "island" ? 2 : 3
+      }`);
+      const data = await response.json();
+      setCategoryName(data.name);
+    } catch (err) {
+      setError("Failed to load category name");
+    }
+  };
 
   useEffect(() => {
     // TODO: Replace with actual API call
@@ -57,6 +71,7 @@ const HomePage: React.FC = () => {
           component="img"
           src={boatIcon}
           alt="Boat Charter"
+          onClick={() => handleCategorySelect("boat")}
           sx={{
             width: 80,
             height: 80,
@@ -71,6 +86,7 @@ const HomePage: React.FC = () => {
           component="img"
           src={islandIcon}
           alt="Island Trips"
+          onClick={() => handleCategorySelect("island")}
           sx={{
             width: 80,
             height: 80,
@@ -85,6 +101,7 @@ const HomePage: React.FC = () => {
           component="img"
           src={fishingIcon}
           alt="Fishing Trips"
+          onClick={() => handleCategorySelect("fishing")}
           sx={{
             width: 80,
             height: 80,
@@ -109,11 +126,7 @@ const HomePage: React.FC = () => {
           color: "text.primary",
         }}
       >
-        {selectedCategory === "boat"
-          ? "Boat Charter Packages"
-          : selectedCategory === "island"
-          ? "Island Trip Packages"
-          : "Fishing Packages"}
+        {categoryName}
       </Typography>
 
       <Box sx={{ mt: 4, display: "flex", gap: 3 }}>
