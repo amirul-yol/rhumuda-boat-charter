@@ -1,0 +1,15 @@
+import React from "react";
+import { Box } from "@mui/material";
+import SearchBar from "../components/SearchBar/SearchBar";
+
+const HomePage: React.FC = () => {
+  return (
+    <Box sx={{ padding: "220px" }}>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! 
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! 
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, ab expedita officia nam maxime facere laudantium asperiores officiis temporibus fugiat? Necessitatibus porro voluptate placeat iure maxime repellendus perspiciatis. Vel, quod! 
+    </Box>
+  );
+};
+
+export default HomePage;

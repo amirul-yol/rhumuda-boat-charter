@@ -5,6 +5,7 @@ import PassengerCounter from "../PassengerCounter";
 import { Box, Paper, IconButton, Divider } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
+
 const SearchBar: React.FC = () => {
   const handleSearch = () => {
     console.log("Search clicked");
