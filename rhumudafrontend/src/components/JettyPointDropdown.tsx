@@ -16,7 +16,7 @@ interface JettyPoint {
 
 const JettyPointDropdown = () => {
   const [jettyPoints, setJettyPoints] = useState<JettyPoint[]>([]);
-  const [selectedJetty, setSelectedJetty] = useState("1");
+  const [selectedJetty, setSelectedJetty] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const JettyPointDropdown = () => {
   return (
     <Box sx={{ minWidth: 200 }}>
       <FormControl fullWidth>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1}}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <LocationOnIcon
             sx={{ fontSize: "1.2rem", color: "text.secondary" }}
           />
