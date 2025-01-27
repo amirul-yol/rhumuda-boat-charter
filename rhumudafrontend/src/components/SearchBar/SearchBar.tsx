@@ -53,7 +53,7 @@ const SearchBar: React.FC = () => {
         <Box sx={{ flex: 1 }}>
           <PassengerCounter />
         </Box>
-        <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
+        <Box sx={{ ml: 2, display: 'flex', alignItems: 'center' }}>
           <IconButton
             onClick={handleSearch}
             sx={{
