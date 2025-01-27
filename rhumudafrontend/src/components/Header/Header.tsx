@@ -29,7 +29,15 @@ const Header: React.FC = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "white" }}>
+    <AppBar
+      position="sticky"
+      sx={{
+        backgroundColor: "white",
+        top: 0,
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+      }}
+    >
       <Container maxWidth={false} disableGutters sx={{ px: SYSTEM_PADDING.x }}>
         <Stack>
           <Toolbar
