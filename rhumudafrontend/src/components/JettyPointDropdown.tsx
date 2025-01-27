@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
+import {
+  FormControl,
+  TextField,
+  MenuItem,
+  Box,
+  InputLabel,
+} from "@mui/material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 interface JettyPoint {
   id: number;
@@ -9,7 +16,7 @@ interface JettyPoint {
 
 const JettyPointDropdown = () => {
   const [jettyPoints, setJettyPoints] = useState<JettyPoint[]>([]);
-  const [selectedJetty, setSelectedJetty] = useState("");
+  const [selectedJetty, setSelectedJetty] = useState("1");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,21 +42,34 @@ const JettyPointDropdown = () => {
   return (
     <Box sx={{ minWidth: 200 }}>
       <FormControl fullWidth>
-        <InputLabel id="jetty-point-label">Jetty Point</InputLabel>
-        <Select
-          labelId="jetty-point-label"
-          id="jetty-point-select"
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1}}>
+          <LocationOnIcon
+            sx={{ fontSize: "1.2rem", color: "text.secondary" }}
+          />
+          <InputLabel
+            shrink={false}
+            sx={{
+              position: "relative",
+              transform: "none",
+              color: "text.primary",
+            }}
+          >
+            Jetty Point
+          </InputLabel>
+        </Box>
+        <TextField
+          select
           value={selectedJetty}
-          label="Jetty Point"
           onChange={handleChange}
           disabled={loading}
+          variant="standard"
         >
           {jettyPoints.map((point) => (
             <MenuItem key={point.id} value={point.id}>
               {point.name}
             </MenuItem>
           ))}
-        </Select>
+        </TextField>
       </FormControl>
     </Box>
   );
