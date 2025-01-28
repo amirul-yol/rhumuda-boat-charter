@@ -4,7 +4,36 @@ Rhumuda Charter Service - A comprehensive web-based booking platform designed fo
 
 ## Phase 1 Project Overview
 
-[Current state of the project and what has been implemented in Phase 1.]
+Current implementation includes:
+
+### Frontend Features
+
+- Multi-step Booking Inquiry Form:
+  - Customer Information with field validation
+    - Name validation (letters only)
+    - Malaysian phone number format (+601XXXXXXXXX)
+    - Email validation
+    - Address validation
+    - Postal code validation (5 digits)
+  - Reservation Details
+    - Package selection
+    - Jetty point selection
+    - Booking date
+    - Passenger count
+    - Add-ons selection
+  - Other Options
+    - Alternative dates
+    - Special remarks/requests
+- Material-UI Implementation
+  - Responsive design
+  - Custom themed components
+  - Form validation feedback
+
+### Implemented Components
+
+- InquiryPage
+- Form validation system
+- Mock data integration for packages and add-ons
 
 ## Tech Stack
 
@@ -12,7 +41,7 @@ Rhumuda Charter Service - A comprehensive web-based booking platform designed fo
 
 Core Technologies:
 
-- React 
+- React
 - Material-UI
 - DayJS (date handling)
 
@@ -32,15 +61,19 @@ project-root/
 ## Getting Started
 
 ### Prerequisites
+
 - [to be filled]
 
 ### Installation & Setup
+
 1. Clone the repository
+
    ```bash
    git clone https://github.com/your-username/rhumuda-boat-charter.git
    ```
 
 2. Frontend Setup
+
    ```bash
    cd rhumudafrontend
    npm install
@@ -48,13 +81,16 @@ project-root/
    ```
 
    3. Backend Setup
+
    ```bash
    cd rhumudasystem
    ./mvnw spring-boot:run
    ```
 
 ## Environment Variables [to be filled properly]
+
 List of required environment variables:
+
 ```env
 # Frontend (.env)
 REACT_APP_API_URL=
@@ -64,63 +100,80 @@ SPRING_DATASOURCE_URL=
 ```
 
 ## Current Features (Phase 1) [to be filled]
+
 - Feature 1: Brief description
 - Feature 2: Brief description
 - ...
 
 ## Future Development (Phase 2+) [to be filled]
+
 - Feature 1: Brief description
 - Feature 2: Brief description
 - ...
 
 ### Planned Features [to be filled properly]
+
 - Feature A: Brief description of planned feature
 - Feature B: Brief description of planned feature
 
 ### Technical Debt & Known Issues [to be filled properly]
+
 - List any known issues or areas that need improvement
 - Highlight any technical debt that should be addressed
 
 ### Development Guidelines [to be filled properly]
+
 - Coding standards
 - Git workflow
 - Testing requirements
 - Any specific architectural decisions that should be maintained
 
 ## API Documentation [to be filled properly]
+
 - Link to API documentation
 - Key endpoints overview
 - Authentication methods
 
 ## Database [to be filled properly]
+
 - Database schema overview
 - Important relationships
 - Migration procedures
 
 ## Testing [to be filled properly]
+
 - How to run tests
 - Test coverage
 - Testing strategy
 
 ## Deployment [to be filled properly]
+
 - Current deployment setup
 - Deployment procedures
 - Important configuration notes
 
 ## Contributing [to be filled properly]
+
 Guidelines for future contributors:
+
 1. Branch naming conventions
 2. PR process
 3. Code review requirements
 
 ## Contact [to be filled properly]
+
 - Your contact information (if you're willing to be contacted for questions)
 - Client/Project owner contact information
 - Any relevant documentation links
 
 ---
+
 ## Version History [to be filled properly]
+
 - v1.0.0 (Phase 1) - [Date]
   - Initial release
   - List of implemented features
+
+```
+
 ```

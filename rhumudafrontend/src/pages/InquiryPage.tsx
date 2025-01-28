@@ -47,6 +47,17 @@ interface OtherOptions {
   specialRemarks: string;
 }
 
+interface ValidationErrors {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  addressLine1: string;
+  postalCode: string;
+  city: string;
+  country: string;
+}
+
 const InquiryPage: React.FC = () => {
   const [activeSection, setActiveSection] = React.useState<number>(0);
   const [customerInfo, setCustomerInfo] = React.useState<CustomerInfo>({
@@ -76,6 +87,17 @@ const InquiryPage: React.FC = () => {
     specialRemarks: "",
   });
 
+  const [errors, setErrors] = React.useState<ValidationErrors>({
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+    addressLine1: "",
+    postalCode: "",
+    city: "",
+    country: "",
+  });
+
   // Temporary mock data
   const mockPackages = [
     {
@@ -96,13 +118,130 @@ const InquiryPage: React.FC = () => {
     { id: "3", name: "Boat tour around Pulau Kapas", price: 10 },
   ];
 
+  const validateName = (name: string): string => {
+    if (!name) return "This field is required";
+    if (name.length < 2) return "Must be at least 2 characters";
+    if (!/^[a-zA-Z\s]*$/.test(name)) return "Only letters and spaces allowed";
+    return "";
+  };
+
+  const validatePhoneNumber = (phone: string): string => {
+    if (!phone) return "This field is required";
+
+    // Remove any potential spaces
+    const cleanPhone = phone.replace(/\s/g, "");
+
+    // Check for valid formats: +601234567890 or 01234567890
+    const phoneRegex = /^(\+?60|0)\d{9,10}$/;
+
+    if (!phoneRegex.test(cleanPhone)) {
+      return "Invalid format. Use +601234567890 or 01234567890";
+    }
+
+    return "";
+  };
+
+  const validateEmail = (email: string): string => {
+    if (!email) return "This field is required";
+
+    // RFC 5322 standard email regex
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(email)) {
+      return "Invalid email address";
+    }
+
+    return "";
+  };
+
+  const validateAddressLine1 = (address: string): string => {
+    if (!address) return "This field is required";
+    if (address.length < 5) return "Address must be at least 5 characters long";
+    return "";
+  };
+
+  const validatePostalCode = (postalCode: string): string => {
+    if (!postalCode) return "This field is required";
+
+    // Check for exactly 5 digits
+    const postalCodeRegex = /^\d{5}$/;
+
+    if (!postalCodeRegex.test(postalCode)) {
+      return "Invalid format. Must be 5 digits (e.g., 12345)";
+    }
+
+    return "";
+  };
+
+  const validateCity = (city: string): string => {
+    if (!city) return "This field is required";
+    if (city.length < 2) return "Must be at least 2 characters";
+    if (!/^[a-zA-Z\s]*$/.test(city)) return "Only letters and spaces allowed";
+    return "";
+  };
+
+  const validateCountry = (country: string): string => {
+    if (!country) return "This field is required";
+    if (country.length < 2) return "Must be at least 2 characters";
+    if (!/^[a-zA-Z\s]*$/.test(country))
+      return "Only letters and spaces allowed";
+    return "";
+  };
+
   const handleCustomerInfoChange =
     (field: keyof CustomerInfo) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
       setCustomerInfo((prev) => ({
         ...prev,
-        [field]: event.target.value,
+        [field]: value,
       }));
+
+      switch (field) {
+        case "firstName":
+        case "lastName":
+          setErrors((prev) => ({
+            ...prev,
+            [field]: validateName(value),
+          }));
+          break;
+        case "phoneNumber":
+          setErrors((prev) => ({
+            ...prev,
+            phoneNumber: validatePhoneNumber(value),
+          }));
+          break;
+        case "email":
+          setErrors((prev) => ({
+            ...prev,
+            email: validateEmail(value),
+          }));
+          break;
+        case "addressLine1":
+          setErrors((prev) => ({
+            ...prev,
+            addressLine1: validateAddressLine1(value),
+          }));
+          break;
+        case "postalCode":
+          setErrors((prev) => ({
+            ...prev,
+            postalCode: validatePostalCode(value),
+          }));
+          break;
+        case "city":
+          setErrors((prev) => ({
+            ...prev,
+            city: validateCity(value),
+          }));
+          break;
+        case "country":
+          setErrors((prev) => ({
+            ...prev,
+            country: validateCountry(value),
+          }));
+          break;
+      }
     };
 
   const handleReservationDetailsChange =
@@ -136,6 +275,41 @@ const InquiryPage: React.FC = () => {
     };
 
   const handleNext = () => {
+    if (activeSection === 0) {
+      const firstNameError = validateName(customerInfo.firstName);
+      const lastNameError = validateName(customerInfo.lastName);
+      const phoneNumberError = validatePhoneNumber(customerInfo.phoneNumber);
+      const emailError = validateEmail(customerInfo.email);
+      const addressLine1Error = validateAddressLine1(customerInfo.addressLine1);
+      const postalCodeError = validatePostalCode(customerInfo.postalCode);
+      const cityError = validateCity(customerInfo.city);
+      const countryError = validateCountry(customerInfo.country);
+
+      setErrors({
+        firstName: firstNameError,
+        lastName: lastNameError,
+        phoneNumber: phoneNumberError,
+        email: emailError,
+        addressLine1: addressLine1Error,
+        postalCode: postalCodeError,
+        city: cityError,
+        country: countryError,
+      });
+
+      if (
+        firstNameError ||
+        lastNameError ||
+        phoneNumberError ||
+        emailError ||
+        addressLine1Error ||
+        postalCodeError ||
+        cityError ||
+        countryError
+      ) {
+        return;
+      }
+    }
+
     setActiveSection((prev) => prev + 1);
   };
 
@@ -156,7 +330,14 @@ const InquiryPage: React.FC = () => {
             label="First Name"
             value={customerInfo.firstName}
             onChange={handleCustomerInfoChange("firstName")}
-            variant="outlined"
+            error={!!errors.firstName}
+            helperText={errors.firstName}
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                firstName: validateName(customerInfo.firstName),
+              }));
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -165,7 +346,14 @@ const InquiryPage: React.FC = () => {
             label="Last Name"
             value={customerInfo.lastName}
             onChange={handleCustomerInfoChange("lastName")}
-            variant="outlined"
+            error={!!errors.lastName}
+            helperText={errors.lastName}
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                lastName: validateName(customerInfo.lastName),
+              }));
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -174,17 +362,32 @@ const InquiryPage: React.FC = () => {
             label="Phone Number"
             value={customerInfo.phoneNumber}
             onChange={handleCustomerInfoChange("phoneNumber")}
-            variant="outlined"
+            error={!!errors.phoneNumber}
+            helperText={errors.phoneNumber}
+            placeholder="+601234567890"
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                phoneNumber: validatePhoneNumber(customerInfo.phoneNumber),
+              }));
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
             label="Email Address"
-            type="email"
             value={customerInfo.email}
             onChange={handleCustomerInfoChange("email")}
-            variant="outlined"
+            error={!!errors.email}
+            helperText={errors.email}
+            placeholder="example@email.com"
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                email: validateEmail(customerInfo.email),
+              }));
+            }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -193,7 +396,14 @@ const InquiryPage: React.FC = () => {
             label="Address Line 1"
             value={customerInfo.addressLine1}
             onChange={handleCustomerInfoChange("addressLine1")}
-            variant="outlined"
+            error={!!errors.addressLine1}
+            helperText={errors.addressLine1}
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                addressLine1: validateAddressLine1(customerInfo.addressLine1),
+              }));
+            }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -202,7 +412,6 @@ const InquiryPage: React.FC = () => {
             label="Address Line 2"
             value={customerInfo.addressLine2}
             onChange={handleCustomerInfoChange("addressLine2")}
-            variant="outlined"
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -211,7 +420,16 @@ const InquiryPage: React.FC = () => {
             label="Postal Code"
             value={customerInfo.postalCode}
             onChange={handleCustomerInfoChange("postalCode")}
-            variant="outlined"
+            error={!!errors.postalCode}
+            helperText={errors.postalCode}
+            placeholder="12345"
+            inputProps={{ maxLength: 5 }}
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                postalCode: validatePostalCode(customerInfo.postalCode),
+              }));
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -220,7 +438,14 @@ const InquiryPage: React.FC = () => {
             label="City"
             value={customerInfo.city}
             onChange={handleCustomerInfoChange("city")}
-            variant="outlined"
+            error={!!errors.city}
+            helperText={errors.city}
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                city: validateCity(customerInfo.city),
+              }));
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -229,7 +454,14 @@ const InquiryPage: React.FC = () => {
             label="Country"
             value={customerInfo.country}
             onChange={handleCustomerInfoChange("country")}
-            variant="outlined"
+            error={!!errors.country}
+            helperText={errors.country}
+            onBlur={() => {
+              setErrors((prev) => ({
+                ...prev,
+                country: validateCountry(customerInfo.country),
+              }));
+            }}
           />
         </Grid>
       </Grid>
