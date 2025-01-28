@@ -58,6 +58,20 @@ interface ValidationErrors {
   country: string;
 }
 
+const STORAGE_KEY = "rhumuda_inquiry_form";
+
+const saveToLocalStorage = (data: {
+  customerInfo: CustomerInfo;
+  activeSection: number;
+}) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+};
+
+const loadFromLocalStorage = () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  return saved ? JSON.parse(saved) : null;
+};
+
 const InquiryPage: React.FC = () => {
   const [activeSection, setActiveSection] = React.useState<number>(0);
   const [customerInfo, setCustomerInfo] = React.useState<CustomerInfo>({
@@ -192,10 +206,18 @@ const InquiryPage: React.FC = () => {
     (field: keyof CustomerInfo) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
-      setCustomerInfo((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
+      setCustomerInfo((prev) => {
+        const newInfo = {
+          ...prev,
+          [field]: value,
+        };
+        // Auto-save to localStorage
+        saveToLocalStorage({
+          customerInfo: newInfo,
+          activeSection,
+        });
+        return newInfo;
+      });
 
       switch (field) {
         case "firstName":
@@ -308,6 +330,12 @@ const InquiryPage: React.FC = () => {
       ) {
         return;
       }
+
+      // Save to localStorage before proceeding
+      saveToLocalStorage({
+        customerInfo,
+        activeSection: activeSection + 1,
+      });
     }
 
     setActiveSection((prev) => prev + 1);
@@ -316,6 +344,15 @@ const InquiryPage: React.FC = () => {
   const handlePrevious = () => {
     setActiveSection((prev) => prev - 1);
   };
+
+  // Load saved data on component mount
+  React.useEffect(() => {
+    const savedData = loadFromLocalStorage();
+    if (savedData) {
+      setCustomerInfo(savedData.customerInfo);
+      setActiveSection(savedData.activeSection);
+    }
+  }, []);
 
   const renderCustomerInfo = () => (
     <Paper elevation={0} sx={{ p: 4, border: "1px solid #e0e0e0" }}>
