@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -16,6 +16,11 @@ import {
   Checkbox,
   Stack,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
@@ -60,6 +65,12 @@ interface ValidationErrors {
   postalCode: string;
   city: string;
   country: string;
+}
+
+interface ClearSections {
+  customerInfo: boolean;
+  reservationDetails: boolean;
+  otherOptions: boolean;
 }
 
 const STORAGE_KEY = "rhumuda_inquiry_form";
@@ -121,6 +132,13 @@ const InquiryPage: React.FC = () => {
     postalCode: "",
     city: "",
     country: "",
+  });
+
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const [sectionsToDelete, setSectionsToDelete] = useState<ClearSections>({
+    customerInfo: false,
+    reservationDetails: false,
+    otherOptions: false,
   });
 
   // Temporary mock data
@@ -365,6 +383,119 @@ const InquiryPage: React.FC = () => {
     }
   }, []);
 
+  const handleClearClick = () => {
+    setClearDialogOpen(true);
+  };
+
+  const handleClearConfirm = () => {
+    if (sectionsToDelete.customerInfo) {
+      setCustomerInfo({
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        email: "",
+        addressLine1: "",
+        addressLine2: "",
+        postalCode: "",
+        city: "",
+        country: "",
+      });
+      // Clear localStorage if customer info is being cleared
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    if (sectionsToDelete.reservationDetails) {
+      setReservationDetails({
+        jettyPoint: "",
+        bookingDate: "",
+        passengers: 1,
+        packageId: "",
+        addOns: [],
+      });
+    }
+
+    if (sectionsToDelete.otherOptions) {
+      setOtherOptions({
+        alternativeDate1: "",
+        alternativeDate2: "",
+        specialRemarks: "",
+      });
+    }
+
+    // If all sections are being cleared, remove from localStorage
+    if (
+      sectionsToDelete.customerInfo &&
+      sectionsToDelete.reservationDetails &&
+      sectionsToDelete.otherOptions
+    ) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    setClearDialogOpen(false);
+    setSectionsToDelete({
+      customerInfo: false,
+      reservationDetails: false,
+      otherOptions: false,
+    });
+  };
+
+  const handleSectionChange =
+    (section: keyof ClearSections) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSectionsToDelete((prev) => ({
+        ...prev,
+        [section]: event.target.checked,
+      }));
+    };
+
+  const handleSelectAllSections = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = event.target.checked;
+    setSectionsToDelete({
+      customerInfo: newValue,
+      reservationDetails: newValue,
+      otherOptions: newValue,
+    });
+  };
+
+  const renderButtons = () => (
+    <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
+      <Button
+        variant="outlined"
+        onClick={handleClearClick}
+        sx={{
+          color: "#FF0000",
+          borderColor: "#FF0000",
+          "&:hover": {
+            bgcolor: "rgba(255, 0, 0, 0.04)",
+            borderColor: "#FF0000",
+          },
+        }}
+      >
+        Clear
+      </Button>
+      <Box sx={{ display: "flex", gap: 2 }}>
+        {activeSection > 0 && (
+          <Button
+            variant="outlined"
+            onClick={handlePrevious}
+            sx={{ color: "#0384BD", borderColor: "#0384BD" }}
+          >
+            Previous
+          </Button>
+        )}
+        <Button
+          variant="contained"
+          onClick={handleNext}
+          sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
+        >
+          {activeSection === 2 ? "Submit" : "Next"}
+        </Button>
+      </Box>
+    </Box>
+  );
+
   const renderCustomerInfo = () => (
     <Paper elevation={0} sx={{ p: 4, border: "1px solid #e0e0e0" }}>
       <Typography variant="h6" sx={{ mb: 3 }}>
@@ -514,15 +645,7 @@ const InquiryPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          variant="contained"
-          onClick={handleNext}
-          sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
-        >
-          Next
-        </Button>
-      </Box>
+      {renderButtons()}
     </Paper>
   );
 
@@ -677,22 +800,7 @@ const InquiryPage: React.FC = () => {
 
       {renderPackageInfo()}
 
-      <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-        <Button
-          variant="outlined"
-          onClick={handlePrevious}
-          sx={{ color: "#0384BD", borderColor: "#0384BD" }}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleNext}
-          sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
-        >
-          Next
-        </Button>
-      </Box>
+      {renderButtons()}
     </Paper>
   );
 
@@ -734,22 +842,7 @@ const InquiryPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
-        <Button
-          variant="outlined"
-          onClick={handlePrevious}
-          sx={{ color: "#0384BD", borderColor: "#0384BD" }}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleNext}
-          sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
-        >
-          Next
-        </Button>
-      </Box>
+      {renderButtons()}
     </Paper>
   );
 
@@ -764,6 +857,99 @@ const InquiryPage: React.FC = () => {
         {activeSection === 1 && renderReservationDetails()}
         {activeSection === 2 && renderOtherOptions()}
       </Box>
+
+      <Dialog
+        open={clearDialogOpen}
+        onClose={() => setClearDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            width: "400px",
+            borderRadius: "12px",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            bgcolor: "#0384BD",
+            color: "white",
+            py: 2,
+          }}
+        >
+          Clear Sections
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <Typography sx={{ mb: 2 }}>
+            Are you sure you want to clear your progress? Please select which
+            section you want to clear:
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+              mb: 2,
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={sectionsToDelete.customerInfo}
+                  onChange={handleSectionChange("customerInfo")}
+                />
+              }
+              label="Customer Information"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={sectionsToDelete.reservationDetails}
+                  onChange={handleSectionChange("reservationDetails")}
+                />
+              }
+              label="Reservation Details"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={sectionsToDelete.otherOptions}
+                  onChange={handleSectionChange("otherOptions")}
+                />
+              }
+              label="Other Options"
+            />
+          </Box>
+          <Divider sx={{ my: 2 }} />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={
+                  sectionsToDelete.customerInfo &&
+                  sectionsToDelete.reservationDetails &&
+                  sectionsToDelete.otherOptions
+                }
+                onChange={handleSelectAllSections}
+              />
+            }
+            label="All of the above"
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button
+            onClick={() => setClearDialogOpen(false)}
+            variant="outlined"
+            sx={{ color: "#0384BD", borderColor: "#0384BD" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleClearConfirm}
+            variant="contained"
+            sx={{ bgcolor: "#FF0000", "&:hover": { bgcolor: "#D32F2F" } }}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
