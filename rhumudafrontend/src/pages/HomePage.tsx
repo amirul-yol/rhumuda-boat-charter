@@ -17,9 +17,11 @@ const HomePage: React.FC = () => {
   const handleCategorySelect = async (category: string) => {
     setSelectedCategory(category);
     try {
-      const response = await fetch(`http://localhost:8080/api/package-categories/${
-        category === "boat" ? 1 : category === "island" ? 2 : 3
-      }`);
+      const response = await fetch(
+        `http://localhost:8080/api/package-categories/${
+          category === "boat" ? 1 : category === "island" ? 2 : 3
+        }`
+      );
       const data = await response.json();
       setCategoryName(data.name);
     } catch (err) {
@@ -28,26 +30,27 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    // TODO: Replace with actual API call
     const fetchPackages = async () => {
+      setLoading(true);
       try {
-        // Simulated API call
-        const response = await Promise.resolve([
-          {
-            id: "1",
-            title: "Package 1",
-            price: "750",
-            priceLabel: "Private boat",
-            services: [
-              { name: "Return trip" },
-              { name: "Free Activity" },
-              { name: "Snorkeling" },
-            ],
-            imageUrl: "../../src/assets/packages/boat/package1.jpg",
-          },
-        ]);
-        setPackages(response);
+        const categoryId =
+          selectedCategory === "boat"
+            ? 1
+            : selectedCategory === "island"
+            ? 2
+            : 3;
+        const response = await fetch(
+          `http://localhost:8080/api/packages/category/${categoryId}`
+        );
+        const data = (await response.json()) as Package[];
+        console.log("Category ID:", categoryId);
+        data.forEach((pkg: Package) => {
+          console.log("Package:", pkg.title);
+          console.log("Price Tiers:", pkg.priceTiers);
+        });
+        setPackages(data);
       } catch (err) {
+        console.error("Error details:", err);
         setError("Failed to load packages");
       } finally {
         setLoading(false);
@@ -59,7 +62,7 @@ const HomePage: React.FC = () => {
 
   return (
     <Box>
-      {/* Package Selector Section */}
+      {/* Category Selector Section */}
       <Stack
         direction="row"
         spacing={4}
@@ -132,9 +135,13 @@ const HomePage: React.FC = () => {
       <Box sx={{ mt: 4, display: "flex", gap: 3 }}>
         {loading && <CircularProgress />}
         {error && <Alert severity="error">{error}</Alert>}
-        {packages.map((pkg) => (
-          <PackageCard key={pkg.id} {...pkg} />
-        ))}
+        {packages.map((pkg) => {
+          if (!pkg.id) {
+            console.warn("Package without ID:", pkg);
+            return null;
+          }
+          return <PackageCard key={pkg.id} {...pkg} />;
+        })}
       </Box>
     </Box>
   );

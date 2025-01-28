@@ -1,16 +1,68 @@
 import React from "react";
-import { Box, Typography, Button, Paper } from "@mui/material";
+import { Box, Typography, Button, Paper, Chip, Stack } from "@mui/material";
 import { Package } from "../../types/package";
+import PriceDisplay from "./PriceDisplay";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import GroupsIcon from "@mui/icons-material/Groups";
+import StraightenIcon from "@mui/icons-material/Straighten";
 
-type PackageCardProps = Package;
-
-const PackageCard: React.FC<PackageCardProps> = ({
+const PackageCard: React.FC<Package> = ({
   title,
-  price,
-  priceLabel,
-  services,
+  categoryId,
+  priceTiers = [],
+  services = [],
   imageUrl,
+  maxCapacity,
+  durationMinutes,
+  distanceMinKm,
+  distanceMaxKm,
 }) => {
+  const renderAdditionalInfo = () => {
+    const items = [];
+
+    if (durationMinutes) {
+      items.push(
+        <Stack key="duration" direction="row" spacing={0.5} alignItems="center">
+          <AccessTimeIcon sx={{ fontSize: 16 }} />
+          <Typography variant="body2">
+            {Math.floor(durationMinutes / 60)}h
+          </Typography>
+        </Stack>
+      );
+    }
+
+    if (maxCapacity) {
+      items.push(
+        <Stack key="capacity" direction="row" spacing={0.5} alignItems="center">
+          <GroupsIcon sx={{ fontSize: 16 }} />
+          <Typography variant="body2">{maxCapacity} pax</Typography>
+        </Stack>
+      );
+    }
+
+    if (distanceMinKm && distanceMaxKm) {
+      items.push(
+        <Stack key="distance" direction="row" spacing={0.5} alignItems="center">
+          <StraightenIcon sx={{ fontSize: 16 }} />
+          <Typography variant="body2">
+            {distanceMinKm}-{distanceMaxKm}km
+          </Typography>
+        </Stack>
+      );
+    }
+
+    return items.length > 0 ? (
+      <Stack
+        direction="row"
+        spacing={2}
+        justifyContent="center"
+        sx={{ mt: 1, mb: 2 }}
+      >
+        {items}
+      </Stack>
+    ) : null;
+  };
+
   return (
     <Paper
       elevation={0}
@@ -53,16 +105,9 @@ const PackageCard: React.FC<PackageCardProps> = ({
       </Box>
 
       <Box sx={{ p: 2, pt: 1.5 }}>
-        <Typography
-          variant="subtitle1"
-          sx={{
-            textAlign: "center",
-            fontWeight: 500,
-            color: "text.primary",
-          }}
-        >
-          RM{price} | {priceLabel}
-        </Typography>
+        <PriceDisplay priceTiers={priceTiers} categoryId={categoryId} />
+
+        {renderAdditionalInfo()}
 
         <Box
           sx={{
