@@ -41,6 +41,12 @@ interface ReservationDetails {
   addOns: string[];
 }
 
+interface OtherOptions {
+  alternativeDate1: string;
+  alternativeDate2: string;
+  specialRemarks: string;
+}
+
 const InquiryPage: React.FC = () => {
   const [activeSection, setActiveSection] = React.useState<number>(0);
   const [customerInfo, setCustomerInfo] = React.useState<CustomerInfo>({
@@ -63,6 +69,12 @@ const InquiryPage: React.FC = () => {
       packageId: "",
       addOns: [],
     });
+
+  const [otherOptions, setOtherOptions] = React.useState<OtherOptions>({
+    alternativeDate1: "",
+    alternativeDate2: "",
+    specialRemarks: "",
+  });
 
   // Temporary mock data
   const mockPackages = [
@@ -111,6 +123,15 @@ const InquiryPage: React.FC = () => {
       setReservationDetails((prev) => ({
         ...prev,
         addOns: newAddOns,
+      }));
+    };
+
+  const handleOtherOptionsChange =
+    (field: keyof OtherOptions) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setOtherOptions((prev) => ({
+        ...prev,
+        [field]: event.target.value,
       }));
     };
 
@@ -390,6 +411,63 @@ const InquiryPage: React.FC = () => {
     </Paper>
   );
 
+  const renderOtherOptions = () => (
+    <Paper elevation={0} sx={{ p: 4, border: "1px solid #e0e0e0" }}>
+      <Typography variant="h6" sx={{ mb: 3 }}>
+        Other Options
+      </Typography>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Alternative Booking Date 1"
+            value={otherOptions.alternativeDate1}
+            onChange={handleOtherOptionsChange("alternativeDate1")}
+            variant="outlined"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            label="Alternative Booking Date 2"
+            value={otherOptions.alternativeDate2}
+            onChange={handleOtherOptionsChange("alternativeDate2")}
+            variant="outlined"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Special Remarks/Requests"
+            value={otherOptions.specialRemarks}
+            onChange={handleOtherOptionsChange("specialRemarks")}
+            variant="outlined"
+            multiline
+            rows={4}
+          />
+        </Grid>
+      </Grid>
+
+      <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
+        <Button
+          variant="outlined"
+          onClick={handlePrevious}
+          sx={{ color: "#0384BD", borderColor: "#0384BD" }}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleNext}
+          sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
+        >
+          Next
+        </Button>
+      </Box>
+    </Paper>
+  );
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
@@ -399,6 +477,7 @@ const InquiryPage: React.FC = () => {
 
         {activeSection === 0 && renderCustomerInfo()}
         {activeSection === 1 && renderReservationDetails()}
+        {activeSection === 2 && renderOtherOptions()}
       </Box>
     </Container>
   );
