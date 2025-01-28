@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import Layout from "./components/Layout/Layout";
 import HomePage from "./pages/HomePage";
 import TestPage from "./pages/TestPage";
+import InquiryPage from "./pages/InquiryPage";
 
 const router = createBrowserRouter(
   [
@@ -27,6 +28,17 @@ const router = createBrowserRouter(
           <Header />
           <Layout>
             <TestPage />
+          </Layout>
+        </>
+      ),
+    },
+    {
+      path: "/inquiry",
+      element: (
+        <>
+          <Header />
+          <Layout>
+            <InquiryPage />
           </Layout>
         </>
       ),

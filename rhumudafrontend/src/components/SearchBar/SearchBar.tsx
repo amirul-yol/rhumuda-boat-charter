@@ -1,14 +1,17 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import JettyPointDropdown from "../JettyPointDropdown";
 import BookingDatePicker from "../BookingDatePicker";
 import PassengerCounter from "../PassengerCounter";
 import { Box, Paper, IconButton, Divider } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-
 const SearchBar: React.FC = () => {
+  const navigate = useNavigate();
+
   const handleSearch = () => {
-    console.log("Search clicked");
+    // TODO: Add validation logic here before navigation
+    navigate("/inquiry");
   };
 
   return (
@@ -54,7 +57,7 @@ const SearchBar: React.FC = () => {
         <Box sx={{ flex: 1 }}>
           <PassengerCounter />
         </Box>
-        <Box sx={{ ml: 2, display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
           <IconButton
             onClick={handleSearch}
             sx={{
