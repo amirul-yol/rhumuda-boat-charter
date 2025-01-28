@@ -14,9 +14,16 @@ interface JettyPoint {
   isActive: boolean;
 }
 
-const JettyPointDropdown = () => {
+interface JettyPointDropdownProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const JettyPointDropdown: React.FC<JettyPointDropdownProps> = ({
+  value,
+  onChange,
+}) => {
   const [jettyPoints, setJettyPoints] = useState<JettyPoint[]>([]);
-  const [selectedJetty, setSelectedJetty] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,12 +36,14 @@ const JettyPointDropdown = () => {
       const data = await response.json();
       setJettyPoints(data);
 
-      // Set default selection to Rhumuda (ID: 1) if available
-      const rhumudaPoint = data.find(
-        (point: JettyPoint) => point.id === 1 && point.isActive
-      );
-      if (rhumudaPoint) {
-        setSelectedJetty(rhumudaPoint.id.toString());
+      // If no value is selected and Rhumuda point exists, select it
+      if (!value) {
+        const rhumudaPoint = data.find(
+          (point: JettyPoint) => point.id === 1 && point.isActive
+        );
+        if (rhumudaPoint) {
+          onChange(rhumudaPoint.id.toString());
+        }
       }
     } catch (error) {
       console.error("Error fetching jetty points:", error);
@@ -43,8 +52,8 @@ const JettyPointDropdown = () => {
     }
   };
 
-  const handleChange = (event: any) => {
-    setSelectedJetty(event.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value);
   };
 
   return (
@@ -67,7 +76,7 @@ const JettyPointDropdown = () => {
         </Box>
         <TextField
           select
-          value={selectedJetty}
+          value={value}
           onChange={handleChange}
           disabled={loading}
           variant="standard"

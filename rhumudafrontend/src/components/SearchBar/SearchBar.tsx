@@ -8,10 +8,16 @@ import SearchIcon from "@mui/icons-material/Search";
 
 const SearchBar: React.FC = () => {
   const navigate = useNavigate();
+  const [searchValues, setSearchValues] = React.useState({
+    jettyPoint: "",
+    bookingDate: "",
+    passengers: 1,
+  });
 
   const handleSearch = () => {
-    // TODO: Add validation logic here before navigation
-    navigate("/inquiry");
+    navigate("/inquiry", {
+      state: searchValues,
+    });
   };
 
   return (
@@ -31,7 +37,15 @@ const SearchBar: React.FC = () => {
         sx={{ display: "flex", alignItems: "stretch", width: "100%", px: 2 }}
       >
         <Box sx={{ flex: 1 }}>
-          <JettyPointDropdown />
+          <JettyPointDropdown
+            value={searchValues.jettyPoint}
+            onChange={(value) =>
+              setSearchValues((prev) => ({
+                ...prev,
+                jettyPoint: value,
+              }))
+            }
+          />
         </Box>
         <Divider
           orientation="vertical"
@@ -43,7 +57,15 @@ const SearchBar: React.FC = () => {
           }}
         />
         <Box sx={{ flex: 1 }}>
-          <BookingDatePicker />
+          <BookingDatePicker
+            value={searchValues.bookingDate}
+            onChange={(value: string) =>
+              setSearchValues((prev) => ({
+                ...prev,
+                bookingDate: value,
+              }))
+            }
+          />
         </Box>
         <Divider
           orientation="vertical"
@@ -55,7 +77,15 @@ const SearchBar: React.FC = () => {
           }}
         />
         <Box sx={{ flex: 1 }}>
-          <PassengerCounter />
+          <PassengerCounter
+            value={searchValues.passengers}
+            onChange={(value) =>
+              setSearchValues((prev) => ({
+                ...prev,
+                passengers: value,
+              }))
+            }
+          />
         </Box>
         <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
           <IconButton

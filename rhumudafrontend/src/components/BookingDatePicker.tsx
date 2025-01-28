@@ -6,15 +6,25 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
-const BookingDatePicker = () => {
+interface BookingDatePickerProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const BookingDatePicker: React.FC<BookingDatePickerProps> = ({
+  value,
+  onChange,
+}) => {
   const tomorrow = dayjs().add(1, "day");
-  const [selectedDate, setSelectedDate] = React.useState<Dayjs | null>(
-    tomorrow
-  );
   const [open, setOpen] = React.useState(false);
 
-  const handleClick = () => {
-    setOpen(true);
+  // Convert string to Dayjs for internal use
+  const selectedDate = value ? dayjs(value) : tomorrow;
+
+  const handleDateChange = (newValue: Dayjs | null) => {
+    if (newValue) {
+      onChange(newValue.format("YYYY-MM-DD"));
+    }
   };
 
   // Disable past dates and dates more than 3 months ahead
@@ -26,10 +36,14 @@ const BookingDatePicker = () => {
     );
   };
 
+  const handleClick = () => {
+    setOpen(true);
+  };
+
   return (
     <Box sx={{ minWidth: 200, mt: 0 }}>
       <FormControl fullWidth>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1}}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <CalendarMonthIcon
             sx={{ fontSize: "1.2rem", color: "text.secondary" }}
           />
@@ -47,7 +61,7 @@ const BookingDatePicker = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DatePicker
             value={selectedDate}
-            onChange={(newValue) => setSelectedDate(newValue)}
+            onChange={handleDateChange}
             shouldDisableDate={disableDates}
             format="DD/MM/YYYY"
             open={open}

@@ -20,6 +20,10 @@ import {
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
+import { useLocation } from "react-router-dom";
+import JettyPointDropdown from "../components/JettyPointDropdown";
+import BookingDatePicker from "../components/BookingDatePicker";
+import PassengerCounter from "../components/PassengerCounter";
 
 interface CustomerInfo {
   firstName: string;
@@ -73,6 +77,13 @@ const loadFromLocalStorage = () => {
 };
 
 const InquiryPage: React.FC = () => {
+  const location = useLocation();
+  const searchValues = location.state || {
+    jettyPoint: "",
+    bookingDate: "",
+    passengers: 1,
+  };
+
   const [activeSection, setActiveSection] = React.useState<number>(0);
   const [customerInfo, setCustomerInfo] = React.useState<CustomerInfo>({
     firstName: "",
@@ -88,9 +99,9 @@ const InquiryPage: React.FC = () => {
 
   const [reservationDetails, setReservationDetails] =
     React.useState<ReservationDetails>({
-      jettyPoint: "",
-      bookingDate: "",
-      passengers: 1,
+      jettyPoint: searchValues.jettyPoint,
+      bookingDate: searchValues.bookingDate,
+      passengers: searchValues.passengers,
       packageId: "",
       addOns: [],
     });
@@ -590,31 +601,36 @@ const InquiryPage: React.FC = () => {
 
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Jetty Point"
+          <JettyPointDropdown
             value={reservationDetails.jettyPoint}
-            onChange={handleReservationDetailsChange("jettyPoint")}
-            variant="outlined"
+            onChange={(value) =>
+              setReservationDetails((prev) => ({
+                ...prev,
+                jettyPoint: value,
+              }))
+            }
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Booking Date"
+          <BookingDatePicker
             value={reservationDetails.bookingDate}
-            onChange={handleReservationDetailsChange("bookingDate")}
-            variant="outlined"
+            onChange={(value) =>
+              setReservationDetails((prev) => ({
+                ...prev,
+                bookingDate: value,
+              }))
+            }
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Passengers"
-            type="number"
+          <PassengerCounter
             value={reservationDetails.passengers}
-            onChange={handleReservationDetailsChange("passengers")}
-            variant="outlined"
+            onChange={(value) =>
+              setReservationDetails((prev) => ({
+                ...prev,
+                passengers: value,
+              }))
+            }
           />
         </Grid>
         <Grid item xs={12} sm={6}>
