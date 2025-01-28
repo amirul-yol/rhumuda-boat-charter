@@ -17,12 +17,11 @@ public class PackageController {
     @GetMapping("/category/{categoryId}")
     public List<Package> getPackagesByCategory(@PathVariable Long categoryId) {
         List<Package> packages = packageRepository.findByCategoryId(categoryId);
-        System.out.println("Packages found: " + packages.size());
         packages.forEach(p -> {
-            System.out.println("Package ID: " + p.getId());
-            System.out.println("Package Title: " + p.getTitle());
-            System.out.println("Services: " + p.getServices().size());
-            System.out.println("Price Tiers: " + p.getPriceTiers().size());
+            System.out.println("Package: " + p.getTitle());
+            p.getPriceTiers().forEach(pt -> 
+                System.out.println("  Price Tier: " + pt.toString())
+            );
         });
         return packages;
     }

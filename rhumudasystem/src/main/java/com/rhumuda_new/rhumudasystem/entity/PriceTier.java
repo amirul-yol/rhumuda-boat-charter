@@ -11,7 +11,7 @@ public class PriceTier {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "tier_type", nullable = false)
     private String type;
 
     @Column(nullable = false)
@@ -20,7 +20,7 @@ public class PriceTier {
     private String label;
 
     @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "package_id", nullable = false)
     private Package packageEntity;
 
@@ -39,4 +39,15 @@ public class PriceTier {
 
     public Package getPackageEntity() { return packageEntity; }
     public void setPackageEntity(Package packageEntity) { this.packageEntity = packageEntity; }
+
+    // Add toString for debugging
+    @Override
+    public String toString() {
+        return "PriceTier{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", price=" + price +
+                ", label='" + label + '\'' +
+                '}';
+    }
 } 

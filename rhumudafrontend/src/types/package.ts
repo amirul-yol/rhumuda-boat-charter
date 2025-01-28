@@ -22,5 +22,5 @@ export interface Package {
   isPrivate?: boolean;
   distanceMinKm?: number;
   distanceMaxKm?: number;
-  fishingType?: string;
+  fishingType: "DEEP_SEA" | "SQUID" | null;
 }
