@@ -28,6 +28,14 @@ const JettyPointDropdown = () => {
       const response = await fetch("http://localhost:8080/api/jetty-points");
       const data = await response.json();
       setJettyPoints(data);
+
+      // Set default selection to Rhumuda (ID: 1) if available
+      const rhumudaPoint = data.find(
+        (point: JettyPoint) => point.id === 1 && point.isActive
+      );
+      if (rhumudaPoint) {
+        setSelectedJetty(rhumudaPoint.id.toString());
+      }
     } catch (error) {
       console.error("Error fetching jetty points:", error);
     } finally {
