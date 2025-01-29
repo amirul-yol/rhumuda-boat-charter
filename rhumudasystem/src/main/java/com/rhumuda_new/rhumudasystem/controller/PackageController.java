@@ -16,12 +16,15 @@ public class PackageController {
 
     @GetMapping("/category/{categoryId}")
     public List<Package> getPackagesByCategory(@PathVariable Long categoryId) {
-        List<Package> packages = packageRepository.findByCategoryId(categoryId);
+        System.out.println("Received request for category: " + categoryId);
+        List<Package> packages = packageRepository.findByCategoryIdAndIsActiveTrue(categoryId);
+        System.out.println("Found " + packages.size() + " packages for category " + categoryId);
         packages.forEach(p -> {
-            System.out.println("Package: " + p.getTitle());
-            p.getPriceTiers().forEach(pt -> 
-                System.out.println("  Price Tier: " + pt.toString())
-            );
+            System.out.println("Package details:");
+            System.out.println("  ID: " + p.getId());
+            System.out.println("  Name: " + p.getName());
+            System.out.println("  Category: " + p.getCategoryId());
+            System.out.println("  Active: " + p.getIsActive());
         });
         return packages;
     }

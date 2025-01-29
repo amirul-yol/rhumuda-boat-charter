@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -21,14 +21,18 @@ import {
   DialogContent,
   DialogActions,
   Divider,
+  FormHelperText,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
+import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
 import { useLocation } from "react-router-dom";
 import JettyPointDropdown from "../components/JettyPointDropdown";
 import BookingDatePicker from "../components/BookingDatePicker";
 import PassengerCounter from "../components/PassengerCounter";
+import AddOnSelection from "../components/AddOnSelection";
+import PackageDropdown from "../components/PackageDropdown";
 
 interface CustomerInfo {
   firstName: string;
@@ -71,6 +75,51 @@ interface ClearSections {
   customerInfo: boolean;
   reservationDetails: boolean;
   otherOptions: boolean;
+}
+
+interface ReservationValidationErrors {
+  packageId: string;
+}
+
+interface AddOn {
+  id: number;
+  name: string;
+  description: string | null;
+  price: number;
+  isActive: boolean;
+}
+
+interface IncludedService {
+  name: string;
+  id: number;
+  serviceName: string;
+  description: string | null;
+}
+
+interface PriceTier {
+  id: number;
+  ageMin: number | null;
+  ageMax: number | null;
+  price: number;
+  type: string;
+  label: string | null;
+}
+
+interface Package {
+  id: number;
+  name: string;
+  description: string;
+  basePrice: number;
+  maxCapacity: number;
+  duration: number;
+  distanceMinKm: number | null;
+  distanceMaxKm: number | null;
+  durationMinutes: number | null;
+  isActive: boolean;
+  categoryId: number;
+  includedServices: IncludedService[];
+  priceTiers: PriceTier[];
+  services: IncludedService[];
 }
 
 const STORAGE_KEY = "rhumuda_inquiry_form";
@@ -134,6 +183,11 @@ const InquiryPage: React.FC = () => {
     country: "",
   });
 
+  const [reservationValidationErrors, setReservationValidationErrors] =
+    useState<ReservationValidationErrors>({
+      packageId: "",
+    });
+
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [sectionsToDelete, setSectionsToDelete] = useState<ClearSections>({
     customerInfo: false,
@@ -141,25 +195,47 @@ const InquiryPage: React.FC = () => {
     otherOptions: false,
   });
 
-  // Temporary mock data
-  const mockPackages = [
-    {
-      id: "1",
-      name: "Private Boat Charter",
-      description: "Private boat charter for up to 8 people",
-    },
-    {
-      id: "2",
-      name: "Sharing Boat Charter",
-      description: "Shared boat experience",
-    },
-  ];
+  const [addOns, setAddOns] = useState<AddOn[]>([]);
+  const [addOnsError, setAddOnsError] = useState<string | null>(null);
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number>(1); // Default to boat charter
 
-  const mockAddOns = [
-    { id: "1", name: "Life jacket & Safety equipment", price: 10 },
-    { id: "2", name: "Snorkeling in water garden", price: 10 },
-    { id: "3", name: "Boat tour around Pulau Kapas", price: 10 },
-  ];
+  useEffect(() => {
+    const fetchAddOns = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/addons");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setAddOns(data);
+      } catch (error) {
+        console.error("Error fetching add-ons:", error);
+        setAddOnsError("Failed to load add-ons");
+      }
+    };
+
+    fetchAddOns();
+  }, []);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/packages/category/${selectedCategory}`
+        );
+        const data = await response.json();
+        console.log("Raw Package Data:", data);
+        setPackages(data);
+      } catch (error) {
+        console.error("Error fetching packages:", error);
+      }
+    };
+
+    if (selectedCategory) {
+      fetchPackages();
+    }
+  }, [selectedCategory]);
 
   const validateName = (name: string): string => {
     if (!name) return "This field is required";
@@ -304,17 +380,19 @@ const InquiryPage: React.FC = () => {
       }));
     };
 
-  const handleAddOnChange =
-    (addOnId: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newAddOns = event.target.checked
-        ? [...reservationDetails.addOns, addOnId]
-        : reservationDetails.addOns.filter((id) => id !== addOnId);
+  const handleAddOnChange = (addOnId: string) => {
+    setReservationDetails((prev) => {
+      const currentAddOns = prev.addOns || [];
+      const newAddOns = currentAddOns.includes(addOnId)
+        ? currentAddOns.filter((id) => id !== addOnId)
+        : [...currentAddOns, addOnId];
 
-      setReservationDetails((prev) => ({
+      return {
         ...prev,
         addOns: newAddOns,
-      }));
-    };
+      };
+    });
+  };
 
   const handleOtherOptionsChange =
     (field: keyof OtherOptions) =>
@@ -365,6 +443,23 @@ const InquiryPage: React.FC = () => {
         customerInfo,
         activeSection: activeSection + 1,
       });
+    }
+
+    if (activeSection === 1) {
+      // Validate reservation details
+      let hasErrors = false;
+      const newErrors = { packageId: "" };
+
+      if (!reservationDetails.packageId) {
+        newErrors.packageId = "Please select a package";
+        hasErrors = true;
+      }
+
+      setReservationValidationErrors(newErrors);
+
+      if (hasErrors) {
+        return;
+      }
     }
 
     setActiveSection((prev) => prev + 1);
@@ -650,9 +745,12 @@ const InquiryPage: React.FC = () => {
   );
 
   const renderPackageInfo = () => {
-    const selectedPackage = mockPackages.find(
-      (pkg) => pkg.id === reservationDetails.packageId
+    const selectedPackage = packages.find(
+      (pkg) => pkg.id.toString() === reservationDetails.packageId
     );
+
+    console.log("Selected Package:", selectedPackage);
+    console.log("Services:", selectedPackage?.services);
 
     if (!selectedPackage) return null;
 
@@ -664,13 +762,15 @@ const InquiryPage: React.FC = () => {
           border: "1px solid #e0e0e0",
           borderRadius: 2,
           bgcolor: "#f8f8f8",
+          mb: 3,
         }}
       >
         <Typography variant="h6" sx={{ mb: 2 }}>
           Package Info
         </Typography>
 
-        <Grid container spacing={2}>
+        <Grid container spacing={3}>
+          {/* Package Name and Description */}
           <Grid item xs={12}>
             <Typography variant="subtitle1" fontWeight={500}>
               {selectedPackage.name}
@@ -680,50 +780,72 @@ const InquiryPage: React.FC = () => {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-              <Typography variant="body2">Duration: 12 hours</Typography>
+          {/* Duration and Capacity */}
+          <Grid item xs={12} sm={6}>
+            <Stack spacing={2}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                <Typography variant="body2">
+                  Duration: {selectedPackage.durationMinutes} minutes
+                </Typography>
+              </Stack>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <GroupsIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                <Typography variant="body2">
+                  Max Capacity: {selectedPackage.maxCapacity} persons
+                </Typography>
+              </Stack>
             </Stack>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <GroupsIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-              <Typography variant="body2">Max Capacity: 8 persons</Typography>
+          {/* Price Tiers */}
+          <Grid item xs={12} sm={6}>
+            <Stack spacing={2}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <PaidIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                <Stack>
+                  {selectedPackage.priceTiers.map((tier) => (
+                    <Typography key={tier.id} variant="body2">
+                      {tier.price === 0 ? "FREE" : `RM${tier.price}`} |{" "}
+                      {tier.type}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Stack>
             </Stack>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <PaidIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-              <Typography variant="body2">Price: RM 750</Typography>
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
-              Services Included:
-            </Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-              <Chip label="Return trip" size="small" />
-              <Chip label="Free Activity" size="small" />
-              <Chip label="Snorkeling" size="small" />
-            </Stack>
-          </Grid>
+          {/* Included Services */}
+          {selectedPackage.services && selectedPackage.services.length > 0 && (
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Services Included:
+              </Typography>
+              <Stack spacing={0.5}>
+                {selectedPackage.services.map((service) => (
+                  <Typography
+                    key={service.id}
+                    variant="body2"
+                    color="text.secondary"
+                  >
+                    {service.name || service.serviceName}
+                  </Typography>
+                ))}
+              </Stack>
+            </Grid>
+          )}
         </Grid>
       </Box>
     );
   };
 
   const renderReservationDetails = () => (
-    <Paper elevation={0} sx={{ p: 4, border: "1px solid #e0e0e0" }}>
-      <Typography variant="h6" sx={{ mb: 3 }}>
+    <Paper sx={{ p: 3 }}>
+      <Typography variant="h5" sx={{ mb: 3 }}>
         Reservation Details
       </Typography>
-
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <JettyPointDropdown
             value={reservationDetails.jettyPoint}
             onChange={(value) =>
@@ -734,7 +856,7 @@ const InquiryPage: React.FC = () => {
             }
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <BookingDatePicker
             value={reservationDetails.bookingDate}
             onChange={(value) =>
@@ -745,7 +867,7 @@ const InquiryPage: React.FC = () => {
             }
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={4}>
           <PassengerCounter
             value={reservationDetails.passengers}
             onChange={(value) =>
@@ -758,47 +880,45 @@ const InquiryPage: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
-            <InputLabel>Package</InputLabel>
+            <InputLabel>Category</InputLabel>
             <Select
-              value={reservationDetails.packageId}
-              onChange={(e) =>
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value as number);
                 setReservationDetails((prev) => ({
                   ...prev,
-                  packageId: e.target.value,
-                }))
-              }
-              label="Package"
+                  packageId: "",
+                }));
+              }}
+              label="Category"
             >
-              {mockPackages.map((pkg) => (
-                <MenuItem key={pkg.id} value={pkg.id}>
-                  {pkg.name}
-                </MenuItem>
-              ))}
+              <MenuItem value={1}>Boat Charter</MenuItem>
+              <MenuItem value={2}>Day Trip</MenuItem>
+              <MenuItem value={3}>Fishing</MenuItem>
             </Select>
           </FormControl>
         </Grid>
+        <Grid item xs={12} sm={6}>
+          <PackageDropdown
+            value={reservationDetails.packageId}
+            onChange={(value) => {
+              setReservationDetails((prev) => ({
+                ...prev,
+                packageId: value,
+              }));
+            }}
+            error={reservationValidationErrors.packageId}
+            categoryId={selectedCategory}
+          />
+        </Grid>
         <Grid item xs={12}>
-          <Typography variant="subtitle1" sx={{ mb: 2 }}>
-            Add-ons (RM10 each)
-          </Typography>
-          <FormGroup>
-            {mockAddOns.map((addon) => (
-              <FormControlLabel
-                key={addon.id}
-                control={
-                  <Checkbox
-                    checked={reservationDetails.addOns.includes(addon.id)}
-                    onChange={handleAddOnChange(addon.id)}
-                  />
-                }
-                label={addon.name}
-              />
-            ))}
-          </FormGroup>
+          {renderPackageInfo()}
+          <AddOnSelection
+            selectedAddOns={reservationDetails.addOns}
+            onAddOnChange={handleAddOnChange}
+          />
         </Grid>
       </Grid>
-
-      {renderPackageInfo()}
 
       {renderButtons()}
     </Paper>

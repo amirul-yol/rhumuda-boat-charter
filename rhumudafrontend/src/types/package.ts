@@ -5,7 +5,9 @@ export interface PriceTier {
 }
 
 export interface Service {
-  name: string;
+  id: number;
+  name?: string;
+  serviceName: string;
   description?: string;
 }
 
