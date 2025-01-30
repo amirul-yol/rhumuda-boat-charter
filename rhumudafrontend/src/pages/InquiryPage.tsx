@@ -34,6 +34,10 @@ import PassengerCounter from "../components/PassengerCounter";
 import AddOnSelection from "../components/AddOnSelection";
 import PackageDropdown from "../components/PackageDropdown";
 import AlternativeDatePicker from "../components/AlternativeDatePicker";
+import dayjs from "dayjs";
+import ReservationDatePicker from "../components/ReservationDatePicker";
+import ReservationJettyPoint from "../components/ReservationJettyPoint";
+import ReservationPassengers from "../components/ReservationPassengers";
 
 interface CustomerInfo {
   firstName: string;
@@ -128,6 +132,7 @@ interface StorageData {
   activeSection: number;
   reservationDetails: ReservationDetails;
   otherOptions: OtherOptions;
+  bookingId?: string;
 }
 
 const STORAGE_KEY = "rhumuda_inquiry_form";
@@ -141,12 +146,18 @@ const loadFromLocalStorage = () => {
   return saved ? JSON.parse(saved) : null;
 };
 
+const generateBookingId = () => {
+  const timestamp = new Date().getTime();
+  const random = Math.floor(Math.random() * 1000);
+  return `RHM${timestamp}${random}`;
+};
+
 const InquiryPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchValues = location.state || {
     jettyPoint: "",
-    bookingDate: "",
+    bookingDate: dayjs().add(1, "day").format("YYYY-MM-DD"),
     passengers: 1,
   };
 
@@ -248,29 +259,39 @@ const InquiryPage: React.FC = () => {
     if (savedData) {
       setCustomerInfo(savedData.customerInfo);
       setActiveSection(savedData.activeSection);
-      if (savedData.reservationDetails) {
-        setReservationDetails(savedData.reservationDetails);
-      } else {
-        // Initialize with search values if no saved data
-        setReservationDetails({
-          jettyPoint: searchValues.jettyPoint || "",
-          bookingDate: searchValues.bookingDate || "",
-          passengers: searchValues.passengers || 1,
-          packageId: "",
-          addOns: [],
-        });
-      }
-      if (savedData.otherOptions) {
-        setOtherOptions(savedData.otherOptions);
-      }
+      setReservationDetails(savedData.reservationDetails);
+      setOtherOptions(savedData.otherOptions);
     } else {
-      // Initialize with search values if no saved data at all
-      setReservationDetails({
+      // Initialize with search values and save to localStorage immediately
+      const initialReservationDetails = {
         jettyPoint: searchValues.jettyPoint || "",
         bookingDate: searchValues.bookingDate || "",
         passengers: searchValues.passengers || 1,
         packageId: "",
         addOns: [],
+      };
+      setReservationDetails(initialReservationDetails);
+
+      // Save initial state to localStorage
+      saveToLocalStorage({
+        customerInfo: {
+          firstName: "",
+          lastName: "",
+          phoneNumber: "",
+          email: "",
+          addressLine1: "",
+          addressLine2: "",
+          postalCode: "",
+          city: "",
+          country: "",
+        },
+        activeSection: 0,
+        reservationDetails: initialReservationDetails,
+        otherOptions: {
+          alternativeDate1: "",
+          alternativeDate2: "",
+          specialRemarks: "",
+        },
       });
     }
   }, []);
@@ -460,6 +481,8 @@ const InquiryPage: React.FC = () => {
   };
 
   const handleNext = () => {
+    console.log("Current reservationDetails:", reservationDetails);
+
     if (activeSection === 0) {
       const firstNameError = validateName(customerInfo.firstName);
       const lastNameError = validateName(customerInfo.lastName);
@@ -604,8 +627,25 @@ const InquiryPage: React.FC = () => {
   };
 
   const handleNavigateToSummary = () => {
+    const bookingId = generateBookingId();
+
+    // Get existing data from localStorage
+    const savedData = loadFromLocalStorage();
+
+    // Save all data including the new bookingId
+    saveToLocalStorage({
+      ...savedData,
+      bookingId,
+      customerInfo,
+      reservationDetails,
+      otherOptions,
+      activeSection,
+    });
+
+    // Navigate to summary page
     navigate("/summary", {
       state: {
+        bookingId,
         customerInfo,
         reservationDetails,
         otherOptions,
@@ -916,7 +956,7 @@ const InquiryPage: React.FC = () => {
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={4}>
-          <JettyPointDropdown
+          <ReservationJettyPoint
             value={reservationDetails.jettyPoint}
             onChange={(value) =>
               setReservationDetails((prev) => ({
@@ -927,7 +967,7 @@ const InquiryPage: React.FC = () => {
           />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <BookingDatePicker
+          <ReservationDatePicker
             value={reservationDetails.bookingDate}
             onChange={(value) =>
               setReservationDetails((prev) => ({
@@ -938,7 +978,7 @@ const InquiryPage: React.FC = () => {
           />
         </Grid>
         <Grid item xs={12} sm={4}>
-          <PassengerCounter
+          <ReservationPassengers
             value={reservationDetails.passengers}
             onChange={(value) =>
               setReservationDetails((prev) => ({

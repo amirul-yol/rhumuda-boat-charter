@@ -52,6 +52,9 @@ const Header: React.FC = () => {
               component="img"
               src={logo}
               alt="Rhumuda Charter Logo"
+              onClick={() => {
+                window.location.href = '/';
+              }}
               sx={{
                 height: 100,
                 marginRight: 2,
