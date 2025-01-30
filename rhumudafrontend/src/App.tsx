@@ -7,6 +7,7 @@ import Layout from "./components/Layout/Layout";
 import HomePage from "./pages/HomePage";
 import TestPage from "./pages/TestPage";
 import InquiryPage from "./pages/InquiryPage";
+import SummaryPage from "./pages/SummaryPage";
 
 const router = createBrowserRouter(
   [
@@ -39,6 +40,17 @@ const router = createBrowserRouter(
           <Header />
           <Layout>
             <InquiryPage />
+          </Layout>
+        </>
+      ),
+    },
+    {
+      path: "/summary",
+      element: (
+        <>
+          <Header />
+          <Layout>
+            <SummaryPage />
           </Layout>
         </>
       ),

@@ -27,7 +27,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import JettyPointDropdown from "../components/JettyPointDropdown";
 import BookingDatePicker from "../components/BookingDatePicker";
 import PassengerCounter from "../components/PassengerCounter";
@@ -143,6 +143,7 @@ const loadFromLocalStorage = () => {
 
 const InquiryPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchValues = location.state || {
     jettyPoint: "",
     bookingDate: "",
@@ -602,6 +603,16 @@ const InquiryPage: React.FC = () => {
     });
   };
 
+  const handleNavigateToSummary = () => {
+    navigate("/summary", {
+      state: {
+        customerInfo,
+        reservationDetails,
+        otherOptions,
+      },
+    });
+  };
+
   const renderButtons = () => (
     <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
       <Button
@@ -628,13 +639,24 @@ const InquiryPage: React.FC = () => {
             Previous
           </Button>
         )}
-        <Button
-          variant="contained"
-          onClick={handleNext}
-          sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
-        >
-          {activeSection === 2 ? "Submit" : "Next"}
-        </Button>
+        {activeSection < 2 && (
+          <Button
+            variant="contained"
+            onClick={handleNext}
+            sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
+          >
+            Next
+          </Button>
+        )}
+        {activeSection === 2 && (
+          <Button
+            variant="contained"
+            onClick={handleNavigateToSummary}
+            sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
+          >
+            Next
+          </Button>
+        )}
       </Box>
     </Box>
   );
