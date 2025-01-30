@@ -33,6 +33,7 @@ import BookingDatePicker from "../components/BookingDatePicker";
 import PassengerCounter from "../components/PassengerCounter";
 import AddOnSelection from "../components/AddOnSelection";
 import PackageDropdown from "../components/PackageDropdown";
+import AlternativeDatePicker from "../components/AlternativeDatePicker";
 
 interface CustomerInfo {
   firstName: string;
@@ -402,6 +403,13 @@ const InquiryPage: React.FC = () => {
         [field]: event.target.value,
       }));
     };
+
+  const handleDateChange = (field: keyof OtherOptions) => (value: string) => {
+    setOtherOptions((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const handleNext = () => {
     if (activeSection === 0) {
@@ -932,21 +940,19 @@ const InquiryPage: React.FC = () => {
 
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
+          <AlternativeDatePicker
             label="Alternative Booking Date 1"
             value={otherOptions.alternativeDate1}
-            onChange={handleOtherOptionsChange("alternativeDate1")}
-            variant="outlined"
+            onChange={handleDateChange("alternativeDate1")}
+            mainBookingDate={reservationDetails.bookingDate}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
+          <AlternativeDatePicker
             label="Alternative Booking Date 2"
             value={otherOptions.alternativeDate2}
-            onChange={handleOtherOptionsChange("alternativeDate2")}
-            variant="outlined"
+            onChange={handleDateChange("alternativeDate2")}
+            mainBookingDate={reservationDetails.bookingDate}
           />
         </Grid>
         <Grid item xs={12}>
@@ -958,6 +964,8 @@ const InquiryPage: React.FC = () => {
             variant="outlined"
             multiline
             rows={4}
+            inputProps={{ maxLength: 500 }}
+            helperText={`${otherOptions.specialRemarks.length}/500 characters`}
           />
         </Grid>
       </Grid>
