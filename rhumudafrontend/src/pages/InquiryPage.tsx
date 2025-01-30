@@ -123,12 +123,16 @@ interface Package {
   services: IncludedService[];
 }
 
-const STORAGE_KEY = "rhumuda_inquiry_form";
-
-const saveToLocalStorage = (data: {
+interface StorageData {
   customerInfo: CustomerInfo;
   activeSection: number;
-}) => {
+  reservationDetails: ReservationDetails;
+  otherOptions: OtherOptions;
+}
+
+const STORAGE_KEY = "rhumuda_inquiry_form";
+
+const saveToLocalStorage = (data: StorageData) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 };
 
@@ -238,6 +242,38 @@ const InquiryPage: React.FC = () => {
     }
   }, [selectedCategory]);
 
+  useEffect(() => {
+    const savedData = loadFromLocalStorage();
+    if (savedData) {
+      setCustomerInfo(savedData.customerInfo);
+      setActiveSection(savedData.activeSection);
+      if (savedData.reservationDetails) {
+        setReservationDetails(savedData.reservationDetails);
+      } else {
+        // Initialize with search values if no saved data
+        setReservationDetails({
+          jettyPoint: searchValues.jettyPoint || "",
+          bookingDate: searchValues.bookingDate || "",
+          passengers: searchValues.passengers || 1,
+          packageId: "",
+          addOns: [],
+        });
+      }
+      if (savedData.otherOptions) {
+        setOtherOptions(savedData.otherOptions);
+      }
+    } else {
+      // Initialize with search values if no saved data at all
+      setReservationDetails({
+        jettyPoint: searchValues.jettyPoint || "",
+        bookingDate: searchValues.bookingDate || "",
+        passengers: searchValues.passengers || 1,
+        packageId: "",
+        addOns: [],
+      });
+    }
+  }, []);
+
   const validateName = (name: string): string => {
     if (!name) return "This field is required";
     if (name.length < 2) return "Must be at least 2 characters";
@@ -321,6 +357,8 @@ const InquiryPage: React.FC = () => {
         saveToLocalStorage({
           customerInfo: newInfo,
           activeSection,
+          reservationDetails,
+          otherOptions,
         });
         return newInfo;
       });
@@ -405,10 +443,19 @@ const InquiryPage: React.FC = () => {
     };
 
   const handleDateChange = (field: keyof OtherOptions) => (value: string) => {
-    setOtherOptions((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setOtherOptions((prev) => {
+      const newOptions = {
+        ...prev,
+        [field]: value,
+      };
+      saveToLocalStorage({
+        customerInfo,
+        activeSection,
+        reservationDetails,
+        otherOptions: newOptions,
+      });
+      return newOptions;
+    });
   };
 
   const handleNext = () => {
@@ -450,6 +497,8 @@ const InquiryPage: React.FC = () => {
       saveToLocalStorage({
         customerInfo,
         activeSection: activeSection + 1,
+        reservationDetails,
+        otherOptions,
       });
     }
 
@@ -476,15 +525,6 @@ const InquiryPage: React.FC = () => {
   const handlePrevious = () => {
     setActiveSection((prev) => prev - 1);
   };
-
-  // Load saved data on component mount
-  React.useEffect(() => {
-    const savedData = loadFromLocalStorage();
-    if (savedData) {
-      setCustomerInfo(savedData.customerInfo);
-      setActiveSection(savedData.activeSection);
-    }
-  }, []);
 
   const handleClearClick = () => {
     setClearDialogOpen(true);
