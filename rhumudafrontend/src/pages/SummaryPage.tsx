@@ -44,9 +44,9 @@ interface JettyPoint {
 interface AddOn {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   price: number;
-  is_active: boolean;
+  isActive: boolean;
 }
 
 interface PriceTier {
@@ -126,6 +126,9 @@ const SummaryPage: React.FC = () => {
     const fetchAddOns = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/addons");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         setAddOns(data);
       } catch (error) {
@@ -161,11 +164,6 @@ const SummaryPage: React.FC = () => {
   const getJettyPointName = (id: string) => {
     const jettyPoint = jettyPoints.find((point) => point.id.toString() === id);
     return jettyPoint ? jettyPoint.name : id;
-  };
-
-  const getAddOnName = (id: string) => {
-    const addOn = addOns.find((addon) => addon.id.toString() === id);
-    return addOn ? addOn.name : id;
   };
 
   const getPackageName = (id: string) => {
@@ -516,22 +514,38 @@ const SummaryPage: React.FC = () => {
                     }`;
                   })()}
                 </Typography>
-                <Typography>
-                  <strong>Add-ons:</strong>{" "}
+                <Typography component="div">
+                  <strong>Add-ons:</strong>
                   {data.reservationDetails.addOns.length > 0 ? (
-                    <Box component="span">
-                      {`RM${data.reservationDetails.addOns.reduce(
-                        (total, addonId) => {
-                          const addon = addOns.find(
-                            (a) => a.id.toString() === addonId
-                          );
-                          return total + (addon?.price || 0);
-                        },
-                        0
-                      )}`}
+                    <Box
+                      component="ul"
+                      sx={{ mt: 1, pl: 2, listStyleType: "none" }}
+                    >
+                      {data.reservationDetails.addOns.map((addonId, index) => {
+                        const addon = addOns.find(
+                          (a) => a.id.toString() === addonId
+                        );
+                        return addon ? (
+                          <li key={addonId}>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              {index + 1}. {addon.name} - RM{addon.price}
+                            </Typography>
+                          </li>
+                        ) : null;
+                      })}
                     </Box>
                   ) : (
-                    "RM0"
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      color="text.secondary"
+                    >
+                      No add-ons selected
+                    </Typography>
                   )}
                 </Typography>
                 <Typography sx={{ mt: 1 }} variant="subtitle1">
