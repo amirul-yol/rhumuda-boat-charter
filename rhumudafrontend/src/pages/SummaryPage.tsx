@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Box, Paper, Grid, Stack } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Grid,
+  Stack,
+  Button,
+} from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
@@ -7,6 +15,8 @@ import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
 import locationMap from "../assets/images/location-rhumuda.png";
 import Description from "../components/Description";
+import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -99,6 +109,7 @@ const SummaryPage: React.FC = () => {
   const [jettyPoints, setJettyPoints] = useState<JettyPoint[]>([]);
   const [addOns, setAddOns] = useState<AddOn[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedData = localStorage.getItem(STORAGE_KEY);
@@ -257,6 +268,10 @@ const SummaryPage: React.FC = () => {
     );
   };
 
+  const handleEditDetails = () => {
+    navigate("/inquiry");
+  };
+
   if (!data) {
     return <Typography>Loading...</Typography>;
   }
@@ -331,6 +346,23 @@ const SummaryPage: React.FC = () => {
               </Typography>
             </Grid>
           </Grid>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              onClick={handleEditDetails}
+              sx={{
+                color: "#0384BD",
+                borderColor: "#0384BD",
+                "&:hover": {
+                  borderColor: "#0384BD",
+                  backgroundColor: "rgba(3, 132, 189, 0.04)",
+                },
+              }}
+            >
+              Edit Details
+            </Button>
+          </Box>
         </Paper>
 
         <Paper sx={{ p: 3, mb: 3 }}>
