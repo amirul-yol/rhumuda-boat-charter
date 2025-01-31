@@ -38,6 +38,7 @@ import dayjs from "dayjs";
 import ReservationDatePicker from "../components/ReservationDatePicker";
 import ReservationJettyPoint from "../components/ReservationJettyPoint";
 import ReservationPassengers from "../components/ReservationPassengers";
+// import Description from "../components/Description";
 
 interface CustomerInfo {
   firstName: string;
@@ -89,7 +90,7 @@ interface ReservationValidationErrors {
 interface AddOn {
   id: number;
   name: string;
-  description: string | null;
+  // description: string | null;
   price: number;
   isActive: boolean;
 }
@@ -98,7 +99,7 @@ interface IncludedService {
   name: string;
   id: number;
   serviceName: string;
-  description: string | null;
+  // description: string | null;
 }
 
 interface PriceTier {
@@ -113,7 +114,7 @@ interface PriceTier {
 interface Package {
   id: number;
   name: string;
-  description: string;
+  // description: string;
   basePrice: number;
   maxCapacity: number;
   duration: number;
@@ -878,14 +879,12 @@ const InquiryPage: React.FC = () => {
 
         <Grid container spacing={3}>
           {/* Package Name and Description */}
-          <Grid item xs={12}>
-            <Typography variant="subtitle1" fontWeight={500}>
+          {/* <Grid item xs={12}> */}
+            {/* <Typography variant="subtitle1" fontWeight={500}>
               {selectedPackage.name}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {selectedPackage.description}
-            </Typography>
-          </Grid>
+            <Description text={selectedPackage.description} /> */}
+          {/* </Grid> */}
 
           {/* Duration, Capacity, and Distance */}
           <Grid item xs={12} sm={6}>

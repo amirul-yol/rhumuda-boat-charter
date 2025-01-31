@@ -6,6 +6,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
 import locationMap from "../assets/images/location-rhumuda.png";
+import Description from "../components/Description";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -184,9 +185,7 @@ const SummaryPage: React.FC = () => {
         <Grid container spacing={2}>
           {/* Package Description */}
           <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {selectedPackage.description}
-            </Typography>
+            <Description text={selectedPackage.description} />
           </Grid>
 
           {/* Duration, Capacity, and Distance */}
@@ -290,24 +289,17 @@ const SummaryPage: React.FC = () => {
         <Paper sx={{ p: 3, mb: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              {/* <Typography variant="subtitle1" fontWeight={500}>
-                Package Description
-              </Typography> */}
               {packages.find(
                 (pkg) => pkg.id.toString() === data.reservationDetails.packageId
               )?.description && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 1 }}
-                >
-                  {
+                <Description
+                  text={
                     packages.find(
                       (pkg) =>
                         pkg.id.toString() === data.reservationDetails.packageId
-                    )?.description
+                    )?.description || ""
                   }
-                </Typography>
+                />
               )}
             </Grid>
           </Grid>
@@ -467,78 +459,6 @@ const SummaryPage: React.FC = () => {
               }}
             />
           </Box>
-        </Paper>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Cancellation Policy
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Full refund up to 7 days prior
-          </Typography>
-        </Paper>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Reservation Details
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography>
-                <strong>Jetty Point:</strong>{" "}
-                {getJettyPointName(data.reservationDetails.jettyPoint)}
-              </Typography>
-              <Typography>
-                <strong>Booking Date:</strong>{" "}
-                {formatDate(data.reservationDetails.bookingDate)}
-              </Typography>
-              <Typography>
-                <strong>Number of Passengers:</strong>{" "}
-                {data.reservationDetails.passengers}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              {renderPackageInfo(data.reservationDetails.packageId)}
-              <Typography>
-                <strong>Add-ons:</strong>
-              </Typography>
-              {data.reservationDetails.addOns.length > 0 ? (
-                <Box component="ul" sx={{ mt: 1, pl: 2 }}>
-                  {data.reservationDetails.addOns.map((addonId) => (
-                    <li key={addonId}>
-                      <Typography component="span">
-                        {getAddOnName(addonId)}
-                      </Typography>
-                    </li>
-                  ))}
-                </Box>
-              ) : (
-                <Typography>No add-ons selected</Typography>
-              )}
-            </Grid>
-          </Grid>
-        </Paper>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Other Options
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography>
-                <strong>Alternative Date 1:</strong>{" "}
-                {formatDate(data.otherOptions.alternativeDate1)}
-              </Typography>
-              <Typography>
-                <strong>Alternative Date 2:</strong>{" "}
-                {formatDate(data.otherOptions.alternativeDate2)}
-              </Typography>
-              <Typography>
-                <strong>Special Remarks:</strong>{" "}
-                {data.otherOptions.specialRemarks || "No special remarks"}
-              </Typography>
-            </Grid>
-          </Grid>
         </Paper>
 
         <Paper sx={{ p: 3, mb: 3 }}>
