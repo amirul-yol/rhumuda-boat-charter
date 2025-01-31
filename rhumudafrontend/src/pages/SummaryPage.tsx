@@ -5,6 +5,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
+import locationMap from "../assets/images/location-rhumuda.png";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -47,6 +48,21 @@ interface AddOn {
   is_active: boolean;
 }
 
+interface PriceTier {
+  id: number;
+  ageMin: number | null;
+  ageMax: number | null;
+  price: number;
+  type: string;
+  label: string | null;
+}
+
+interface IncludedService {
+  id: number;
+  name?: string;
+  serviceName?: string;
+}
+
 interface Package {
   id: number;
   name: string;
@@ -61,18 +77,6 @@ interface Package {
   categoryId: number;
   priceTiers: PriceTier[];
   services: IncludedService[];
-}
-
-interface PriceTier {
-  id: number;
-  price: number;
-  type: string;
-}
-
-interface IncludedService {
-  id: number;
-  name?: string;
-  serviceName?: string;
 }
 
 interface StorageData {
@@ -341,6 +345,141 @@ const SummaryPage: React.FC = () => {
 
         <Paper sx={{ p: 3, mb: 3 }}>
           <Typography variant="h6" gutterBottom>
+            Services
+          </Typography>
+          <Grid container spacing={3}>
+            {/* Duration, Capacity, and Distance */}
+            <Grid item xs={12} sm={6}>
+              <Stack spacing={2}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                  <Typography variant="body2">
+                    Duration:{" "}
+                    {
+                      packages.find(
+                        (pkg) =>
+                          pkg.id.toString() ===
+                          data.reservationDetails.packageId
+                      )?.durationMinutes
+                    }{" "}
+                    minutes
+                  </Typography>
+                </Stack>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <GroupsIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                  <Typography variant="body2">
+                    Max Capacity:{" "}
+                    {
+                      packages.find(
+                        (pkg) =>
+                          pkg.id.toString() ===
+                          data.reservationDetails.packageId
+                      )?.maxCapacity
+                    }{" "}
+                    persons
+                  </Typography>
+                </Stack>
+                {packages.find(
+                  (pkg) =>
+                    pkg.id.toString() === data.reservationDetails.packageId
+                )?.distanceMinKm &&
+                  packages.find(
+                    (pkg) =>
+                      pkg.id.toString() === data.reservationDetails.packageId
+                  )?.distanceMaxKm && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <DirectionsBoatIcon
+                        sx={{ color: "#0384BD", fontSize: 20 }}
+                      />
+                      <Typography variant="body2">
+                        Distance:{" "}
+                        {
+                          packages.find(
+                            (pkg) =>
+                              pkg.id.toString() ===
+                              data.reservationDetails.packageId
+                          )?.distanceMinKm
+                        }{" "}
+                        -{" "}
+                        {
+                          packages.find(
+                            (pkg) =>
+                              pkg.id.toString() ===
+                              data.reservationDetails.packageId
+                          )?.distanceMaxKm
+                        }{" "}
+                        km
+                      </Typography>
+                    </Stack>
+                  )}
+              </Stack>
+            </Grid>
+
+            {/* Included Services */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Services Included:
+              </Typography>
+              <Stack spacing={0.5}>
+                {packages
+                  .find(
+                    (pkg) =>
+                      pkg.id.toString() === data.reservationDetails.packageId
+                  )
+                  ?.services.map((service) => (
+                    <Typography
+                      key={service.id}
+                      variant="body2"
+                      color="text.secondary"
+                    >
+                      {service.name || service.serviceName}
+                    </Typography>
+                  ))}
+              </Stack>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Location
+          </Typography>
+          <Box
+            component="a"
+            href="https://maps.app.goo.gl/vwFiMqMgWNzB9J8f9"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              display: "block",
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.9,
+              },
+            }}
+          >
+            <img
+              src={locationMap}
+              alt="Location Map"
+              style={{
+                width: "60%",
+                height: "auto",
+                borderRadius: "4px",
+              }}
+            />
+          </Box>
+        </Paper>
+
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Cancellation Policy
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Full refund up to 7 days prior
+          </Typography>
+        </Paper>
+
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
             Reservation Details
           </Typography>
           <Grid container spacing={2}>
@@ -398,6 +537,116 @@ const SummaryPage: React.FC = () => {
                 <strong>Special Remarks:</strong>{" "}
                 {data.otherOptions.specialRemarks || "No special remarks"}
               </Typography>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Estimated Cost
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Stack spacing={1}>
+                <Typography>
+                  <strong>Jetty Point:</strong>{" "}
+                  {getJettyPointName(data.reservationDetails.jettyPoint)}
+                </Typography>
+                <Typography>
+                  <strong>Booking Date:</strong>{" "}
+                  {formatDate(data.reservationDetails.bookingDate)}
+                </Typography>
+                <Typography>
+                  <strong>Passengers:</strong>{" "}
+                  {data.reservationDetails.passengers}
+                </Typography>
+                <Typography>
+                  <strong>Alternative Date 1:</strong>{" "}
+                  {formatDate(data.otherOptions.alternativeDate1)}
+                </Typography>
+                <Typography>
+                  <strong>Alternative Date 2:</strong>{" "}
+                  {formatDate(data.otherOptions.alternativeDate2)}
+                </Typography>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Stack spacing={1}>
+                <Typography>
+                  <strong>Base Cost:</strong>{" "}
+                  {(() => {
+                    const selectedPackage = packages.find(
+                      (pkg) =>
+                        pkg.id.toString() === data.reservationDetails.packageId
+                    );
+
+                    if (!selectedPackage) return "RM0";
+
+                    // Check if package has fixed pricing
+                    const hasFixedPrice = selectedPackage.priceTiers.some(
+                      (tier) => tier.type === "FIXED"
+                    );
+
+                    const basePrice = selectedPackage.basePrice;
+
+                    return `RM${
+                      hasFixedPrice
+                        ? basePrice
+                        : basePrice * data.reservationDetails.passengers
+                    }`;
+                  })()}
+                </Typography>
+                <Typography>
+                  <strong>Add-ons:</strong>{" "}
+                  {data.reservationDetails.addOns.length > 0 ? (
+                    <Box component="span">
+                      {`RM${data.reservationDetails.addOns.reduce(
+                        (total, addonId) => {
+                          const addon = addOns.find(
+                            (a) => a.id.toString() === addonId
+                          );
+                          return total + (addon?.price || 0);
+                        },
+                        0
+                      )}`}
+                    </Box>
+                  ) : (
+                    "RM0"
+                  )}
+                </Typography>
+                <Typography sx={{ mt: 1 }} variant="subtitle1">
+                  <strong>Est. Total:</strong>{" "}
+                  {(() => {
+                    const selectedPackage = packages.find(
+                      (pkg) =>
+                        pkg.id.toString() === data.reservationDetails.packageId
+                    );
+
+                    if (!selectedPackage) return "RM0";
+
+                    const hasFixedPrice = selectedPackage.priceTiers.some(
+                      (tier) => tier.type === "FIXED"
+                    );
+
+                    const basePrice = selectedPackage.basePrice;
+                    const baseCost = hasFixedPrice
+                      ? basePrice
+                      : basePrice * data.reservationDetails.passengers;
+
+                    const addOnsCost = data.reservationDetails.addOns.reduce(
+                      (total, addonId) => {
+                        const addon = addOns.find(
+                          (a) => a.id.toString() === addonId
+                        );
+                        return total + (addon?.price || 0);
+                      },
+                      0
+                    );
+
+                    return `RM${baseCost + addOnsCost}`;
+                  })()}
+                </Typography>
+              </Stack>
             </Grid>
           </Grid>
         </Paper>
