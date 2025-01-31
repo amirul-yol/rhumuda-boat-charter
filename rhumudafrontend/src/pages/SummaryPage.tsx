@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
+import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -53,6 +54,8 @@ interface Package {
   basePrice: number;
   maxCapacity: number;
   duration: number;
+  distanceMinKm: number | null;
+  distanceMaxKm: number | null;
   durationMinutes: number | null;
   isActive: boolean;
   categoryId: number;
@@ -182,7 +185,7 @@ const SummaryPage: React.FC = () => {
             </Typography>
           </Grid>
 
-          {/* Duration and Capacity */}
+          {/* Duration, Capacity, and Distance */}
           <Grid item xs={12} sm={6}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={1} alignItems="center">
@@ -197,6 +200,18 @@ const SummaryPage: React.FC = () => {
                   Max Capacity: {selectedPackage.maxCapacity} persons
                 </Typography>
               </Stack>
+              {selectedPackage.distanceMinKm &&
+                selectedPackage.distanceMaxKm && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <DirectionsBoatIcon
+                      sx={{ color: "#0384BD", fontSize: 20 }}
+                    />
+                    <Typography variant="body2">
+                      Distance: {selectedPackage.distanceMinKm} -{" "}
+                      {selectedPackage.distanceMaxKm} km
+                    </Typography>
+                  </Stack>
+                )}
             </Stack>
           </Grid>
 
@@ -253,48 +268,72 @@ const SummaryPage: React.FC = () => {
         </Typography>
 
         <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Booking ID
-          </Typography>
-          <Typography>{data.bookingId || "Not generated"}</Typography>
-        </Paper>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Customer Information
-          </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <Typography>
-                <strong>First Name:</strong> {data.customerInfo.firstName}
-              </Typography>
-              <Typography>
-                <strong>Last Name:</strong> {data.customerInfo.lastName}
-              </Typography>
-              <Typography>
-                <strong>Phone Number:</strong> {data.customerInfo.phoneNumber}
-              </Typography>
-              <Typography>
-                <strong>Email:</strong> {data.customerInfo.email}
+                <strong>Booking ID:</strong> {data.bookingId || "Not generated"}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Typography>
-                <strong>Address Line 1:</strong>{" "}
-                {data.customerInfo.addressLine1}
+                <strong>Package:</strong>{" "}
+                {getPackageName(data.reservationDetails.packageId)}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              {/* <Typography variant="subtitle1" fontWeight={500}>
+                Package Description
+              </Typography> */}
+              {packages.find(
+                (pkg) => pkg.id.toString() === data.reservationDetails.packageId
+              )?.description && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  {
+                    packages.find(
+                      (pkg) =>
+                        pkg.id.toString() === data.reservationDetails.packageId
+                    )?.description
+                  }
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Paper>
+
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Customer Details
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography>
+                <strong>Name:</strong>{" "}
+                {`${data.customerInfo.firstName} ${data.customerInfo.lastName}`}
               </Typography>
               <Typography>
-                <strong>Address Line 2:</strong>{" "}
-                {data.customerInfo.addressLine2 || "N/A"}
+                <strong>Email:</strong> {data.customerInfo.email}
               </Typography>
               <Typography>
-                <strong>Postal Code:</strong> {data.customerInfo.postalCode}
+                <strong>Phone:</strong> {data.customerInfo.phoneNumber}
               </Typography>
               <Typography>
-                <strong>City:</strong> {data.customerInfo.city}
-              </Typography>
-              <Typography>
-                <strong>Country:</strong> {data.customerInfo.country}
+                <strong>Address:</strong>{" "}
+                {`${data.customerInfo.addressLine1}${
+                  data.customerInfo.addressLine2
+                    ? `, ${data.customerInfo.addressLine2}`
+                    : ""
+                }, ${data.customerInfo.postalCode} ${data.customerInfo.city}, ${
+                  data.customerInfo.country
+                }`}
               </Typography>
             </Grid>
           </Grid>
@@ -320,10 +359,6 @@ const SummaryPage: React.FC = () => {
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography>
-                <strong>Package:</strong>{" "}
-                {getPackageName(data.reservationDetails.packageId)}
-              </Typography>
               {renderPackageInfo(data.reservationDetails.packageId)}
               <Typography>
                 <strong>Add-ons:</strong>

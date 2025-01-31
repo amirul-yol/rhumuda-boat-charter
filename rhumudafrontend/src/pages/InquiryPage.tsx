@@ -859,9 +859,6 @@ const InquiryPage: React.FC = () => {
       (pkg) => pkg.id.toString() === reservationDetails.packageId
     );
 
-    console.log("Selected Package:", selectedPackage);
-    console.log("Services:", selectedPackage?.services);
-
     if (!selectedPackage) return null;
 
     return (
@@ -890,7 +887,7 @@ const InquiryPage: React.FC = () => {
             </Typography>
           </Grid>
 
-          {/* Duration and Capacity */}
+          {/* Duration, Capacity, and Distance */}
           <Grid item xs={12} sm={6}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={1} alignItems="center">
@@ -905,6 +902,18 @@ const InquiryPage: React.FC = () => {
                   Max Capacity: {selectedPackage.maxCapacity} persons
                 </Typography>
               </Stack>
+              {selectedPackage.distanceMinKm &&
+                selectedPackage.distanceMaxKm && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <DirectionsBoatIcon
+                      sx={{ color: "#0384BD", fontSize: 20 }}
+                    />
+                    <Typography variant="body2">
+                      Distance: {selectedPackage.distanceMinKm} -{" "}
+                      {selectedPackage.distanceMaxKm} km
+                    </Typography>
+                  </Stack>
+                )}
             </Stack>
           </Grid>
 
