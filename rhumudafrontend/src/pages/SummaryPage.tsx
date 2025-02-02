@@ -15,8 +15,9 @@ import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
 import locationMap from "../assets/images/location-rhumuda.png";
 import Description from "../components/Description";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
+import CompletionDialog from "../components/CompletionDialog";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -54,7 +55,6 @@ interface JettyPoint {
 interface AddOn {
   id: number;
   name: string;
-  description: string | null;
   price: number;
   isActive: boolean;
 }
@@ -110,6 +110,7 @@ const SummaryPage: React.FC = () => {
   const [addOns, setAddOns] = useState<AddOn[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
   const navigate = useNavigate();
+  const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
 
   useEffect(() => {
     const savedData = localStorage.getItem(STORAGE_KEY);
@@ -270,6 +271,71 @@ const SummaryPage: React.FC = () => {
 
   const handleEditDetails = () => {
     navigate("/inquiry");
+  };
+
+  const handleSendInquiry = async () => {
+    if (!data) return;
+
+    try {
+      // Prepare booking data
+      const bookingData = {
+        bookingId: data.bookingId,
+        status: "PENDING",
+        ...data.customerInfo,
+        ...data.reservationDetails,
+        ...data.otherOptions,
+      };
+
+      // Send booking data to backend
+      const bookingResponse = await fetch(
+        "http://localhost:8080/api/bookings",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingData),
+        }
+      );
+
+      if (!bookingResponse.ok) {
+        throw new Error("Failed to create booking");
+      }
+
+      const booking = await bookingResponse.json();
+
+      // If there are add-ons, create booking add-ons relationships
+      if (data.reservationDetails.addOns.length > 0) {
+        const addOnsData = data.reservationDetails.addOns.map((addonId) => ({
+          bookingId: booking.id,
+          addonId: parseInt(addonId),
+        }));
+
+        const addOnsResponse = await fetch(
+          "http://localhost:8080/api/booking-addons",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(addOnsData),
+          }
+        );
+
+        if (!addOnsResponse.ok) {
+          throw new Error("Failed to create booking add-ons");
+        }
+      }
+
+      // Clear localStorage after successful submission
+      localStorage.removeItem("rhumuda_inquiry_form");
+
+      // Show completion dialog
+      setCompletionDialogOpen(true);
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      // Here you would typically show an error message to the user
+    }
   };
 
   if (!data) {
@@ -615,8 +681,27 @@ const SummaryPage: React.FC = () => {
               </Stack>
             </Grid>
           </Grid>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: "#0384BD",
+                "&:hover": {
+                  bgcolor: "rgba(3, 132, 189, 0.9)",
+                },
+                px: 4,
+              }}
+              onClick={handleSendInquiry}
+            >
+              Send Inquiry
+            </Button>
+          </Box>
         </Paper>
       </Box>
+      <CompletionDialog
+        open={completionDialogOpen}
+        onClose={() => setCompletionDialogOpen(false)}
+      />
     </Container>
   );
 };
