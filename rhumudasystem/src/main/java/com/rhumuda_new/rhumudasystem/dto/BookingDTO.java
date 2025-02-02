@@ -1,91 +1,73 @@
-package com.rhumuda_new.rhumudasystem.entity;
+package com.rhumuda_new.rhumudasystem.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
 
-@Entity
-@Table(name = "bookings")
-public class Booking {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
+public class BookingDTO {
+    @NotBlank(message = "Booking ID is required")
     private String bookingId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BookingStatus status = BookingStatus.PENDING;
+    @NotBlank(message = "Status is required")
+    private String status;
 
     // Customer Info
-    @Column(nullable = false)
+    @NotBlank(message = "First name is required")
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     private String firstName;
-    @Column(nullable = false)
+
+    @NotBlank(message = "Last name is required")
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
-    @Column(nullable = false)
+
+    @NotBlank(message = "Phone number is required")
+    @Size(min = 8, max = 15, message = "Phone number must be between 8 and 15 characters")
     private String phoneNumber;
-    @Column(nullable = false)
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
-    @Column(nullable = false)
+
+    @NotBlank(message = "Address Line 1 is required")
     private String addressLine1;
+
     private String addressLine2;
-    @Column(nullable = false)
+
+    @NotBlank(message = "Postal code is required")
     private String postalCode;
-    @Column(nullable = false)
+
+    @NotBlank(message = "City is required")
     private String city;
-    @Column(nullable = false)
+
+    @NotBlank(message = "Country is required")
     private String country;
 
     // Reservation Details
-    @ManyToOne
-    @JoinColumn(name = "jetty_point_id", nullable = false)
-    private JettyPoint jettyPoint;
+    @NotBlank(message = "Jetty point is required")
+    private String jettyPoint;
 
-    @Column(nullable = false)
+    @NotNull(message = "Booking date is required")
     private LocalDate bookingDate;
-    
-    @Column(nullable = false)
+
+    @NotNull(message = "Number of passengers is required")
+    @Min(value = 1, message = "Number of passengers must be at least 1")
     private Integer passengers;
 
-    @ManyToOne
-    @JoinColumn(name = "package_id", nullable = false)
-    private Package packageDetails;
+    @NotBlank(message = "Package is required")
+    private String packageId;
 
-    @ManyToMany
-    @JoinTable(
-        name = "booking_addons",
-        joinColumns = @JoinColumn(name = "booking_id"),
-        inverseJoinColumns = @JoinColumn(name = "addon_id")
-    )
-    private Set<AddOn> addOns;
+    private List<String> addOns;
 
     // Other Options
     private LocalDate alternativeDate1;
     private LocalDate alternativeDate2;
     private String specialRemarks;
 
-    // System Fields
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-    
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    public enum BookingStatus {
-        PENDING, CONFIRMED, CANCELLED
-    }
-
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getBookingId() {
         return bookingId;
     }
@@ -94,11 +76,11 @@ public class Booking {
         this.bookingId = bookingId;
     }
 
-    public BookingStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(BookingStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -174,11 +156,11 @@ public class Booking {
         this.country = country;
     }
 
-    public JettyPoint getJettyPoint() {
+    public String getJettyPoint() {
         return jettyPoint;
     }
 
-    public void setJettyPoint(JettyPoint jettyPoint) {
+    public void setJettyPoint(String jettyPoint) {
         this.jettyPoint = jettyPoint;
     }
 
@@ -198,19 +180,19 @@ public class Booking {
         this.passengers = passengers;
     }
 
-    public Package getPackageDetails() {
-        return packageDetails;
+    public String getPackageId() {
+        return packageId;
     }
 
-    public void setPackageDetails(Package packageDetails) {
-        this.packageDetails = packageDetails;
+    public void setPackageId(String packageId) {
+        this.packageId = packageId;
     }
 
-    public Set<AddOn> getAddOns() {
+    public List<String> getAddOns() {
         return addOns;
     }
 
-    public void setAddOns(Set<AddOn> addOns) {
+    public void setAddOns(List<String> addOns) {
         this.addOns = addOns;
     }
 
@@ -236,21 +218,5 @@ public class Booking {
 
     public void setSpecialRemarks(String specialRemarks) {
         this.specialRemarks = specialRemarks;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

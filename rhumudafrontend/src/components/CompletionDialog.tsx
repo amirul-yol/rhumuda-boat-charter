@@ -22,6 +22,8 @@ const CompletionDialog: React.FC<CompletionDialogProps> = ({
   const navigate = useNavigate();
 
   const handleClose = () => {
+    // Clear localStorage
+    localStorage.removeItem("rhumuda_inquiry_form");
     onClose();
     navigate("/");
   };

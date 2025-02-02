@@ -111,6 +111,7 @@ const SummaryPage: React.FC = () => {
   const [packages, setPackages] = useState<Package[]>([]);
   const navigate = useNavigate();
   const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
+  const [clearLocalStorage, setClearLocalStorage] = useState(false);
 
   useEffect(() => {
     const savedData = localStorage.getItem(STORAGE_KEY);
@@ -302,41 +303,20 @@ const SummaryPage: React.FC = () => {
         throw new Error("Failed to create booking");
       }
 
-      const booking = await bookingResponse.json();
-
-      // If there are add-ons, create booking add-ons relationships
-      if (data.reservationDetails.addOns.length > 0) {
-        const addOnsData = data.reservationDetails.addOns.map((addonId) => ({
-          bookingId: booking.id,
-          addonId: parseInt(addonId),
-        }));
-
-        const addOnsResponse = await fetch(
-          "http://localhost:8080/api/booking-addons",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(addOnsData),
-          }
-        );
-
-        if (!addOnsResponse.ok) {
-          throw new Error("Failed to create booking add-ons");
-        }
-      }
-
-      // Clear localStorage after successful submission
-      localStorage.removeItem("rhumuda_inquiry_form");
-
       // Show completion dialog
       setCompletionDialogOpen(true);
+      setClearLocalStorage(true);
     } catch (error) {
       console.error("Error creating booking:", error);
       // Here you would typically show an error message to the user
     }
   };
+
+  useEffect(() => {
+    if (clearLocalStorage) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [clearLocalStorage]);
 
   if (!data) {
     return <Typography>Loading...</Typography>;
