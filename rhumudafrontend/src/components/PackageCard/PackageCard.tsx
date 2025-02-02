@@ -8,6 +8,7 @@ import StraightenIcon from "@mui/icons-material/Straighten";
 
 const PackageCard: React.FC<Package> = ({
   title,
+  name,
   categoryId,
   priceTiers = [],
   services = [],
@@ -83,6 +84,19 @@ const PackageCard: React.FC<Package> = ({
         }}
       >
         {title}
+      </Typography>
+
+      <Typography
+        variant="subtitle1"
+        sx={{
+          p: 2,
+          pb: 1,
+          textAlign: "center",
+          fontWeight: 600,
+          color: "#0384BD",
+        }}
+      >
+        {name}
       </Typography>
 
       <Box

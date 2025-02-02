@@ -16,6 +16,7 @@ public class Package {
     @Column(nullable = false)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "base_price")
@@ -46,6 +47,9 @@ public class Package {
 
     @Column(name = "fishing_type")
     private String fishingType;
+
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "packageEntity", cascade = CascadeType.ALL)
@@ -98,6 +102,9 @@ public class Package {
 
     public String getFishingType() { return fishingType; }
     public void setFishingType(String fishingType) { this.fishingType = fishingType; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public List<PriceTier> getPriceTiers() { return priceTiers; }
     public void setPriceTiers(List<PriceTier> priceTiers) { this.priceTiers = priceTiers; }

@@ -14,6 +14,7 @@ export interface Service {
 export interface Package {
   id: string;
   title: string;
+  name: string;
   categoryId: number;
   description?: string;
   priceTiers: PriceTier[];
