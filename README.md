@@ -28,152 +28,260 @@ Current implementation includes:
   - Responsive design
   - Custom themed components
   - Form validation feedback
+- Package Display System
+  - Categorized package viewing (Boat Charter, Island Trips, Fishing)
+  - Dynamic package cards with pricing tiers
+  - Service inclusion details
+  - Duration and capacity information
+  - Booking integration
+
+### Backend Features
+
+- RESTful API Endpoints:
+  - Package management
+  - Booking handling
+  - Add-on management
+  - Jetty point management
+  - Package category management
+- Data Validation
+- Cross-Origin Resource Sharing (CORS) support
+- Error handling and validation
 
 ### Implemented Components
 
 - InquiryPage
+- HomePage with package listings
+- PackageCard component
 - Form validation system
-- Mock data integration for packages and add-ons
+- Category navigation
+- Price display system
+- Service listing component
 
 ## Tech Stack
 
 ### Frontend
 
 Core Technologies:
-
-- React
-- Material-UI
+- React 18
+- TypeScript
+- Material-UI v5
 - DayJS (date handling)
+- Vite (build tool)
+
+Development Tools:
+- ESLint
+- Prettier
+- React Router v6
 
 ### Backend
 
 Core Technologies:
+- Spring Boot 3
+- Java 17
+- MySQL 8
+- Spring Data JPA
+- Spring Web
 
-- Spring Boot
-- MySQL
+Development Tools:
+- Maven
+- Spring DevTools
+- Lombok
 
-## Project Structure [needs to be updated]
+## Project Structure
 
+```
 project-root/
-├── rhumudafrontend/ # React frontend
-└── rhumudasystem/ # Spring Boot backend
+├── rhumudafrontend/          # React frontend
+│   ├── src/
+│   │   ├── assets/          # Static assets
+│   │   ├── components/      # Reusable UI components
+│   │   ├── pages/          # Page components
+│   │   ├── types/          # TypeScript type definitions
+│   │   └── App.tsx         # Root component
+│   └── package.json
+│
+├── rhumudasystem/           # Spring Boot backend
+│   ├── src/
+│   │   └── main/
+│   │       ├── java/       # Java source files
+│   │       │   └── com/rhumuda_new/rhumudasystem/
+│   │       │       ├── controller/  # REST controllers
+│   │       │       ├── entity/      # JPA entities
+│   │       │       ├── repository/  # Data repositories
+│   │       │       └── service/     # Business logic
+│   │       └── resources/
+│   │           └── application.properties
+│   └── pom.xml
+```
 
 ## Getting Started
 
 ### Prerequisites
 
-- [to be filled]
+- Node.js 16+ and npm
+- Java Development Kit (JDK) 17
+- MySQL 8.0+
+- Maven 3.8+
 
 ### Installation & Setup
 
 1. Clone the repository
-
    ```bash
    git clone https://github.com/your-username/rhumuda-boat-charter.git
    ```
 
 2. Frontend Setup
-
    ```bash
    cd rhumudafrontend
    npm install
    npm run dev
    ```
 
-   3. Backend Setup
-
+3. Backend Setup
    ```bash
    cd rhumudasystem
-   ./mvnw spring-boot:run
+   mvn clean install
+   mvn spring-boot:run
    ```
 
-## Environment Variables [to be filled properly]
+4. Database Setup
+   - Create a MySQL database named 'rhumuda_system'
+   - Run the SQL scripts in rhumuda-system.sql
 
-List of required environment variables:
+## Environment Variables
 
 ```env
 # Frontend (.env)
-REACT_APP_API_URL=
+VITE_API_URL=http://localhost:8080/api
 
 # Backend (application.properties)
-SPRING_DATASOURCE_URL=
+spring.datasource.url=jdbc:mysql://localhost:3306/rhumuda_system
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.jpa.hibernate.ddl-auto=update
 ```
 
-## Current Features (Phase 1) [to be filled]
+## Current Features (Phase 1)
 
-- Feature 1: Brief description
-- Feature 2: Brief description
-- ...
+- Package Management
+  - CRUD operations for packages
+  - Category-based organization
+  - Price tier system
+- Booking System
+  - Multi-step inquiry form
+  - Validation system
+  - Customer information management
+- Add-on Management
+  - Additional services handling
+  - Price management
+- Location Management
+  - Jetty point handling
+  - Distance calculations
 
-## Future Development (Phase 2+) [to be filled]
+## Future Development (Phase 2+)
 
-- Feature 1: Brief description
-- Feature 2: Brief description
-- ...
+### Planned Features
 
-### Planned Features [to be filled properly]
+- User Authentication System
+  - Customer accounts
+  - Admin dashboard
+  - Role-based access control
+- Payment Integration
+  - Online payment processing
+  - Invoice generation
+  - Receipt management
+- Booking Management System
+  - Calendar integration
+  - Availability checking
+  - Automated notifications
+- Analytics Dashboard
+  - Booking statistics
+  - Revenue reports
+  - Customer analytics
 
-- Feature A: Brief description of planned feature
-- Feature B: Brief description of planned feature
+### Technical Debt & Known Issues
 
-### Technical Debt & Known Issues [to be filled properly]
+- Need to implement proper error boundaries in React components
+- API response caching system needed
+- Form state management could be improved with React Query
+- Need to implement proper logging system
+- Security features need enhancement
 
-- List any known issues or areas that need improvement
-- Highlight any technical debt that should be addressed
+### Development Guidelines
 
-### Development Guidelines [to be filled properly]
+#### Coding Standards
+- Use TypeScript for all new frontend code
+- Follow Material-UI best practices
+- Implement proper error handling
+- Write unit tests for critical components
 
-- Coding standards
-- Git workflow
-- Testing requirements
-- Any specific architectural decisions that should be maintained
+#### Git Workflow
+1. Create feature branches from 'develop'
+2. Use conventional commits
+3. Require PR reviews
+4. Squash merge to main
 
-## API Documentation [to be filled properly]
+## API Documentation
 
-- Link to API documentation
-- Key endpoints overview
-- Authentication methods
+### Key Endpoints
 
-## Database [to be filled properly]
+- Packages
+  - GET /api/packages - List all packages
+  - GET /api/packages/category/{id} - Get packages by category
+  - POST /api/packages - Create new package
 
-- Database schema overview
-- Important relationships
-- Migration procedures
+- Bookings
+  - POST /api/bookings - Create new booking
+  - GET /api/bookings/{id} - Get booking details
 
-## Testing [to be filled properly]
+- Add-ons
+  - GET /api/add-ons - List all add-ons
+  - POST /api/add-ons - Create new add-on
 
-- How to run tests
-- Test coverage
-- Testing strategy
+## Database Schema Overview
 
-## Deployment [to be filled properly]
+Key Tables:
+- packages
+- bookings
+- customers
+- add_ons
+- jetty_points
+- package_categories
 
-- Current deployment setup
-- Deployment procedures
-- Important configuration notes
+## Testing
 
-## Contributing [to be filled properly]
-
-Guidelines for future contributors:
-
-1. Branch naming conventions
-2. PR process
-3. Code review requirements
-
-## Contact [to be filled properly]
-
-- Your contact information (if you're willing to be contacted for questions)
-- Client/Project owner contact information
-- Any relevant documentation links
-
----
-
-## Version History [to be filled properly]
-
-- v1.0.0 (Phase 1) - [Date]
-  - Initial release
-  - List of implemented features
-
+### Frontend
+```bash
+npm run test
 ```
 
+### Backend
+```bash
+./mvnw test
 ```
+
+## Deployment
+
+Current deployment is local development only. Production deployment guide to be added in Phase 2.
+
+## Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Contact
+
+- Project Maintainer: [Your Name]
+- Email: [Your Email]
+- Project Link: [GitHub Repository URL]
+
+## Version History
+
+- v0.1.0 (Phase 1) - February 2024
+  - Initial development release
+  - Basic booking system implementation
+  - Package management system
+  - Frontend UI implementation
