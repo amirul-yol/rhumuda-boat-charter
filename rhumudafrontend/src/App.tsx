@@ -10,6 +10,7 @@ import InquiryPage from "./pages/InquiryPage";
 import SummaryPage from "./pages/SummaryPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import ContactUsPage from "./pages/ContactUsPage";
+import ServicesPage from "./pages/ServicesPage";
 
 const router = createBrowserRouter(
   [
@@ -75,6 +76,17 @@ const router = createBrowserRouter(
           <Header />
           <Layout>
             <SummaryPage />
+          </Layout>
+        </>
+      ),
+    },
+    {
+      path: "/services",
+      element: (
+        <>
+          <Header />
+          <Layout>
+            <ServicesPage />
           </Layout>
         </>
       ),
