@@ -6,14 +6,138 @@ import {
   CircularProgress,
   Alert,
   Grid,
+  Container,
+  Card,
+  CardContent,
+  Button,
 } from "@mui/material";
 import SearchBar from "../components/SearchBar/SearchBar";
-import boatIcon from "../../src/assets/icons/boat_color.png";
-import islandIcon from "../../src/assets/icons/island_color.png";
-import fishingIcon from "../../src/assets/icons/fishing_color.png";
+import boatIcon from "../assets/icons/boat_color.png";
+import islandIcon from "../assets/icons/island_color.png";
+import fishingIcon from "../assets/icons/fishing_color.png";
+import yachtIcon from "../assets/icons/yatch.png";
+import summerIcon from "../assets/icons/summer-holidays.png";
 import { Package } from "../types/package";
 import PackageCard from "../components/PackageCard/PackageCard";
 import FishingCategoryHeader from "../components/FishingCategoryHeader";
+
+const ServicesSection = () => {
+  const services = [
+    {
+      icon: yachtIcon,
+      title: "Private Boat",
+      description: "Experience the serenity of the open waters with our private boat rentals. Explore hidden coves, fish, or simply cruise. Our modern boats prioritize safety and an exciting journey.",
+    },
+    {
+      icon: summerIcon,
+      title: "Island Day Trip",
+      description: "Escape city life with our serene island day trips to Pulau Kapas. Enjoy crystal-clear waters, pristine beaches, and vibrant marine life. Snorkel, swim, or relax - our experienced crew will guide you.",
+    },
+    {
+      icon: fishingIcon,
+      title: "Fishing",
+      description: "Thrill seeking fishing with us. Expert guides, prime spots, all skill levels welcome, inshore, offshore, night fishing options.",
+    },
+    {
+      icon: boatIcon,
+      title: "Round Island",
+      description: "Explore the island's beauty on our Round-Island Excursion. Discover breathtaking views, hidden beaches, and stunning landscapes. Experience wonder and tranquility.",
+    },
+  ];
+
+  return (
+    <Container maxWidth="lg">
+      <Typography 
+        variant="h4" 
+        align="center" 
+        gutterBottom 
+        sx={{ 
+          mb: 6,
+          fontWeight: 500,
+          color: 'text.primary'
+        }}
+      >
+        Services Offered
+      </Typography>
+      <Grid container spacing={4} sx={{ mb: 6 }}>
+        {services.map((service, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card 
+              elevation={0}
+              sx={{ 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                bgcolor: 'transparent',
+              }}
+            >
+              <Box
+                sx={{
+                  width: 80,
+                  height: 80,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mb: 2,
+                }}
+              >
+                <img
+                  src={service.icon}
+                  alt={service.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                  }}
+                />
+              </Box>
+              <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                <Typography 
+                  variant="h6" 
+                  gutterBottom
+                  sx={{ 
+                    fontWeight: 500,
+                    mb: 2,
+                  }}
+                >
+                  {service.title}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{ 
+                    lineHeight: 1.6,
+                    mb: 2,
+                  }}
+                >
+                  {service.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Button 
+          variant="contained" 
+          color="primary"
+          href="/services"
+          sx={{ 
+            borderRadius: 28,
+            px: 4,
+            py: 1,
+            textTransform: 'none',
+            fontSize: '1rem',
+          }}
+        >
+          Learn more about our services
+        </Button>
+      </Box>
+    </Container>
+  );
+};
 
 const HomePage: React.FC = () => {
   const [packages, setPackages] = useState<Package[]>([]);
@@ -211,6 +335,54 @@ const HomePage: React.FC = () => {
         {loading && <CircularProgress />}
         {error && <Alert severity="error">{error}</Alert>}
         {!loading && !error && renderPackages()}
+      </Box>
+
+      {/* Explore Pulau Kapas Section */}
+      <Box sx={{ py: 8, bgcolor: 'background.paper' }}>
+        <Container maxWidth="lg">
+          <Typography 
+            variant="h4" 
+            align="center" 
+            gutterBottom 
+            sx={{ 
+              mb: 4,
+              fontWeight: 500,
+              color: 'primary.main'
+            }}
+          >
+            Explore Pulau Kapas
+          </Typography>
+          <Box
+            sx={{
+              position: 'relative',
+              width: '100%',
+              paddingTop: '56.25%', // 16:9 aspect ratio
+              borderRadius: '16px',
+              overflow: 'hidden',
+              boxShadow: 3,
+            }}
+          >
+            <iframe
+              src="https://www.youtube.com/embed/iR8MHSyERTk"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 0,
+              }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title="Explore Pulau Kapas"
+            />
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Services Offered Section */}
+      <Box sx={{ py: 8, bgcolor: 'background.default' }}>
+        <ServicesSection />
       </Box>
     </Box>
   );
