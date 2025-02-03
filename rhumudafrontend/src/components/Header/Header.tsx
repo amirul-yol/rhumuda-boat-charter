@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -17,6 +18,7 @@ import SearchBar from "../SearchBar/SearchBar";
 import { SYSTEM_PADDING } from "../../constants/layout";
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -26,6 +28,11 @@ const Header: React.FC = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    handleClose();
   };
 
   return (
@@ -52,12 +59,11 @@ const Header: React.FC = () => {
               component="img"
               src={logo}
               alt="Rhumuda Charter Logo"
-              onClick={() => {
-                window.location.href = '/';
-              }}
+              onClick={() => navigate('/')}
               sx={{
                 height: 100,
                 marginRight: 2,
+                cursor: 'pointer',
               }}
             />
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -110,9 +116,9 @@ const Header: React.FC = () => {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                <MenuItem onClick={handleClose}>About Us</MenuItem>
-                <MenuItem onClick={handleClose}>Contact Us</MenuItem>
-                <MenuItem onClick={handleClose}>Services</MenuItem>
+                <MenuItem onClick={() => handleNavigation('/about')}>About Us</MenuItem>
+                <MenuItem onClick={() => handleNavigation('/contact')}>Contact Us</MenuItem>
+                <MenuItem onClick={() => handleNavigation('/services')}>Services</MenuItem>
               </Menu>
             </Box>
           </Toolbar>

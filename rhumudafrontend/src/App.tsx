@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import TestPage from "./pages/TestPage";
 import InquiryPage from "./pages/InquiryPage";
 import SummaryPage from "./pages/SummaryPage";
+import AboutUsPage from "./pages/AboutUsPage";
 
 const router = createBrowserRouter(
   [
@@ -18,6 +19,17 @@ const router = createBrowserRouter(
           <Header />
           <Layout>
             <HomePage />
+          </Layout>
+        </>
+      ),
+    },
+    {
+      path: "/about",
+      element: (
+        <>
+          <Header />
+          <Layout>
+            <AboutUsPage />
           </Layout>
         </>
       ),
@@ -56,15 +68,10 @@ const router = createBrowserRouter(
       ),
     },
   ],
-  {
-    future: {
-      unstable_useBlocker: true,
-      unstable_useTransition: true,
-    },
-  }
+  { basename: "/" }
 );
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <RouterProvider router={router} />
