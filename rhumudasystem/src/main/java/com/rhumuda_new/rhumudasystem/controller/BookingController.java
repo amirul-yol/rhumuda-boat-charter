@@ -11,6 +11,8 @@ import com.rhumuda_new.rhumudasystem.repository.JettyPointRepository;
 import com.rhumuda_new.rhumudasystem.repository.PackageRepository;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/bookings")
 @CrossOrigin(origins = "http://localhost:3000")
 public class BookingController {
+    private static final Logger logger = LoggerFactory.getLogger(BookingController.class);
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -40,6 +43,42 @@ public class BookingController {
 
     @Autowired
     private AddOnRepository addOnRepository;
+
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<?> getBooking(@PathVariable String bookingId) {
+        try {
+            logger.info("Fetching booking with ID: {}", bookingId);
+            
+            if (bookingId == null || bookingId.trim().isEmpty()) {
+                logger.error("Invalid booking ID provided: {}", bookingId);
+                return ResponseEntity
+                    .badRequest()
+                    .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Invalid booking ID", "Booking ID cannot be empty"));
+            }
+
+            var booking = bookingRepository.findByBookingId(bookingId.trim());
+            
+            if (booking.isEmpty()) {
+                logger.error("Booking not found with ID: {}", bookingId);
+                return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new ApiError(HttpStatus.NOT_FOUND.value(), "Booking not found", "No booking found with ID: " + bookingId));
+            }
+
+            logger.info("Successfully retrieved booking with ID: {}", bookingId);
+            return ResponseEntity.ok(booking.get());
+
+        } catch (Exception e) {
+            logger.error("Error fetching booking with ID: " + bookingId, e);
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiError(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "Internal server error",
+                    "An unexpected error occurred while fetching the booking: " + e.getMessage()
+                ));
+        }
+    }
 
     @PostMapping
     public ResponseEntity<?> createBooking(@Valid @RequestBody BookingDTO bookingDTO, BindingResult bindingResult) {
@@ -113,6 +152,7 @@ public class BookingController {
                 .badRequest()
                 .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Error creating booking", e.getMessage()));
         } catch (Exception e) {
+            logger.error("Error creating booking", e);
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error", e.getMessage()));
