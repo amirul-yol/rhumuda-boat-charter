@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -24,6 +24,8 @@ import { SYSTEM_PADDING } from "../../constants/layout";
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isSearchVisible = !location.pathname.startsWith('/inquiry') && !location.pathname.startsWith('/summary');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openBookingDialog, setOpenBookingDialog] = useState(false);
   const [bookingId, setBookingId] = useState("");
@@ -150,9 +152,11 @@ const Header: React.FC = () => {
               </Menu>
             </Box>
           </Toolbar>
-          <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-            <SearchBar />
-          </Box>
+          {isSearchVisible && (
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+              <SearchBar />
+            </Box>
+          )}
         </Stack>
       </Container>
 
