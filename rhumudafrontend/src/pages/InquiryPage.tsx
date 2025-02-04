@@ -481,9 +481,7 @@ const InquiryPage: React.FC = () => {
     });
   };
 
-  const handleNext = () => {
-    console.log("Current reservationDetails:", reservationDetails);
-
+  const handleNext = async () => {
     if (activeSection === 0) {
       const firstNameError = validateName(customerInfo.firstName);
       const lastNameError = validateName(customerInfo.lastName);
@@ -544,7 +542,27 @@ const InquiryPage: React.FC = () => {
       }
     }
 
-    setActiveSection((prev) => prev + 1);
+    if (activeSection === 2) {
+      try {
+        const bookingId = await saveBooking();
+        // Save to localStorage with the booking ID
+        saveToLocalStorage({
+          customerInfo,
+          activeSection,
+          reservationDetails,
+          otherOptions,
+          bookingId,
+        });
+        // Navigate to summary page with the booking ID
+        navigate(`/summary/${bookingId}`);
+      } catch (error) {
+        // Handle error (you might want to show an error message to the user)
+        console.error("Failed to save booking:", error);
+        return;
+      }
+    } else {
+      setActiveSection((prev) => prev + 1);
+    }
   };
 
   const handlePrevious = () => {
@@ -627,31 +645,50 @@ const InquiryPage: React.FC = () => {
     });
   };
 
-  const handleNavigateToSummary = () => {
-    const bookingId = generateBookingId();
+  const saveBooking = async () => {
+    try {
+      const bookingId = generateBookingId();
 
-    // Get existing data from localStorage
-    const savedData = loadFromLocalStorage();
+      const bookingData = {
+        bookingId: bookingId,
+        status: "PENDING",
+        firstName: customerInfo.firstName,
+        lastName: customerInfo.lastName,
+        phoneNumber: customerInfo.phoneNumber,
+        email: customerInfo.email,
+        addressLine1: customerInfo.addressLine1,
+        addressLine2: customerInfo.addressLine2,
+        postalCode: customerInfo.postalCode,
+        city: customerInfo.city,
+        country: customerInfo.country,
+        jettyPoint: reservationDetails.jettyPoint,
+        packageId: reservationDetails.packageId,
+        bookingDate: reservationDetails.bookingDate,
+        passengers: reservationDetails.passengers,
+        addOns: reservationDetails.addOns,
+        alternativeDate1: otherOptions.alternativeDate1 || null,
+        alternativeDate2: otherOptions.alternativeDate2 || null,
+        specialRemarks: otherOptions.specialRemarks || null,
+      };
 
-    // Save all data including the new bookingId
-    saveToLocalStorage({
-      ...savedData,
-      bookingId,
-      customerInfo,
-      reservationDetails,
-      otherOptions,
-      activeSection,
-    });
+      const response = await fetch("http://localhost:8080/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
 
-    // Navigate to summary page
-    navigate("/summary", {
-      state: {
-        bookingId,
-        customerInfo,
-        reservationDetails,
-        otherOptions,
-      },
-    });
+      if (!response.ok) {
+        throw new Error("Failed to save booking");
+      }
+
+      const savedBooking = await response.json();
+      return savedBooking.bookingId;
+    } catch (error) {
+      console.error("Error saving booking:", error);
+      throw error;
+    }
   };
 
   const renderButtons = () => (
@@ -692,7 +729,7 @@ const InquiryPage: React.FC = () => {
         {activeSection === 2 && (
           <Button
             variant="contained"
-            onClick={handleNavigateToSummary}
+            onClick={handleNext}
             sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
           >
             Next

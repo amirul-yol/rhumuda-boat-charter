@@ -70,7 +70,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/summary",
+    path: "/summary/:bookingId",
     element: (
       <>
         <Header />

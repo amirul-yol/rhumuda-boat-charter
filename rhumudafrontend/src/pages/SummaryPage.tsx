@@ -7,6 +7,8 @@ import {
   Grid,
   Stack,
   Button,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -15,9 +17,10 @@ import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
 import locationMap from "../assets/images/location-rhumuda.png";
 import Description from "../components/Description";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import CompletionDialog from "../components/CompletionDialog";
+import EditBookingDialog from "../components/EditBookingDialog";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -98,9 +101,51 @@ interface StorageData {
   bookingId?: string;
 }
 
+interface BookingData {
+  bookingId: string;
+  status: string;
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string;
+  country: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  postalCode: string;
+  jettyPoint: {
+    id: number;
+    name: string;
+  };
+  packageDetails: {
+    id: number;
+    name: string;
+    description: string;
+    basePrice: number;
+    maxCapacity: number;
+    durationMinutes: number;
+    services: Array<{
+      id: number;
+      name: string;
+    }>;
+  };
+  bookingDate: string;
+  passengers: number;
+  alternativeDate1: string | null;
+  alternativeDate2: string | null;
+  specialRemarks: string | null;
+  addOns: Array<{
+    id: number;
+    name: string;
+    price: number;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const STORAGE_KEY = "rhumuda_inquiry_form";
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString: string | null) => {
   return dateString ? dayjs(dateString).format("DD/MM/YYYY") : "Not specified";
 };
 
@@ -112,6 +157,45 @@ const SummaryPage: React.FC = () => {
   const navigate = useNavigate();
   const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
   const [clearLocalStorage, setClearLocalStorage] = useState(false);
+  const { bookingId } = useParams<{ bookingId: string }>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [booking, setBooking] = useState<BookingData | null>(null);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+
+  const fetchBookingData = async () => {
+    if (!bookingId) {
+      setError("No booking ID provided");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log("Backend response:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch booking details");
+      }
+
+      setBooking(data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching booking:", err);
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const savedData = localStorage.getItem(STORAGE_KEY);
@@ -174,14 +258,32 @@ const SummaryPage: React.FC = () => {
     fetchPackages();
   }, []);
 
-  const getJettyPointName = (id: string) => {
-    const jettyPoint = jettyPoints.find((point) => point.id.toString() === id);
-    return jettyPoint ? jettyPoint.name : id;
+  useEffect(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      if (parsedData.bookingId === bookingId) {
+        // Use saved data
+        setBooking(parsedData);
+        setLoading(false);
+        return;
+      }
+    }
+
+    fetchBookingData();
+  }, [bookingId]);
+
+  const getJettyPointName = (jettyPoint: any) => {
+    return jettyPoint?.name || "Unknown Jetty Point";
   };
 
-  const getPackageName = (id: string) => {
-    const pkg = packages.find((p) => p.id.toString() === id);
-    return pkg ? pkg.name : id;
+  const getPackageName = (packageDetails: any) => {
+    return packageDetails?.name || "Unknown Package";
+  };
+
+  const getAddOnName = (id: string) => {
+    const addon = addOns.find((a) => a.id.toString() === id);
+    return addon ? addon.name : id;
   };
 
   const renderPackageInfo = (packageId: string) => {
@@ -270,45 +372,115 @@ const SummaryPage: React.FC = () => {
     );
   };
 
-  const handleEditDetails = () => {
-    navigate("/inquiry");
+  const handleEditClick = () => {
+    setOpenEditDialog(true);
+  };
+
+  const handleUpdateBooking = async (updatedData: any) => {
+    setUpdateLoading(true);
+    try {
+      // Transform the data to match backend expectations
+      const bookingData = {
+        bookingId: bookingId, // Include the bookingId in the request
+        firstName: updatedData.firstName,
+        lastName: updatedData.lastName,
+        email: updatedData.email,
+        phoneNumber: updatedData.phoneNumber,
+        addressLine1: updatedData.addressLine1,
+        addressLine2: updatedData.addressLine2 || null,
+        postalCode: updatedData.postalCode,
+        city: updatedData.city,
+        country: updatedData.country,
+        jettyPoint: updatedData.jettyPoint.id.toString(),
+        packageId: updatedData.packageDetails.id.toString(),
+        bookingDate: updatedData.bookingDate,
+        passengers: updatedData.passengers,
+        addOns: updatedData.addOns.map((addon: any) => addon.id.toString()),
+        alternativeDate1: updatedData.alternativeDate1 || null,
+        alternativeDate2: updatedData.alternativeDate2 || null,
+        specialRemarks: updatedData.specialRemarks || null,
+        status: "PENDING"
+      };
+
+      console.log("Sending update data:", JSON.stringify(bookingData, null, 2));
+
+      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      const responseData = await response.json();
+      console.log("Backend response:", responseData);
+
+      if (!response.ok) {
+        console.error("Backend error details:", responseData);
+        throw new Error(responseData.message || "Failed to update booking");
+      }
+
+      // Refetch the booking data to update the UI
+      await fetchBookingData();
+    } catch (error) {
+      console.error("Error updating booking:", error);
+      throw error;
+    } finally {
+      setUpdateLoading(false);
+    }
   };
 
   const handleSendInquiry = async () => {
-    if (!data) return;
+    if (!booking) return;
 
     try {
-      // Prepare booking data
+      // Transform the data to match backend expectations
       const bookingData = {
-        bookingId: data.bookingId,
-        status: "PENDING",
-        ...data.customerInfo,
-        ...data.reservationDetails,
-        ...data.otherOptions,
+        bookingId: booking.bookingId,
+        firstName: booking.firstName,
+        lastName: booking.lastName,
+        email: booking.email,
+        phoneNumber: booking.phoneNumber,
+        addressLine1: booking.addressLine1,
+        addressLine2: booking.addressLine2 || null,
+        postalCode: booking.postalCode,
+        city: booking.city,
+        country: booking.country,
+        jettyPoint: booking.jettyPoint.id.toString(),
+        packageId: booking.packageDetails.id.toString(),
+        bookingDate: booking.bookingDate,
+        passengers: booking.passengers,
+        addOns: booking.addOns.map((addon: any) => addon.id.toString()),
+        alternativeDate1: booking.alternativeDate1 || null,
+        alternativeDate2: booking.alternativeDate2 || null,
+        specialRemarks: booking.specialRemarks || null,
+        status: "CONFIRMED"
       };
 
-      // Send booking data to backend
-      const bookingResponse = await fetch(
-        "http://localhost:8080/api/bookings",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(bookingData),
-        }
-      );
+      console.log("Sending inquiry data:", JSON.stringify(bookingData, null, 2));
 
-      if (!bookingResponse.ok) {
-        throw new Error("Failed to create booking");
+      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      const responseData = await response.json();
+      console.log("Backend response:", responseData);
+
+      if (!response.ok) {
+        console.error("Backend error details:", responseData);
+        throw new Error(responseData.message || "Failed to update booking");
       }
 
-      // Show completion dialog
       setCompletionDialogOpen(true);
-      setClearLocalStorage(true);
     } catch (error) {
-      console.error("Error creating booking:", error);
-      // Here you would typically show an error message to the user
+      console.error("Error updating booking:", error);
+      setError("Failed to send inquiry. Please try again.");
     }
   };
 
@@ -318,9 +490,39 @@ const SummaryPage: React.FC = () => {
     }
   }, [clearLocalStorage]);
 
-  if (!data) {
-    return <Typography>Loading...</Typography>;
+  if (loading) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
   }
+
+  if (error) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4 }}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      </Container>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4 }}>
+          <Alert severity="error">No booking data found</Alert>
+        </Box>
+      </Container>
+    );
+  }
+
+  const selectedPackage = packages.find(
+    (pkg) => pkg.id === booking.packageDetails.id
+  );
 
   return (
     <Container maxWidth="lg">
@@ -333,13 +535,13 @@ const SummaryPage: React.FC = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <Typography>
-                <strong>Booking ID:</strong> {data.bookingId || "Not generated"}
+                <strong>Booking ID:</strong> {booking.bookingId}
               </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
               <Typography>
                 <strong>Package:</strong>{" "}
-                {getPackageName(data.reservationDetails.packageId)}
+                {getPackageName(booking.packageDetails)}
               </Typography>
             </Grid>
           </Grid>
@@ -348,17 +550,8 @@ const SummaryPage: React.FC = () => {
         <Paper sx={{ p: 3, mb: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              {packages.find(
-                (pkg) => pkg.id.toString() === data.reservationDetails.packageId
-              )?.description && (
-                <Description
-                  text={
-                    packages.find(
-                      (pkg) =>
-                        pkg.id.toString() === data.reservationDetails.packageId
-                    )?.description || ""
-                  }
-                />
+              {selectedPackage?.description && (
+                <Description text={selectedPackage.description} />
               )}
             </Grid>
           </Grid>
@@ -372,39 +565,27 @@ const SummaryPage: React.FC = () => {
             <Grid item xs={12}>
               <Typography>
                 <strong>Name:</strong>{" "}
-                {`${data.customerInfo.firstName} ${data.customerInfo.lastName}`}
+                {`${booking.firstName} ${booking.lastName}`}
               </Typography>
               <Typography>
-                <strong>Email:</strong> {data.customerInfo.email}
+                <strong>Email:</strong> {booking.email}
               </Typography>
               <Typography>
-                <strong>Phone:</strong> {data.customerInfo.phoneNumber}
+                <strong>Phone:</strong> {booking.phoneNumber}
               </Typography>
               <Typography>
                 <strong>Address:</strong>{" "}
-                {`${data.customerInfo.addressLine1}${
-                  data.customerInfo.addressLine2
-                    ? `, ${data.customerInfo.addressLine2}`
-                    : ""
-                }, ${data.customerInfo.postalCode} ${data.customerInfo.city}, ${
-                  data.customerInfo.country
-                }`}
+                {`${booking.addressLine1}${
+                  booking.addressLine2 ? `, ${booking.addressLine2}` : ""
+                }, ${booking.postalCode} ${booking.city}, ${booking.country}`}
               </Typography>
             </Grid>
           </Grid>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
             <Button
-              variant="outlined"
-              startIcon={<EditIcon />}
-              onClick={handleEditDetails}
-              sx={{
-                color: "#0384BD",
-                borderColor: "#0384BD",
-                "&:hover": {
-                  borderColor: "#0384BD",
-                  backgroundColor: "rgba(3, 132, 189, 0.04)",
-                },
-              }}
+              variant="contained"
+              onClick={handleEditClick}
+              sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
             >
               Edit Details
             </Button>
@@ -422,64 +603,23 @@ const SummaryPage: React.FC = () => {
                 <Stack direction="row" spacing={1} alignItems="center">
                   <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
                   <Typography variant="body2">
-                    Duration:{" "}
-                    {
-                      packages.find(
-                        (pkg) =>
-                          pkg.id.toString() ===
-                          data.reservationDetails.packageId
-                      )?.durationMinutes
-                    }{" "}
-                    minutes
+                    Duration: {selectedPackage?.durationMinutes || 0} minutes
                   </Typography>
                 </Stack>
                 <Stack direction="row" spacing={1} alignItems="center">
                   <GroupsIcon sx={{ color: "#0384BD", fontSize: 20 }} />
                   <Typography variant="body2">
-                    Max Capacity:{" "}
-                    {
-                      packages.find(
-                        (pkg) =>
-                          pkg.id.toString() ===
-                          data.reservationDetails.packageId
-                      )?.maxCapacity
-                    }{" "}
-                    persons
+                    Max Capacity: {selectedPackage?.maxCapacity || 0} persons
                   </Typography>
                 </Stack>
-                {packages.find(
-                  (pkg) =>
-                    pkg.id.toString() === data.reservationDetails.packageId
-                )?.distanceMinKm &&
-                  packages.find(
-                    (pkg) =>
-                      pkg.id.toString() === data.reservationDetails.packageId
-                  )?.distanceMaxKm && (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <DirectionsBoatIcon
-                        sx={{ color: "#0384BD", fontSize: 20 }}
-                      />
-                      <Typography variant="body2">
-                        Distance:{" "}
-                        {
-                          packages.find(
-                            (pkg) =>
-                              pkg.id.toString() ===
-                              data.reservationDetails.packageId
-                          )?.distanceMinKm
-                        }{" "}
-                        -{" "}
-                        {
-                          packages.find(
-                            (pkg) =>
-                              pkg.id.toString() ===
-                              data.reservationDetails.packageId
-                          )?.distanceMaxKm
-                        }{" "}
-                        km
-                      </Typography>
-                    </Stack>
-                  )}
+                {selectedPackage?.distanceMinKm && selectedPackage?.distanceMaxKm && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <DirectionsBoatIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                    <Typography variant="body2">
+                      Distance: {selectedPackage.distanceMinKm} - {selectedPackage.distanceMaxKm} km
+                    </Typography>
+                  </Stack>
+                )}
               </Stack>
             </Grid>
 
@@ -489,20 +629,15 @@ const SummaryPage: React.FC = () => {
                 Services Included:
               </Typography>
               <Stack spacing={0.5}>
-                {packages
-                  .find(
-                    (pkg) =>
-                      pkg.id.toString() === data.reservationDetails.packageId
-                  )
-                  ?.services.map((service) => (
-                    <Typography
-                      key={service.id}
-                      variant="body2"
-                      color="text.secondary"
-                    >
-                      {service.name || service.serviceName}
-                    </Typography>
-                  ))}
+                {selectedPackage?.services?.map((service) => (
+                  <Typography
+                    key={service.id}
+                    variant="body2"
+                    color="text.secondary"
+                  >
+                    {service.name || service.serviceName}
+                  </Typography>
+                ))}
               </Stack>
             </Grid>
           </Grid>
@@ -546,23 +681,23 @@ const SummaryPage: React.FC = () => {
               <Stack spacing={1}>
                 <Typography>
                   <strong>Jetty Point:</strong>{" "}
-                  {getJettyPointName(data.reservationDetails.jettyPoint)}
+                  {getJettyPointName(booking.jettyPoint)}
                 </Typography>
                 <Typography>
                   <strong>Booking Date:</strong>{" "}
-                  {formatDate(data.reservationDetails.bookingDate)}
+                  {formatDate(booking.bookingDate)}
                 </Typography>
                 <Typography>
                   <strong>Passengers:</strong>{" "}
-                  {data.reservationDetails.passengers}
+                  {booking.passengers}
                 </Typography>
                 <Typography>
                   <strong>Alternative Date 1:</strong>{" "}
-                  {formatDate(data.otherOptions.alternativeDate1)}
+                  {formatDate(booking.alternativeDate1)}
                 </Typography>
                 <Typography>
                   <strong>Alternative Date 2:</strong>{" "}
-                  {formatDate(data.otherOptions.alternativeDate2)}
+                  {formatDate(booking.alternativeDate2)}
                 </Typography>
               </Stack>
             </Grid>
@@ -571,50 +706,42 @@ const SummaryPage: React.FC = () => {
                 <Typography>
                   <strong>Base Cost:</strong>{" "}
                   {(() => {
-                    const selectedPackage = packages.find(
-                      (pkg) =>
-                        pkg.id.toString() === data.reservationDetails.packageId
-                    );
-
-                    if (!selectedPackage) return "RM0";
-
-                    // Check if package has fixed pricing
-                    const hasFixedPrice = selectedPackage.priceTiers.some(
+                    const hasFixedPrice = selectedPackage?.priceTiers.some(
                       (tier) => tier.type === "FIXED"
                     );
 
-                    const basePrice = selectedPackage.basePrice;
-
-                    return `RM${
+                    const baseCost = selectedPackage ? (
                       hasFixedPrice
-                        ? basePrice
-                        : basePrice * data.reservationDetails.passengers
-                    }`;
+                        ? selectedPackage.basePrice
+                        : selectedPackage.basePrice * booking.passengers
+                    ) : 0;
+
+                    const addOnsCost = booking.addOns ? booking.addOns.reduce(
+                      (total, addon) => total + addon.price,
+                      0
+                    ) : 0;
+
+                    return `RM${baseCost + addOnsCost}`;
                   })()}
                 </Typography>
                 <Typography component="div">
                   <strong>Add-ons:</strong>
-                  {data.reservationDetails.addOns.length > 0 ? (
+                  {booking.addOns && booking.addOns.length > 0 ? (
                     <Box
                       component="ul"
                       sx={{ mt: 1, pl: 2, listStyleType: "none" }}
                     >
-                      {data.reservationDetails.addOns.map((addonId, index) => {
-                        const addon = addOns.find(
-                          (a) => a.id.toString() === addonId
-                        );
-                        return addon ? (
-                          <li key={addonId}>
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.secondary"
-                            >
-                              {index + 1}. {addon.name} - RM{addon.price}
-                            </Typography>
-                          </li>
-                        ) : null;
-                      })}
+                      {booking.addOns.map((addon, index) => (
+                        <li key={addon.id}>
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            color="text.secondary"
+                          >
+                            {index + 1}. {addon.name} - RM{addon.price}
+                          </Typography>
+                        </li>
+                      ))}
                     </Box>
                   ) : (
                     <Typography
@@ -629,31 +756,20 @@ const SummaryPage: React.FC = () => {
                 <Typography sx={{ mt: 1 }} variant="subtitle1">
                   <strong>Est. Total:</strong>{" "}
                   {(() => {
-                    const selectedPackage = packages.find(
-                      (pkg) =>
-                        pkg.id.toString() === data.reservationDetails.packageId
-                    );
-
-                    if (!selectedPackage) return "RM0";
-
-                    const hasFixedPrice = selectedPackage.priceTiers.some(
+                    const hasFixedPrice = selectedPackage?.priceTiers.some(
                       (tier) => tier.type === "FIXED"
                     );
 
-                    const basePrice = selectedPackage.basePrice;
-                    const baseCost = hasFixedPrice
-                      ? basePrice
-                      : basePrice * data.reservationDetails.passengers;
+                    const baseCost = selectedPackage ? (
+                      hasFixedPrice
+                        ? selectedPackage.basePrice
+                        : selectedPackage.basePrice * booking.passengers
+                    ) : 0;
 
-                    const addOnsCost = data.reservationDetails.addOns.reduce(
-                      (total, addonId) => {
-                        const addon = addOns.find(
-                          (a) => a.id.toString() === addonId
-                        );
-                        return total + (addon?.price || 0);
-                      },
+                    const addOnsCost = booking.addOns ? booking.addOns.reduce(
+                      (total, addon) => total + addon.price,
                       0
-                    );
+                    ) : 0;
 
                     return `RM${baseCost + addOnsCost}`;
                   })()}
@@ -678,6 +794,12 @@ const SummaryPage: React.FC = () => {
           </Box>
         </Paper>
       </Box>
+      <EditBookingDialog
+        open={openEditDialog}
+        onClose={() => setOpenEditDialog(false)}
+        bookingData={booking}
+        onUpdate={handleUpdateBooking}
+      />
       <CompletionDialog
         open={completionDialogOpen}
         onClose={() => setCompletionDialogOpen(false)}

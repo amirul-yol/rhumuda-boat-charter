@@ -158,4 +158,76 @@ public class BookingController {
                 .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error", e.getMessage()));
         }
     }
+
+    @PutMapping("/{bookingId}")
+    public ResponseEntity<?> updateBooking(@PathVariable String bookingId, @Valid @RequestBody BookingDTO bookingDTO) {
+        try {
+            logger.info("Updating booking with ID: {}", bookingId);
+            
+            // Find existing booking
+            Booking existingBooking = bookingRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found with ID: " + bookingId));
+
+            // Update fields
+            existingBooking.setStatus(BookingStatus.valueOf(bookingDTO.getStatus()));
+            existingBooking.setFirstName(bookingDTO.getFirstName());
+            existingBooking.setLastName(bookingDTO.getLastName());
+            existingBooking.setPhoneNumber(bookingDTO.getPhoneNumber());
+            existingBooking.setEmail(bookingDTO.getEmail());
+            existingBooking.setAddressLine1(bookingDTO.getAddressLine1());
+            existingBooking.setAddressLine2(bookingDTO.getAddressLine2());
+            existingBooking.setPostalCode(bookingDTO.getPostalCode());
+            existingBooking.setCity(bookingDTO.getCity());
+            existingBooking.setCountry(bookingDTO.getCountry());
+
+            // Update relationships
+            existingBooking.setJettyPoint(jettyPointRepository.findById(Long.parseLong(bookingDTO.getJettyPoint()))
+                .orElseThrow(() -> new RuntimeException("JettyPoint not found")));
+
+            existingBooking.setPackageDetails(packageRepository.findById(Long.parseLong(bookingDTO.getPackageId()))
+                .orElseThrow(() -> new RuntimeException("Package not found")));
+
+            // Update dates and passengers
+            existingBooking.setBookingDate(bookingDTO.getBookingDate());
+            existingBooking.setPassengers(bookingDTO.getPassengers());
+            existingBooking.setAlternativeDate1(bookingDTO.getAlternativeDate1());
+            existingBooking.setAlternativeDate2(bookingDTO.getAlternativeDate2());
+            existingBooking.setSpecialRemarks(bookingDTO.getSpecialRemarks());
+
+            // Update system fields
+            existingBooking.setUpdatedAt(LocalDateTime.now());
+
+            // Update add-ons
+            if (bookingDTO.getAddOns() != null) {
+                Set<AddOn> addOns = new HashSet<>();
+                for (String addOnId : bookingDTO.getAddOns()) {
+                    AddOn addOn = addOnRepository.findById(Long.parseLong(addOnId))
+                        .orElseThrow(() -> new RuntimeException("AddOn not found: " + addOnId));
+                    addOns.add(addOn);
+                }
+                existingBooking.setAddOns(addOns);
+            }
+
+            // Save the updated booking
+            Booking updatedBooking = bookingRepository.save(existingBooking);
+            logger.info("Successfully updated booking with ID: {}", bookingId);
+            return ResponseEntity.ok(updatedBooking);
+
+        } catch (NumberFormatException e) {
+            logger.error("Invalid ID format while updating booking: {}", bookingId, e);
+            return ResponseEntity
+                .badRequest()
+                .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Invalid ID format", e.getMessage()));
+        } catch (RuntimeException e) {
+            logger.error("Error updating booking: {}", bookingId, e);
+            return ResponseEntity
+                .badRequest()
+                .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Error updating booking", e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Unexpected error updating booking: {}", bookingId, e);
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error", e.getMessage()));
+        }
+    }
 }
