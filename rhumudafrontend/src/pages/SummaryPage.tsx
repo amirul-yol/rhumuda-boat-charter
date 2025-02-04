@@ -9,7 +9,8 @@ import {
   Button,
   CircularProgress,
   Alert,
-  Snackbar
+  Snackbar,
+  Chip
 } from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -23,6 +24,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import CompletionDialog from "../components/CompletionDialog";
 import BookingEditDialog from "../components/BookingEditDialog";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PendingIcon from '@mui/icons-material/Pending';
+import ErrorIcon from '@mui/icons-material/Error';
+import SendIcon from '@mui/icons-material/Send';
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -165,6 +170,7 @@ const SummaryPage: React.FC = () => {
   const [booking, setBooking] = useState<BookingData | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
 
   const fetchBookingData = async () => {
     if (!bookingId) {
@@ -385,6 +391,124 @@ const SummaryPage: React.FC = () => {
     }
   }, [clearLocalStorage]);
 
+  const getStatusDetails = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case 'COMPLETE':
+        return {
+          label: 'Booking Complete',
+          color: 'success' as const,
+          icon: <CheckCircleIcon />,
+          description: 'Your booking has been approved by our team.'
+        };
+      case 'PENDING':
+        return {
+          label: 'Inquiry Sent',
+          color: 'warning' as const,
+          icon: <PendingIcon />,
+          description: 'Your inquiry has been sent and is awaiting approval from our team.'
+        };
+      case 'CANCELLED':
+        return {
+          label: 'Booking Cancelled',
+          color: 'error' as const,
+          icon: <ErrorIcon />,
+          description: 'This booking has been cancelled.'
+        };
+      case 'INCOMPLETE':
+      default:
+        return {
+          label: 'Incomplete',
+          color: 'error' as const,
+          icon: <ErrorIcon />,
+          description: 'Please review your booking details and click "Send Inquiry" to submit your booking.'
+        };
+    }
+  };
+
+  const handleSendInquiry = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/submit`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'PENDING' })  // Update to PENDING when sending inquiry
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit inquiry');
+      }
+
+      setSuccessMessage('Your inquiry has been sent successfully!');
+      setShowCompletionDialog(true);
+      fetchBookingData(); // Refresh to get updated status
+    } catch (error) {
+      console.error('Error sending inquiry:', error);
+      setError(error instanceof Error ? error.message : 'Failed to send inquiry');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setShowCompletionDialog(false);
+  };
+
+  const renderActionButton = () => {
+    if (!booking) return null;
+
+    switch (booking.status?.toUpperCase()) {
+      case 'COMPLETE':
+        return (
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<CheckCircleIcon />}
+            disabled
+          >
+            Booking Complete
+          </Button>
+        );
+      case 'PENDING':
+        return (
+          <Button
+            variant="contained"
+            color="warning"
+            startIcon={<PendingIcon />}
+            disabled
+          >
+            Inquiry Sent
+          </Button>
+        );
+      case 'CANCELLED':
+        return (
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<ErrorIcon />}
+            disabled
+          >
+            Booking Cancelled
+          </Button>
+        );
+      case 'INCOMPLETE':
+      default:
+        return (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SendIcon />}
+            onClick={handleSendInquiry}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : 'Send Inquiry'}
+          </Button>
+        );
+    }
+  };
+
   if (loading) {
     return (
       <Container maxWidth="lg">
@@ -589,6 +713,30 @@ const SummaryPage: React.FC = () => {
           </Box>
         </Paper>
 
+        <Grid item xs={12}>
+          <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Booking Status
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Chip
+                icon={getStatusDetails(booking?.status).icon}
+                label={getStatusDetails(booking?.status).label}
+                color={getStatusDetails(booking?.status).color}
+                sx={{ fontSize: '1rem', py: 2, px: 1 }}
+              />
+            </Box>
+            <Typography color="text.secondary">
+              {getStatusDetails(booking?.status).description}
+            </Typography>
+            {booking?.status === 'PENDING' && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Submitted on: {dayjs(booking.createdAt).format('DD MMM YYYY, HH:mm')}
+              </Typography>
+            )}
+          </Paper>
+        </Grid>
+
         <Paper sx={{ p: 3, mb: 3 }}>
           <Typography variant="h6" gutterBottom>
             Estimated Cost
@@ -695,19 +843,7 @@ const SummaryPage: React.FC = () => {
             </Grid>
           </Grid>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-            <Button
-              variant="contained"
-              sx={{
-                bgcolor: "#0384BD",
-                "&:hover": {
-                  bgcolor: "rgba(3, 132, 189, 0.9)",
-                },
-                px: 4,
-              }}
-              onClick={() => setCompletionDialogOpen(true)}
-            >
-              Send Inquiry
-            </Button>
+            {renderActionButton()}
           </Box>
         </Paper>
       </Box>
@@ -721,8 +857,8 @@ const SummaryPage: React.FC = () => {
         />
       )}
       <CompletionDialog
-        open={completionDialogOpen}
-        onClose={() => setCompletionDialogOpen(false)}
+        open={showCompletionDialog}
+        onClose={handleCloseDialog}
       />
       <Snackbar
         open={!!successMessage}

@@ -21,8 +21,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -228,6 +230,25 @@ public class BookingController {
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal server error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{bookingId}/submit")
+    public ResponseEntity<?> submitBooking(@PathVariable String bookingId) {
+        try {
+            Optional<Booking> bookingOpt = bookingRepository.findByBookingId(bookingId);
+            if (!bookingOpt.isPresent()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Booking booking = bookingOpt.get();
+            booking.setStatus(BookingStatus.PENDING);
+            bookingRepository.save(booking);
+            
+            return ResponseEntity.ok(booking);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Error updating booking status", Arrays.asList(e.getMessage())));
         }
     }
 }

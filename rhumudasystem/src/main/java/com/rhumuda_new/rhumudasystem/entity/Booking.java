@@ -17,7 +17,7 @@ public class Booking {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookingStatus status = BookingStatus.PENDING;
+    private BookingStatus status = BookingStatus.INCOMPLETE;
 
     // Customer Info
     @Column(nullable = false)
@@ -74,7 +74,7 @@ public class Booking {
     private LocalDateTime updatedAt;
 
     public enum BookingStatus {
-        PENDING, CONFIRMED, CANCELLED
+        INCOMPLETE, PENDING, COMPLETE, CANCELLED
     }
 
     // Getters and Setters

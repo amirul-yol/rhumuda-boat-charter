@@ -651,7 +651,7 @@ const InquiryPage: React.FC = () => {
 
       const bookingData = {
         bookingId: bookingId,
-        status: "PENDING",
+        status: "INCOMPLETE", // Initial status when creating booking
         firstName: customerInfo.firstName,
         lastName: customerInfo.lastName,
         phoneNumber: customerInfo.phoneNumber,
@@ -670,6 +670,8 @@ const InquiryPage: React.FC = () => {
         alternativeDate2: otherOptions.alternativeDate2 || null,
         specialRemarks: otherOptions.specialRemarks || null,
       };
+
+      console.log('Sending booking data:', bookingData);
 
       const response = await fetch("http://localhost:8080/api/bookings", {
         method: "POST",
