@@ -53,7 +53,7 @@ const Header: React.FC = () => {
       const cleanBookingId = bookingId.trim().replace(/[^a-zA-Z0-9]/g, '');
       console.log('Submitting Booking ID:', cleanBookingId); // Debug log
       handleCloseBookingDialog();
-      navigate(`/manage-booking/${encodeURIComponent(cleanBookingId)}`);
+      navigate(`/summary/${encodeURIComponent(cleanBookingId)}`);
     }
   };
 
