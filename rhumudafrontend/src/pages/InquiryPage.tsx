@@ -680,11 +680,16 @@ const InquiryPage: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save booking");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save booking");
       }
 
       const savedBooking = await response.json();
-      return savedBooking.bookingId;
+      
+      // Clear the form data from localStorage since we've successfully saved
+      localStorage.removeItem(STORAGE_KEY);
+      
+      return savedBooking.bookingId || bookingId;
     } catch (error) {
       console.error("Error saving booking:", error);
       throw error;

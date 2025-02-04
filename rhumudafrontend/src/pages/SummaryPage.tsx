@@ -9,6 +9,7 @@ import {
   Button,
   CircularProgress,
   Alert,
+  Snackbar
 } from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -20,7 +21,8 @@ import Description from "../components/Description";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 import CompletionDialog from "../components/CompletionDialog";
-import EditBookingDialog from "../components/EditBookingDialog";
+import BookingEditDialog from "../components/BookingEditDialog";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -161,8 +163,8 @@ const SummaryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingData | null>(null);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [updateLoading, setUpdateLoading] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fetchBookingData = async () => {
     if (!bookingId) {
@@ -172,30 +174,44 @@ const SummaryPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
-        method: "GET",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      setLoading(true);
+      setError(null);
 
-      const data = await response.json();
-      console.log("Backend response:", data);
+      // Fetch booking data and all packages from all categories
+      const [bookingResponse, ...packageResponses] = await Promise.all([
+        fetch(`http://localhost:8080/api/bookings/${bookingId}`),
+        fetch("http://localhost:8080/api/packages/category/1"),
+        fetch("http://localhost:8080/api/packages/category/2"),
+        fetch("http://localhost:8080/api/packages/category/3")
+      ]);
 
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch booking details");
+      if (!bookingResponse.ok) {
+        const errorData = await bookingResponse.json();
+        throw new Error(errorData.message || "Failed to fetch booking data");
       }
 
-      setBooking(data);
-      setError(null);
-    } catch (err) {
-      console.error("Error fetching booking:", err);
-      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      // Check if any package response failed
+      const failedPackageResponse = packageResponses.find(response => !response.ok);
+      if (failedPackageResponse) {
+        throw new Error("Failed to fetch packages data");
+      }
+
+      const bookingData = await bookingResponse.json();
+      const packagesData = (await Promise.all(packageResponses.map(r => r.json()))).flat();
+
+      setBooking(bookingData);
+      setPackages(packagesData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error instanceof Error ? error.message : "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchBookingData();
+  }, [bookingId]);
 
   useEffect(() => {
     const savedData = localStorage.getItem(STORAGE_KEY);
@@ -234,28 +250,6 @@ const SummaryPage: React.FC = () => {
     };
 
     fetchAddOns();
-  }, []);
-
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        // Fetch all categories (1, 2, and 3)
-        const responses = await Promise.all([
-          fetch("http://localhost:8080/api/packages/category/1"),
-          fetch("http://localhost:8080/api/packages/category/2"),
-          fetch("http://localhost:8080/api/packages/category/3"),
-        ]);
-
-        const results = await Promise.all(responses.map((r) => r.json()));
-        // Combine all packages into a single array
-        const allPackages = results.flat();
-        setPackages(allPackages);
-      } catch (error) {
-        console.error("Error fetching packages:", error);
-      }
-    };
-
-    fetchPackages();
   }, []);
 
   useEffect(() => {
@@ -373,115 +367,16 @@ const SummaryPage: React.FC = () => {
   };
 
   const handleEditClick = () => {
-    setOpenEditDialog(true);
+    setEditDialogOpen(true);
   };
 
-  const handleUpdateBooking = async (updatedData: any) => {
-    setUpdateLoading(true);
-    try {
-      // Transform the data to match backend expectations
-      const bookingData = {
-        bookingId: bookingId, // Include the bookingId in the request
-        firstName: updatedData.firstName,
-        lastName: updatedData.lastName,
-        email: updatedData.email,
-        phoneNumber: updatedData.phoneNumber,
-        addressLine1: updatedData.addressLine1,
-        addressLine2: updatedData.addressLine2 || null,
-        postalCode: updatedData.postalCode,
-        city: updatedData.city,
-        country: updatedData.country,
-        jettyPoint: updatedData.jettyPoint.id.toString(),
-        packageId: updatedData.packageDetails.id.toString(),
-        bookingDate: updatedData.bookingDate,
-        passengers: updatedData.passengers,
-        addOns: updatedData.addOns.map((addon: any) => addon.id.toString()),
-        alternativeDate1: updatedData.alternativeDate1 || null,
-        alternativeDate2: updatedData.alternativeDate2 || null,
-        specialRemarks: updatedData.specialRemarks || null,
-        status: "PENDING"
-      };
-
-      console.log("Sending update data:", JSON.stringify(bookingData, null, 2));
-
-      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify(bookingData),
-      });
-
-      const responseData = await response.json();
-      console.log("Backend response:", responseData);
-
-      if (!response.ok) {
-        console.error("Backend error details:", responseData);
-        throw new Error(responseData.message || "Failed to update booking");
-      }
-
-      // Refetch the booking data to update the UI
-      await fetchBookingData();
-    } catch (error) {
-      console.error("Error updating booking:", error);
-      throw error;
-    } finally {
-      setUpdateLoading(false);
-    }
+  const handleBookingUpdate = () => {
+    setSuccessMessage("Booking updated successfully!");
+    fetchBookingData();
   };
 
-  const handleSendInquiry = async () => {
-    if (!booking) return;
-
-    try {
-      // Transform the data to match backend expectations
-      const bookingData = {
-        bookingId: booking.bookingId,
-        firstName: booking.firstName,
-        lastName: booking.lastName,
-        email: booking.email,
-        phoneNumber: booking.phoneNumber,
-        addressLine1: booking.addressLine1,
-        addressLine2: booking.addressLine2 || null,
-        postalCode: booking.postalCode,
-        city: booking.city,
-        country: booking.country,
-        jettyPoint: booking.jettyPoint.id.toString(),
-        packageId: booking.packageDetails.id.toString(),
-        bookingDate: booking.bookingDate,
-        passengers: booking.passengers,
-        addOns: booking.addOns.map((addon: any) => addon.id.toString()),
-        alternativeDate1: booking.alternativeDate1 || null,
-        alternativeDate2: booking.alternativeDate2 || null,
-        specialRemarks: booking.specialRemarks || null,
-        status: "CONFIRMED"
-      };
-
-      console.log("Sending inquiry data:", JSON.stringify(bookingData, null, 2));
-
-      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify(bookingData),
-      });
-
-      const responseData = await response.json();
-      console.log("Backend response:", responseData);
-
-      if (!response.ok) {
-        console.error("Backend error details:", responseData);
-        throw new Error(responseData.message || "Failed to update booking");
-      }
-
-      setCompletionDialogOpen(true);
-    } catch (error) {
-      console.error("Error updating booking:", error);
-      setError("Failed to send inquiry. Please try again.");
-    }
+  const handleCloseSuccess = () => {
+    setSuccessMessage(null);
   };
 
   useEffect(() => {
@@ -493,7 +388,7 @@ const SummaryPage: React.FC = () => {
   if (loading) {
     return (
       <Container maxWidth="lg">
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+        <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
           <CircularProgress />
         </Box>
       </Container>
@@ -503,8 +398,17 @@ const SummaryPage: React.FC = () => {
   if (error) {
     return (
       <Container maxWidth="lg">
-        <Box sx={{ mt: 4 }}>
-          <Alert severity="error">{error}</Alert>
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <Typography color="error" variant="h6" gutterBottom>
+            {error}
+          </Typography>
+          <Button 
+            variant="contained" 
+            onClick={fetchBookingData}
+            startIcon={<RefreshIcon />}
+          >
+            Retry
+          </Button>
         </Box>
       </Container>
     );
@@ -513,16 +417,29 @@ const SummaryPage: React.FC = () => {
   if (!booking) {
     return (
       <Container maxWidth="lg">
-        <Box sx={{ mt: 4 }}>
-          <Alert severity="error">No booking data found</Alert>
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <Typography variant="h6">
+            No booking data found
+          </Typography>
         </Box>
       </Container>
     );
   }
 
-  const selectedPackage = packages.find(
-    (pkg) => pkg.id === booking.packageDetails.id
-  );
+  // Add null checks for booking and packages
+  const selectedPackage = booking?.packageDetails?.id 
+    ? packages.find((pkg) => pkg.id === booking.packageDetails.id)
+    : null;
+
+  if (!booking || !selectedPackage) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg">
@@ -787,23 +704,41 @@ const SummaryPage: React.FC = () => {
                 },
                 px: 4,
               }}
-              onClick={handleSendInquiry}
+              onClick={() => setCompletionDialogOpen(true)}
             >
               Send Inquiry
             </Button>
           </Box>
         </Paper>
       </Box>
-      <EditBookingDialog
-        open={openEditDialog}
-        onClose={() => setOpenEditDialog(false)}
-        bookingData={booking}
-        onUpdate={handleUpdateBooking}
-      />
+      {/* Only render dialog if bookingId exists */}
+      {bookingId && (
+        <BookingEditDialog 
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          bookingId={bookingId}
+          onUpdate={handleBookingUpdate}
+        />
+      )}
       <CompletionDialog
         open={completionDialogOpen}
         onClose={() => setCompletionDialogOpen(false)}
       />
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={2000}
+        onClose={handleCloseSuccess}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseSuccess}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
