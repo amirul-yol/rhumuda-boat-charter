@@ -791,17 +791,17 @@ const SummaryPage: React.FC = () => {
 
           {/* Estimated Cost Section */}
           <Paper sx={{ 
-            p: 2, 
+            p: 3, 
             mb: 3,
             maxWidth: '400px',
             mx: 'auto'
           }}>
-            <Typography variant="subtitle1" sx={{ mb: 0.5, color: 'text.secondary' }}>
+            <Typography variant="subtitle1" sx={{ mb: 1, color: 'text.secondary' }}>
               Estimated Cost
             </Typography>
             {/* Total Cost Display */}
             <Typography variant="h4" sx={{ 
-              mb: 2,
+              mb: 4,
               fontWeight: 'bold'
             }}>
               MYR {(() => {
@@ -825,32 +825,32 @@ const SummaryPage: React.FC = () => {
             </Typography>
 
             {/* Details Grid */}
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
                 Jetty Location
               </Typography>
               <Box sx={{ 
                 border: '1px solid rgba(0, 0, 0, 0.12)', 
                 borderRadius: '4px',
-                p: 1,
-                minHeight: '36px',
+                p: 1.5,
+                minHeight: '40px',
                 display: 'flex',
                 alignItems: 'center',
-                mb: 1.5
+                mb: 2
               }}>
                 {getJettyPointName(booking?.jettyPoint)}
               </Box>
 
-              <Grid container spacing={1.5}>
+              <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <Typography variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
                     Date
                   </Typography>
                   <Box sx={{ 
                     border: '1px solid rgba(0, 0, 0, 0.12)', 
                     borderRadius: '4px',
-                    p: 1,
-                    minHeight: '36px',
+                    p: 1.5,
+                    minHeight: '40px',
                     display: 'flex',
                     alignItems: 'center'
                   }}>
@@ -858,14 +858,14 @@ const SummaryPage: React.FC = () => {
                   </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                  <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
                     Group Size
                   </Typography>
                   <Box sx={{ 
                     border: '1px solid rgba(0, 0, 0, 0.12)', 
                     borderRadius: '4px',
-                    p: 1,
-                    minHeight: '36px',
+                    p: 1.5,
+                    minHeight: '40px',
                     display: 'flex',
                     alignItems: 'center'
                   }}>
@@ -876,12 +876,12 @@ const SummaryPage: React.FC = () => {
             </Box>
 
             {/* Cost Breakdown */}
-            <Box sx={{ mb: 2 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2">Base Cost</Typography>
                 <Typography variant="body2">RM {selectedPackage?.basePrice.toFixed(2)}</Typography>
               </Box>
-              <Typography variant="body2" sx={{ mb: 0.5 }}>Add On:</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>Add On:</Typography>
               {booking?.addOns && booking.addOns.length > 0 ? (
                 booking.addOns.map((addon) => (
                   <Box key={addon.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5, pl: 2 }}>
@@ -900,8 +900,8 @@ const SummaryPage: React.FC = () => {
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 borderTop: '1px solid rgba(0, 0, 0, 0.12)',
-                pt: 1.5,
-                mb: 2
+                pt: 2,
+                mb: 3
               }}>
                 <Typography>Total</Typography>
                 <Typography>
@@ -931,7 +931,6 @@ const SummaryPage: React.FC = () => {
                     variant="contained"
                     disabled
                     fullWidth
-                    size="small"
                     sx={{
                       bgcolor: 'rgba(0, 0, 0, 0.12)',
                       color: 'rgba(0, 0, 0, 0.38)',
