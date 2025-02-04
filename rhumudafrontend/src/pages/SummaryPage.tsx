@@ -10,7 +10,8 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
-  Chip
+  Chip,
+  Divider
 } from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -398,21 +399,21 @@ const SummaryPage: React.FC = () => {
           label: 'Booking Complete',
           color: 'success' as const,
           icon: <CheckCircleIcon />,
-          description: 'Your booking has been approved by our team.'
+          // description: 'Your booking has been approved by our team.'
         };
       case 'PENDING':
         return {
           label: 'Inquiry Sent',
           color: 'warning' as const,
           icon: <PendingIcon />,
-          description: 'Your inquiry has been sent and is awaiting approval from our team.'
+          // description: 'Your inquiry has been sent and is awaiting approval from our team.'
         };
       case 'CANCELLED':
         return {
           label: 'Booking Cancelled',
           color: 'error' as const,
           icon: <ErrorIcon />,
-          description: 'This booking has been cancelled.'
+          // description: 'This booking has been cancelled.'
         };
       case 'INCOMPLETE':
       default:
@@ -420,7 +421,7 @@ const SummaryPage: React.FC = () => {
           label: 'Incomplete',
           color: 'error' as const,
           icon: <ErrorIcon />,
-          description: 'Please review your booking details and click "Send Inquiry" to submit your booking.'
+          // description: 'Please review your booking details and click "Send Inquiry" to submit your booking.'
         };
     }
   };
@@ -566,155 +567,207 @@ const SummaryPage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
-          Booking Summary
-        </Typography>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
 
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography>
-                <strong>Booking ID:</strong> {booking.bookingId}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography>
-                <strong>Package:</strong>{" "}
-                {getPackageName(booking.packageDetails)}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Paper>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              {selectedPackage?.description && (
-                <Description text={selectedPackage.description} />
-              )}
-            </Grid>
-          </Grid>
-        </Paper>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Customer Details
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography>
-                <strong>Name:</strong>{" "}
-                {`${booking.firstName} ${booking.lastName}`}
-              </Typography>
-              <Typography>
-                <strong>Email:</strong> {booking.email}
-              </Typography>
-              <Typography>
-                <strong>Phone:</strong> {booking.phoneNumber}
-              </Typography>
-              <Typography>
-                <strong>Address:</strong>{" "}
-                {`${booking.addressLine1}${
-                  booking.addressLine2 ? `, ${booking.addressLine2}` : ""
-                }, ${booking.postalCode} ${booking.city}, ${booking.country}`}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-            <Button
-              variant="contained"
-              onClick={handleEditClick}
-              sx={{ bgcolor: "#0384BD", "&:hover": { bgcolor: "#026994" } }}
-            >
-              Edit Details
-            </Button>
+      {/* Main Content Grid */}
+      <Grid container spacing={3}>
+        {/* Left Column - 70% */}
+        <Grid item xs={12} md={8}>
+          {/* Booking ID and Package Name Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+              Booking ID: #{booking?.bookingId}
+            </Typography>
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              Package: {getPackageName(booking?.packageDetails)}
+            </Typography>
+            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
           </Box>
-        </Paper>
 
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Services
-          </Typography>
-          <Grid container spacing={3}>
-            {/* Duration, Capacity, and Distance */}
-            <Grid item xs={12} sm={6}>
-              <Stack spacing={2}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-                  <Typography variant="body2">
-                    Duration: {selectedPackage?.durationMinutes || 0} minutes
+          {/* Package Description Section */}
+          <Box sx={{ mb: 3 }}>
+            {selectedPackage?.description && (
+              <>
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    mb: 2,
+                    fontSize: '1.1rem',
+                    color: 'black',
+                    lineHeight: 1.7
+                  }}
+                >
+                  Embark on an unforgettable fishing adventure with RhuMuda Boat Charter. Our experienced captains will take you to the best fishing spots, where you can cast your line and reel in a variety of fish species. Whether you're a seasoned angler or a beginner, we'll provide you with all the necessary equipment and expert guidance.
+                </Typography>
+                <Typography 
+                  variant="body1"
+                  sx={{ 
+                    mb: 2,
+                    fontSize: '1.1rem',
+                    color: 'black',
+                    lineHeight: 1.7
+                  }}
+                >
+                  Our fishing charters offer a unique opportunity to relax, unwind, and enjoy the thrill of the catch. We cater to both inshore, offshore, and night fishing - depending on your preferences and the season.
+                </Typography>
+                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
+              </>
+            )}
+          </Box>
+
+          {/* Customer Details Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              Customer Details
+            </Typography>
+            <Box sx={{ 
+              border: '1px solid rgba(0, 0, 0, 0.12)', 
+              borderRadius: '4px',
+              p: 3,
+              mb: 3
+            }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                    <strong>Name:</strong>{" "}
+                    {`${booking?.firstName} ${booking?.lastName}`}
                   </Typography>
-                </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <GroupsIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-                  <Typography variant="body2">
-                    Max Capacity: {selectedPackage?.maxCapacity || 0} persons
+                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                    <strong>Email:</strong> {booking?.email}
                   </Typography>
-                </Stack>
-                {selectedPackage?.distanceMinKm && selectedPackage?.distanceMaxKm && (
+                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                    <strong>Phone:</strong> {booking?.phoneNumber}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                    <strong>Address:</strong>{" "}
+                    {`${booking?.addressLine1}${
+                      booking?.addressLine2 ? ` ${booking.addressLine2}` : ""
+                    }, ${booking?.postalCode} ${booking?.city}, ${booking?.country}`}
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+                <Button
+                  variant="contained"
+                  onClick={handleEditClick}
+                  sx={{ 
+                    bgcolor: "#0384BD", 
+                    "&:hover": { bgcolor: "#026994" },
+                    textTransform: 'none',
+                    borderRadius: '4px',
+                    px: 3
+                  }}
+                >
+                  Edit Details
+                </Button>
+              </Box>
+            </Box>
+            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
+          </Box>
+
+          {/* Services Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              Services
+            </Typography>
+            <Grid container spacing={3}>
+              {/* Duration, Capacity, and Distance */}
+              <Grid item xs={12} md={6}>
+                <Stack spacing={2}>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <DirectionsBoatIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-                    <Typography variant="body2">
-                      Distance: {selectedPackage.distanceMinKm} - {selectedPackage.distanceMaxKm} km
+                    <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                    <Typography sx={{ fontSize: '1rem', color: 'black' }}>
+                      Duration: {selectedPackage?.durationMinutes || 0} minutes
                     </Typography>
                   </Stack>
-                )}
-              </Stack>
-            </Grid>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <GroupsIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                    <Typography sx={{ fontSize: '1rem', color: 'black' }}>
+                      Max Capacity: {selectedPackage?.maxCapacity || 0} persons
+                    </Typography>
+                  </Stack>
+                  {selectedPackage?.distanceMinKm && selectedPackage?.distanceMaxKm && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <DirectionsBoatIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                      <Typography sx={{ fontSize: '1rem', color: 'black' }}>
+                        Distance: {selectedPackage.distanceMinKm} - {selectedPackage.distanceMaxKm} km
+                      </Typography>
+                    </Stack>
+                  )}
+                </Stack>
+              </Grid>
 
-            {/* Included Services */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Services Included:
-              </Typography>
-              <Stack spacing={0.5}>
-                {selectedPackage?.services?.map((service) => (
-                  <Typography
-                    key={service.id}
-                    variant="body2"
-                    color="text.secondary"
-                  >
-                    {service.name || service.serviceName}
-                  </Typography>
-                ))}
-              </Stack>
+              {/* Included Services - Moved to right side */}
+              <Grid item xs={12} md={6}>
+                <Typography sx={{ fontSize: '1rem', color: 'black', fontWeight: 'bold', mb: 1 }}>
+                  Services Included:
+                </Typography>
+                <Stack spacing={0.5}>
+                  {selectedPackage?.services?.map((service) => (
+                    <Typography
+                      key={service.id}
+                      sx={{ fontSize: '1rem', color: 'black' }}
+                    >
+                      {service.name || service.serviceName}
+                    </Typography>
+                  ))}
+                </Stack>
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
-
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Location
-          </Typography>
-          <Box
-            component="a"
-            href="https://maps.app.goo.gl/vwFiMqMgWNzB9J8f9"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              display: "block",
-              cursor: "pointer",
-              "&:hover": {
-                opacity: 0.9,
-              },
-            }}
-          >
-            <img
-              src={locationMap}
-              alt="Location Map"
-              style={{
-                width: "60%",
-                height: "auto",
-                borderRadius: "4px",
-              }}
-            />
+            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1, mt: 3 }} />
           </Box>
-        </Paper>
 
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+          {/* Location Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              Location
+            </Typography>
+            <Box
+              component="a"
+              href="https://maps.app.goo.gl/vwFiMqMgWNzB9J8f9"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: "block",
+                cursor: "pointer",
+                width: "100%",
+                "&:hover": {
+                  opacity: 0.9,
+                },
+              }}
+            >
+              <img
+                src={locationMap}
+                alt="Location Map"
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  borderRadius: "4px",
+                  objectFit: "cover",
+                }}
+              />
+            </Box>
+            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1, mt: 3 }} />
+          </Box>
+
+          {/* Cancellation Policy Section */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              Cancellation Policy
+            </Typography>
+            <Typography sx={{ fontSize: '1rem', color: 'black', mb: 2 }}>
+              Full refund up to 7 days prior
+            </Typography>
+            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
+          </Box>
+        </Grid>
+
+        {/* Right Column - 30% */}
+        <Grid item xs={12} md={4}>
+          {/* Booking Status Section */}
+          <Paper elevation={3} sx={{ p: 3, mb: 3, position: 'sticky', top: 24 }}>
             <Typography variant="h6" gutterBottom>
               Booking Status
             </Typography>
@@ -726,155 +779,199 @@ const SummaryPage: React.FC = () => {
                 sx={{ fontSize: '1rem', py: 2, px: 1 }}
               />
             </Box>
-            <Typography color="text.secondary">
+            {/* <Typography color="text.secondary">
               {getStatusDetails(booking?.status).description}
-            </Typography>
+            </Typography> */}
             {booking?.status === 'PENDING' && (
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Submitted on: {dayjs(booking.createdAt).format('DD MMM YYYY, HH:mm')}
+                Submitted on: {dayjs(booking?.createdAt).format('DD MMM YYYY, HH:mm')}
               </Typography>
             )}
           </Paper>
+
+          {/* Estimated Cost Section */}
+          <Paper sx={{ 
+            p: 3, 
+            mb: 3,
+            maxWidth: '400px',
+            mx: 'auto'
+          }}>
+            <Typography variant="subtitle1" sx={{ mb: 1, color: 'text.secondary' }}>
+              Estimated Cost
+            </Typography>
+            {/* Total Cost Display */}
+            <Typography variant="h4" sx={{ 
+              mb: 4,
+              fontWeight: 'bold'
+            }}>
+              MYR {(() => {
+                const hasFixedPrice = selectedPackage?.priceTiers.some(
+                  (tier) => tier.type === "FIXED"
+                );
+
+                const baseCost = selectedPackage ? (
+                  hasFixedPrice
+                    ? selectedPackage.basePrice
+                    : selectedPackage.basePrice * (booking?.passengers || 0)
+                ) : 0;
+
+                const addOnsCost = booking?.addOns ? booking.addOns.reduce(
+                  (total, addon) => total + addon.price,
+                  0
+                ) : 0;
+
+                return (baseCost + addOnsCost).toFixed(2);
+              })()}
+            </Typography>
+
+            {/* Details Grid */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+                Jetty Location
+              </Typography>
+              <Box sx={{ 
+                border: '1px solid rgba(0, 0, 0, 0.12)', 
+                borderRadius: '4px',
+                p: 1.5,
+                minHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                mb: 2
+              }}>
+                {getJettyPointName(booking?.jettyPoint)}
+              </Box>
+
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+                    Date
+                  </Typography>
+                  <Box sx={{ 
+                    border: '1px solid rgba(0, 0, 0, 0.12)', 
+                    borderRadius: '4px',
+                    p: 1.5,
+                    minHeight: '40px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {formatDate(booking?.bookingDate)}
+                  </Box>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+                    Group Size
+                  </Typography>
+                  <Box sx={{ 
+                    border: '1px solid rgba(0, 0, 0, 0.12)', 
+                    borderRadius: '4px',
+                    p: 1.5,
+                    minHeight: '40px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {booking?.passengers} persons
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+
+            {/* Cost Breakdown */}
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2">Base Cost</Typography>
+                <Typography variant="body2">RM {selectedPackage?.basePrice.toFixed(2)}</Typography>
+              </Box>
+              <Typography variant="body2" sx={{ mb: 1 }}>Add On:</Typography>
+              {booking?.addOns && booking.addOns.length > 0 ? (
+                booking.addOns.map((addon) => (
+                  <Box key={addon.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5, pl: 2 }}>
+                    <Typography variant="body2">{addon.name}</Typography>
+                    <Typography variant="body2">RM {addon.price.toFixed(2)}</Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant="body2" sx={{ pl: 2, color: 'text.secondary' }}>None</Typography>
+              )}
+            </Box>
+
+            {/* Total and Action Button */}
+            <Box>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                borderTop: '1px solid rgba(0, 0, 0, 0.12)',
+                pt: 2,
+                mb: 3
+              }}>
+                <Typography>Total</Typography>
+                <Typography>
+                  RM {(() => {
+                    const hasFixedPrice = selectedPackage?.priceTiers.some(
+                      (tier) => tier.type === "FIXED"
+                    );
+
+                    const baseCost = selectedPackage ? (
+                      hasFixedPrice
+                        ? selectedPackage.basePrice
+                        : selectedPackage.basePrice * (booking?.passengers || 0)
+                    ) : 0;
+
+                    const addOnsCost = booking?.addOns ? booking.addOns.reduce(
+                      (total, addon) => total + addon.price,
+                      0
+                    ) : 0;
+
+                    return (baseCost + addOnsCost).toFixed(2);
+                  })()}
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "center", width: '100%' }}>
+                {booking?.status === 'PENDING' && (
+                  <Button
+                    variant="contained"
+                    disabled
+                    fullWidth
+                    sx={{
+                      bgcolor: 'rgba(0, 0, 0, 0.12)',
+                      color: 'rgba(0, 0, 0, 0.38)',
+                      '&:hover': {
+                        bgcolor: 'rgba(0, 0, 0, 0.12)'
+                      }
+                    }}
+                  >
+                    Inquiry Sent
+                  </Button>
+                )}
+                {booking?.status !== 'PENDING' && renderActionButton()}
+              </Box>
+            </Box>
+          </Paper>
         </Grid>
+      </Grid>
 
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Estimated Cost
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <Stack spacing={1}>
-                <Typography>
-                  <strong>Jetty Point:</strong>{" "}
-                  {getJettyPointName(booking.jettyPoint)}
-                </Typography>
-                <Typography>
-                  <strong>Booking Date:</strong>{" "}
-                  {formatDate(booking.bookingDate)}
-                </Typography>
-                <Typography>
-                  <strong>Passengers:</strong>{" "}
-                  {booking.passengers}
-                </Typography>
-                <Typography>
-                  <strong>Alternative Date 1:</strong>{" "}
-                  {formatDate(booking.alternativeDate1)}
-                </Typography>
-                <Typography>
-                  <strong>Alternative Date 2:</strong>{" "}
-                  {formatDate(booking.alternativeDate2)}
-                </Typography>
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Stack spacing={1}>
-                <Typography>
-                  <strong>Base Cost:</strong>{" "}
-                  {(() => {
-                    const hasFixedPrice = selectedPackage?.priceTiers.some(
-                      (tier) => tier.type === "FIXED"
-                    );
-
-                    const baseCost = selectedPackage ? (
-                      hasFixedPrice
-                        ? selectedPackage.basePrice
-                        : selectedPackage.basePrice * booking.passengers
-                    ) : 0;
-
-                    const addOnsCost = booking.addOns ? booking.addOns.reduce(
-                      (total, addon) => total + addon.price,
-                      0
-                    ) : 0;
-
-                    return `RM${baseCost + addOnsCost}`;
-                  })()}
-                </Typography>
-                <Typography component="div">
-                  <strong>Add-ons:</strong>
-                  {booking.addOns && booking.addOns.length > 0 ? (
-                    <Box
-                      component="ul"
-                      sx={{ mt: 1, pl: 2, listStyleType: "none" }}
-                    >
-                      {booking.addOns.map((addon, index) => (
-                        <li key={addon.id}>
-                          <Typography
-                            component="span"
-                            variant="body2"
-                            color="text.secondary"
-                          >
-                            {index + 1}. {addon.name} - RM{addon.price}
-                          </Typography>
-                        </li>
-                      ))}
-                    </Box>
-                  ) : (
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      color="text.secondary"
-                    >
-                      No add-ons selected
-                    </Typography>
-                  )}
-                </Typography>
-                <Typography sx={{ mt: 1 }} variant="subtitle1">
-                  <strong>Est. Total:</strong>{" "}
-                  {(() => {
-                    const hasFixedPrice = selectedPackage?.priceTiers.some(
-                      (tier) => tier.type === "FIXED"
-                    );
-
-                    const baseCost = selectedPackage ? (
-                      hasFixedPrice
-                        ? selectedPackage.basePrice
-                        : selectedPackage.basePrice * booking.passengers
-                    ) : 0;
-
-                    const addOnsCost = booking.addOns ? booking.addOns.reduce(
-                      (total, addon) => total + addon.price,
-                      0
-                    ) : 0;
-
-                    return `RM${baseCost + addOnsCost}`;
-                  })()}
-                </Typography>
-              </Stack>
-            </Grid>
-          </Grid>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-            {renderActionButton()}
-          </Box>
-        </Paper>
-      </Box>
-      {/* Only render dialog if bookingId exists */}
-      {bookingId && (
-        <BookingEditDialog 
-          open={editDialogOpen}
-          onClose={() => setEditDialogOpen(false)}
-          bookingId={bookingId}
-          onUpdate={handleBookingUpdate}
-        />
-      )}
+      {/* Dialogs and Snackbars - Keep these outside the grid */}
+      <BookingEditDialog 
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        bookingId={booking?.bookingId || ''}
+        onUpdate={handleBookingUpdate}
+      />
       <CompletionDialog
         open={showCompletionDialog}
         onClose={handleCloseDialog}
       />
       <Snackbar
         open={!!successMessage}
-        autoHideDuration={2000}
-        onClose={handleCloseSuccess}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleCloseSuccess}
-          severity="success"
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage(null)}
+        message={successMessage}
+      />
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+        message={error}
+      />
     </Container>
   );
 };
