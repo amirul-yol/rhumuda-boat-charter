@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
@@ -29,7 +29,18 @@ const Header: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openBookingDialog, setOpenBookingDialog] = useState(false);
   const [bookingId, setBookingId] = useState("");
+  const [isScrolled, setIsScrolled] = useState(false);
   const open = Boolean(anchorEl);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -72,6 +83,7 @@ const Header: React.FC = () => {
         top: 0,
         zIndex: (theme) => theme.zIndex.drawer + 1,
         boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+        transition: "all 0.3s ease-in-out",
       }}
     >
       <Container maxWidth={false} disableGutters sx={{ px: SYSTEM_PADDING.x }}>
@@ -79,9 +91,10 @@ const Header: React.FC = () => {
           <Toolbar
             disableGutters
             sx={{
-              minHeight: "100px",
-              height: "100px",
+              minHeight: isScrolled ? "70px" : "100px",
+              height: isScrolled ? "70px" : "100px",
               justifyContent: "space-between",
+              transition: "all 0.3s ease-in-out",
             }}
           >
             <Box
@@ -90,9 +103,10 @@ const Header: React.FC = () => {
               alt="Rhumuda Charter Logo"
               onClick={() => navigate('/')}
               sx={{
-                height: 100,
+                height: isScrolled ? 70 : 100,
                 marginRight: 2,
                 cursor: 'pointer',
+                transition: "all 0.3s ease-in-out",
               }}
             />
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
