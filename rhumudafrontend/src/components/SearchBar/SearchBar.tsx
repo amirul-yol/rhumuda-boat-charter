@@ -6,7 +6,11 @@ import PassengerCounter from "../PassengerCounter";
 import { Box, Paper, IconButton, Divider } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  isCompact?: boolean;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ isCompact = false }) => {
   const navigate = useNavigate();
   const [searchValues, setSearchValues] = React.useState({
     jettyPoint: "",
@@ -23,20 +27,37 @@ const SearchBar: React.FC = () => {
   return (
     <Paper
       sx={{
-        p: "12px",
+        p: isCompact ? "6px 12px" : "12px",
         borderRadius: "30px",
         border: "2px solid black",
-        width: "750px",
+        width: isCompact ? "600px" : "750px",
         margin: "0 auto",
-        height: "45px",
+        height: isCompact ? "35px" : "45px",
         display: "flex",
         alignItems: "center",
+        transition: "all 0.3s ease-in-out",
+        backgroundColor: "white",
+        position: "relative",
       }}
     >
       <Box
-        sx={{ display: "flex", alignItems: "stretch", width: "100%", px: 2 }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          px: isCompact ? 1 : 2,
+          gap: isCompact ? 1 : 2,
+        }}
       >
-        <Box sx={{ flex: 1 }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            minWidth: 0,
+            px: isCompact ? 0.5 : 1,
+          }}
+        >
           <JettyPointDropdown
             value={searchValues.jettyPoint}
             onChange={(value) =>
@@ -45,15 +66,17 @@ const SearchBar: React.FC = () => {
                 jettyPoint: value,
               }))
             }
+            isCompact={isCompact}
           />
         </Box>
         <Divider
           orientation="vertical"
           flexItem
           sx={{
-            height: "auto",
-            mx: 2,
+            height: isCompact ? "24px" : "32px",
+            my: "auto",
             borderColor: "rgba(0, 0, 0, 0.12)",
+            alignSelf: "center",
           }}
         />
         <Box sx={{ flex: 1 }}>
@@ -65,15 +88,17 @@ const SearchBar: React.FC = () => {
                 bookingDate: value,
               }))
             }
+            isCompact={isCompact}
           />
         </Box>
         <Divider
           orientation="vertical"
           flexItem
           sx={{
-            height: "auto",
-            mx: 2,
+            height: isCompact ? "24px" : "32px",
+            my: "auto",
             borderColor: "rgba(0, 0, 0, 0.12)",
+            alignSelf: "center",
           }}
         />
         <Box sx={{ flex: 1 }}>
@@ -85,25 +110,28 @@ const SearchBar: React.FC = () => {
                 passengers: value,
               }))
             }
+            isCompact={isCompact}
           />
         </Box>
-        <Box sx={{ ml: 2, display: "flex", alignItems: "center" }}>
-          <IconButton
-            onClick={handleSearch}
-            sx={{
-              backgroundColor: "black",
-              borderRadius: "12px",
-              height: "45px",
-              width: "45px",
-              "&:hover": {
-                backgroundColor: "#333",
-              },
-            }}
-          >
-            <SearchIcon sx={{ color: "white", fontSize: "1.2rem" }} />
-          </IconButton>
-        </Box>
       </Box>
+
+      <IconButton
+        onClick={handleSearch}
+        sx={{
+          backgroundColor: "black",
+          color: "white",
+          position: "absolute",
+          right: isCompact ? "4px" : "8px",
+          height: isCompact ? "27px" : "35px",
+          width: isCompact ? "27px" : "35px",
+          transition: "all 0.3s ease-in-out",
+          "&:hover": {
+            backgroundColor: "black",
+          },
+        }}
+      >
+        <SearchIcon sx={{ fontSize: isCompact ? "1rem" : "1.2rem" }} />
+      </IconButton>
     </Paper>
   );
 };

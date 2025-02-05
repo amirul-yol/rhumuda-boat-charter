@@ -25,7 +25,9 @@ import { SYSTEM_PADDING } from "../../constants/layout";
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isSearchVisible = !location.pathname.startsWith('/inquiry') && !location.pathname.startsWith('/summary');
+  const isSearchVisible =
+    !location.pathname.startsWith("/inquiry") &&
+    !location.pathname.startsWith("/summary");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openBookingDialog, setOpenBookingDialog] = useState(false);
   const [bookingId, setBookingId] = useState("");
@@ -38,8 +40,8 @@ const Header: React.FC = () => {
       setIsScrolled(scrollPosition > 20);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -63,8 +65,8 @@ const Header: React.FC = () => {
   const handleBookingSubmit = () => {
     if (bookingId.trim()) {
       // Remove any spaces and special characters
-      const cleanBookingId = bookingId.trim().replace(/[^a-zA-Z0-9]/g, '');
-      console.log('Submitting Booking ID:', cleanBookingId); // Debug log
+      const cleanBookingId = bookingId.trim().replace(/[^a-zA-Z0-9]/g, "");
+      console.log("Submitting Booking ID:", cleanBookingId); // Debug log
       handleCloseBookingDialog();
       navigate(`/summary/${encodeURIComponent(cleanBookingId)}`);
     }
@@ -101,11 +103,11 @@ const Header: React.FC = () => {
               component="img"
               src={logo}
               alt="Rhumuda Charter Logo"
-              onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               sx={{
                 height: isScrolled ? 70 : 100,
                 marginRight: 2,
-                cursor: 'pointer',
+                cursor: "pointer",
                 transition: "all 0.3s ease-in-out",
               }}
             />
@@ -160,35 +162,39 @@ const Header: React.FC = () => {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                <MenuItem onClick={() => handleNavigation('/about')}>About Us</MenuItem>
-                <MenuItem onClick={() => handleNavigation('/contact')}>Contact Us</MenuItem>
-                <MenuItem onClick={() => handleNavigation('/services')}>Services</MenuItem>
+                <MenuItem onClick={() => handleNavigation("/about")}>
+                  About Us
+                </MenuItem>
+                <MenuItem onClick={() => handleNavigation("/contact")}>
+                  Contact Us
+                </MenuItem>
+                <MenuItem onClick={() => handleNavigation("/services")}>
+                  Services
+                </MenuItem>
               </Menu>
             </Box>
           </Toolbar>
           {isSearchVisible && (
             <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-              <SearchBar />
+              <SearchBar isCompact={isScrolled} />
             </Box>
           )}
         </Stack>
       </Container>
 
       {/* Booking ID Dialog */}
-      <Dialog 
-        open={openBookingDialog} 
+      <Dialog
+        open={openBookingDialog}
         onClose={handleCloseBookingDialog}
         PaperProps={{
           sx: {
-            width: '100%',
-            maxWidth: '400px',
+            width: "100%",
+            maxWidth: "400px",
             p: 2,
-          }
+          },
         }}
       >
-        <DialogTitle sx={{ pb: 2 }}>
-          Enter Booking ID
-        </DialogTitle>
+        <DialogTitle sx={{ pb: 2 }}>Enter Booking ID</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -200,7 +206,7 @@ const Header: React.FC = () => {
             value={bookingId}
             onChange={(e) => setBookingId(e.target.value)}
             onKeyPress={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 handleBookingSubmit();
               }
             }}
@@ -210,9 +216,9 @@ const Header: React.FC = () => {
           <Button onClick={handleCloseBookingDialog} color="primary">
             Cancel
           </Button>
-          <Button 
-            onClick={handleBookingSubmit} 
-            variant="contained" 
+          <Button
+            onClick={handleBookingSubmit}
+            variant="contained"
             color="primary"
             disabled={!bookingId.trim()}
           >

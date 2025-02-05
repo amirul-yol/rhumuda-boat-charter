@@ -17,11 +17,13 @@ interface JettyPoint {
 interface JettyPointDropdownProps {
   value: string;
   onChange: (value: string) => void;
+  isCompact?: boolean;
 }
 
 const JettyPointDropdown: React.FC<JettyPointDropdownProps> = ({
   value,
   onChange,
+  isCompact = false,
 }) => {
   const [jettyPoints, setJettyPoints] = useState<JettyPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,11 +59,27 @@ const JettyPointDropdown: React.FC<JettyPointDropdownProps> = ({
   };
 
   return (
-    <Box sx={{ minWidth: 200 }}>
+    <Box
+      sx={{
+        minWidth: isCompact ? 150 : 200,
+        transition: "all 0.3s ease-in-out",
+      }}
+    >
       <FormControl fullWidth>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: isCompact ? 0.5 : 1,
+            mb: isCompact ? 0.25 : 0.5,
+          }}
+        >
           <LocationOnIcon
-            sx={{ fontSize: "1.2rem", color: "text.secondary" }}
+            sx={{
+              fontSize: isCompact ? "1rem" : "1.2rem",
+              color: "text.secondary",
+              transition: "all 0.3s ease-in-out",
+            }}
           />
           <InputLabel
             shrink={false}
@@ -69,6 +87,9 @@ const JettyPointDropdown: React.FC<JettyPointDropdownProps> = ({
               position: "relative",
               transform: "none",
               color: "text.primary",
+              fontSize: isCompact ? "0.75rem" : "1rem",
+              transition: "all 0.3s ease-in-out",
+              whiteSpace: "nowrap",
             }}
           >
             Jetty Point
@@ -80,9 +101,44 @@ const JettyPointDropdown: React.FC<JettyPointDropdownProps> = ({
           onChange={handleChange}
           disabled={loading}
           variant="standard"
+          sx={{
+            "& .MuiInput-input": {
+              fontSize: isCompact ? "0.875rem" : "1rem",
+              py: isCompact ? 0.25 : 1,
+              transition: "all 0.3s ease-in-out",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            },
+            "& .MuiInput-root": {
+              "&:before, &:after": {
+                borderBottomWidth: isCompact ? "0.5px" : "1px",
+              },
+            },
+          }}
         >
+          <MenuItem
+            value=""
+            disabled
+            sx={{
+              fontSize: isCompact ? "0.875rem" : "1rem",
+              py: isCompact ? 0.5 : 1,
+            }}
+          >
+            Select a jetty point
+          </MenuItem>
           {jettyPoints.map((point) => (
-            <MenuItem key={point.id} value={point.id}>
+            <MenuItem
+              key={point.id}
+              value={point.id.toString()}
+              sx={{
+                fontSize: isCompact ? "0.875rem" : "1rem",
+                py: isCompact ? 0.5 : 1,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {point.name}
             </MenuItem>
           ))}

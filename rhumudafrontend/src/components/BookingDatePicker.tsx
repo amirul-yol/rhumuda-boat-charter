@@ -1,51 +1,45 @@
 import React from "react";
-import { Box, FormControl, InputLabel } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { Box, TextField, InputLabel, FormControl } from "@mui/material";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 interface BookingDatePickerProps {
   value: string;
   onChange: (value: string) => void;
+  isCompact?: boolean;
 }
 
 const BookingDatePicker: React.FC<BookingDatePickerProps> = ({
   value,
   onChange,
+  isCompact = false,
 }) => {
-  const tomorrow = dayjs().add(1, "day");
-  const [open, setOpen] = React.useState(false);
-
-  // Convert string to Dayjs for internal use
-  const selectedDate = value ? dayjs(value) : tomorrow;
-
-  const handleDateChange = (newValue: Dayjs | null) => {
-    if (newValue) {
-      onChange(newValue.format("YYYY-MM-DD"));
-    }
-  };
-
-  // Disable past dates and dates more than 3 months ahead
-  const disableDates = (date: Dayjs) => {
-    const today = dayjs();
-    const threeMonthsFromNow = today.add(3, "month");
-    return (
-      date.isBefore(today, "day") || date.isAfter(threeMonthsFromNow, "day")
-    );
-  };
-
-  const handleClick = () => {
-    setOpen(true);
-  };
+  const minDate = dayjs().add(1, "day");
+  const maxDate = dayjs().add(3, "month");
 
   return (
-    <Box sx={{ minWidth: 200, mt: 0 }}>
+    <Box
+      sx={{
+        minWidth: isCompact ? 150 : 200,
+        transition: "all 0.3s ease-in-out",
+      }}
+    >
       <FormControl fullWidth>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <CalendarMonthIcon
-            sx={{ fontSize: "1.2rem", color: "text.secondary" }}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: isCompact ? 0.5 : 1,
+            mb: isCompact ? 0.25 : 0.5,
+          }}
+        >
+          <CalendarTodayIcon
+            sx={{
+              fontSize: isCompact ? "1rem" : "1.2rem",
+              color: "text.secondary",
+              transition: "all 0.3s ease-in-out",
+            }}
           />
           <InputLabel
             shrink={false}
@@ -53,70 +47,52 @@ const BookingDatePicker: React.FC<BookingDatePickerProps> = ({
               position: "relative",
               transform: "none",
               color: "text.primary",
+              fontSize: isCompact ? "0.75rem" : "1rem",
+              transition: "all 0.3s ease-in-out",
+              whiteSpace: "nowrap",
             }}
           >
-            Booking Date
+            Date
           </InputLabel>
         </Box>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            value={selectedDate}
-            onChange={handleDateChange}
-            shouldDisableDate={disableDates}
-            format="DD/MM/YYYY"
-            open={open}
-            onClose={() => setOpen(false)}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                onClick: handleClick,
-                variant: "standard",
-                InputProps: {
-                  readOnly: true,
+        <DatePicker
+          value={value ? dayjs(value) : null}
+          onChange={(newValue) => {
+            onChange(newValue ? newValue.format("YYYY-MM-DD") : "");
+          }}
+          minDate={minDate}
+          maxDate={maxDate}
+          slotProps={{
+            textField: {
+              variant: "standard",
+              sx: {
+                "& .MuiInput-input": {
+                  fontSize: isCompact ? "0.875rem" : "1rem",
+                  py: isCompact ? 0.25 : 1,
+                  transition: "all 0.3s ease-in-out",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                },
+                "& .MuiInput-root": {
+                  "&:before, &:after": {
+                    borderBottomWidth: isCompact ? "0.5px" : "1px",
+                  },
                 },
               },
-              popper: {
-                sx: {
-                  "& .MuiPaper-root": {
-                    width: "320px",
-                  },
-                  "& .MuiPickersCalendarHeader-root": {
-                    paddingLeft: "12px",
-                    paddingRight: "12px",
-                  },
-                  "& .MuiDayCalendar-header, .MuiDayCalendar-weekContainer": {
-                    justifyContent: "space-around",
-                    margin: "0 6px",
-                  },
+            },
+            popper: {
+              sx: {
+                "& .MuiPickersDay-root": {
+                  fontSize: isCompact ? "0.875rem" : "1rem",
                 },
-                placement: "bottom",
-                modifiers: [
-                  {
-                    name: "offset",
-                    options: {
-                      offset: [0, 8],
-                    },
-                  },
-                  {
-                    name: "flip",
-                    options: {
-                      fallbackPlacements: ["top"],
-                    },
-                  },
-                  {
-                    name: "preventOverflow",
-                    options: {
-                      mainAxis: true,
-                      altAxis: true,
-                      tether: false,
-                      altBoundary: true,
-                    },
-                  },
-                ],
+                "& .MuiTypography-root": {
+                  fontSize: isCompact ? "0.875rem" : "1rem",
+                },
               },
-            }}
-          />
-        </LocalizationProvider>
+            },
+          }}
+        />
       </FormControl>
     </Box>
   );
