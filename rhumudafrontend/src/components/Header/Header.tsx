@@ -100,17 +100,37 @@ const Header: React.FC = () => {
             }}
           >
             <Box
-              component="img"
-              src={logo}
-              alt="Rhumuda Charter Logo"
-              onClick={() => navigate("/")}
               sx={{
-                height: isScrolled ? 70 : 100,
-                marginRight: 2,
-                cursor: "pointer",
-                transition: "all 0.3s ease-in-out",
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                flex: 1,
               }}
-            />
+            >
+              <Box
+                component="img"
+                src={logo}
+                alt="Rhumuda Charter Logo"
+                onClick={() => navigate("/")}
+                sx={{
+                  height: isScrolled ? 50 : 80,
+                  marginRight: 1,
+                  cursor: "pointer",
+                  transition: "all 0.3s ease-in-out",
+                }}
+              />
+              {isScrolled && isSearchVisible && (
+                <Box
+                  sx={{
+                    flex: 1,
+                    maxWidth: "600px",
+                    marginLeft: 0,
+                  }}
+                >
+                  <SearchBar isCompact={true} />
+                </Box>
+              )}
+            </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Button
                 color="inherit"
@@ -174,9 +194,9 @@ const Header: React.FC = () => {
               </Menu>
             </Box>
           </Toolbar>
-          {isSearchVisible && (
+          {isSearchVisible && !isScrolled && (
             <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-              <SearchBar isCompact={isScrolled} />
+              <SearchBar isCompact={false} />
             </Box>
           )}
         </Stack>
