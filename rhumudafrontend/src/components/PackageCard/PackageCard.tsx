@@ -69,56 +69,68 @@ const PackageCard: React.FC<Package> = ({
       elevation={0}
       sx={{
         width: 280,
-        border: "1px solid #e0e0e0",
+        height: 620,
+        border: "1px solid black",
         borderRadius: 2,
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <Typography
-        variant="h6"
-        sx={{
-          p: 2,
-          pb: 1,
-          textAlign: "center",
-          fontWeight: 500,
-        }}
-      >
-        {title}
-      </Typography>
+      <Box sx={{ flex: "0 0 auto", pt: 2 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            p: 2,
+            pb: 1,
+            textAlign: "center",
+            color: "black",
+            fontWeight: 500,
+            fontSize: "1.25rem",
+          }}
+        >
+          {title}
+        </Typography>
 
-      <Typography
-        variant="subtitle1"
-        sx={{
-          p: 2,
-          pb: 1,
-          textAlign: "center",
-          fontWeight: 600,
-          color: "#0384BD",
-        }}
-      >
-        {name}
-      </Typography>
+        <Typography
+          variant="h6"
+          sx={{
+            pb: 2,
+            textAlign: "center",
+            color: "black",
+            fontWeight: 500,
+            fontSize: "1.5rem",
+          }}
+        >
+          {name}
+        </Typography>
+      </Box>
 
-      <Box
-        sx={{
-          position: "relative",
-          width: "100%",
-          height: 160,
-        }}
-      >
+      <Box sx={{ flex: "0 0 160px", position: "relative" }}>
         <Box
           component="img"
           src={imageUrl}
           alt={title}
           sx={{
-            width: "100%",
-            height: "100%",
+            width: "90%",
+            height: "90%",
             objectFit: "cover",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
           }}
         />
       </Box>
 
-      <Box sx={{ p: 2, pt: 1.5 }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          p: 2,
+        }}
+      >
         <PriceDisplay priceTiers={priceTiers} categoryId={categoryId} />
 
         {renderAdditionalInfo()}
@@ -155,7 +167,9 @@ const PackageCard: React.FC<Package> = ({
             </Typography>
           ))}
         </Box>
+      </Box>
 
+      <Box sx={{ p: 2, pt: 0 }}>
         <Button
           variant="contained"
           fullWidth
