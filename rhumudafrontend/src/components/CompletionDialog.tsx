@@ -49,17 +49,16 @@ const CompletionDialog: React.FC<CompletionDialogProps> = ({
         }}
       >
         <CheckCircleOutlineIcon />
-        Thank you for your inquiry!
+        Inquiry Sent Successfully
       </DialogTitle>
       <DialogContent sx={{ mt: 2, pb: 3 }}>
-        <Typography paragraph>
-          Your inquiry has been submitted successfully! You will receive an
-          inquiry confirmation email shortly with the details of your request.
+        <Typography variant="body1" gutterBottom>
+          Thank you for your inquiry! We have sent a confirmation email to your
+          registered email address.
         </Typography>
-        <Typography>
-          We will review your request and contact you soon to confirm
-          availability and discuss your booking options. Thank you for choosing
-          Rhumuda Boat Charter.
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+          Please check your inbox (and spam folder) for the confirmation email.
+          Our team will review your inquiry and get back to you shortly.
         </Typography>
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>

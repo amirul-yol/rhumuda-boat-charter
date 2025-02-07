@@ -2,3 +2,8 @@
 .vscode/
 ProjectOverview.md
 *.sql
+
+# Environment variables
+.env
+.env.local
+.env.*

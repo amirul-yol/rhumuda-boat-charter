@@ -11,7 +11,7 @@ import {
   Alert,
   Snackbar,
   Chip,
-  Divider
+  Divider,
 } from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -25,10 +25,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import CompletionDialog from "../components/CompletionDialog";
 import BookingEditDialog from "../components/BookingEditDialog";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PendingIcon from '@mui/icons-material/Pending';
-import ErrorIcon from '@mui/icons-material/Error';
-import SendIcon from '@mui/icons-material/Send';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingIcon from "@mui/icons-material/Pending";
+import ErrorIcon from "@mui/icons-material/Error";
+import SendIcon from "@mui/icons-material/Send";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -189,7 +189,7 @@ const SummaryPage: React.FC = () => {
         fetch(`http://localhost:8080/api/bookings/${bookingId}`),
         fetch("http://localhost:8080/api/packages/category/1"),
         fetch("http://localhost:8080/api/packages/category/2"),
-        fetch("http://localhost:8080/api/packages/category/3")
+        fetch("http://localhost:8080/api/packages/category/3"),
       ]);
 
       if (!bookingResponse.ok) {
@@ -198,19 +198,25 @@ const SummaryPage: React.FC = () => {
       }
 
       // Check if any package response failed
-      const failedPackageResponse = packageResponses.find(response => !response.ok);
+      const failedPackageResponse = packageResponses.find(
+        (response) => !response.ok
+      );
       if (failedPackageResponse) {
         throw new Error("Failed to fetch packages data");
       }
 
       const bookingData = await bookingResponse.json();
-      const packagesData = (await Promise.all(packageResponses.map(r => r.json()))).flat();
+      const packagesData = (
+        await Promise.all(packageResponses.map((r) => r.json()))
+      ).flat();
 
       setBooking(bookingData);
       setPackages(packagesData);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setError(error instanceof Error ? error.message : "An unexpected error occurred");
+      setError(
+        error instanceof Error ? error.message : "An unexpected error occurred"
+      );
     } finally {
       setLoading(false);
     }
@@ -394,32 +400,32 @@ const SummaryPage: React.FC = () => {
 
   const getStatusDetails = (status: string) => {
     switch (status?.toUpperCase()) {
-      case 'COMPLETE':
+      case "COMPLETE":
         return {
-          label: 'Booking Complete',
-          color: 'success' as const,
+          label: "Booking Complete",
+          color: "success" as const,
           icon: <CheckCircleIcon />,
           // description: 'Your booking has been approved by our team.'
         };
-      case 'PENDING':
+      case "PENDING":
         return {
-          label: 'Inquiry Sent',
-          color: 'warning' as const,
+          label: "Inquiry Sent",
+          color: "warning" as const,
           icon: <PendingIcon />,
           // description: 'Your inquiry has been sent and is awaiting approval from our team.'
         };
-      case 'CANCELLED':
+      case "CANCELLED":
         return {
-          label: 'Booking Cancelled',
-          color: 'error' as const,
+          label: "Booking Cancelled",
+          color: "error" as const,
           icon: <ErrorIcon />,
           // description: 'This booking has been cancelled.'
         };
-      case 'INCOMPLETE':
+      case "INCOMPLETE":
       default:
         return {
-          label: 'Incomplete',
-          color: 'error' as const,
+          label: "Incomplete",
+          color: "error" as const,
           icon: <ErrorIcon />,
           // description: 'Please review your booking details and click "Send Inquiry" to submit your booking.'
         };
@@ -429,25 +435,33 @@ const SummaryPage: React.FC = () => {
   const handleSendInquiry = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/submit`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: 'PENDING' })  // Update to PENDING when sending inquiry
-      });
+
+      // First, update the booking status
+      const response = await fetch(
+        `http://localhost:8080/api/bookings/${bookingId}/submit`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit inquiry');
+        throw new Error(errorData.message || "Failed to submit inquiry");
       }
 
-      setSuccessMessage('Your inquiry has been sent successfully!');
+      setSuccessMessage(
+        "Your inquiry has been sent successfully! Please check your email for confirmation."
+      );
       setShowCompletionDialog(true);
       fetchBookingData(); // Refresh to get updated status
     } catch (error) {
-      console.error('Error sending inquiry:', error);
-      setError(error instanceof Error ? error.message : 'Failed to send inquiry');
+      console.error("Error sending inquiry:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to send inquiry"
+      );
     } finally {
       setLoading(false);
     }
@@ -461,7 +475,7 @@ const SummaryPage: React.FC = () => {
     if (!booking) return null;
 
     switch (booking.status?.toUpperCase()) {
-      case 'COMPLETE':
+      case "COMPLETE":
         return (
           <Button
             variant="contained"
@@ -472,7 +486,7 @@ const SummaryPage: React.FC = () => {
             Booking Complete
           </Button>
         );
-      case 'PENDING':
+      case "PENDING":
         return (
           <Button
             variant="contained"
@@ -483,7 +497,7 @@ const SummaryPage: React.FC = () => {
             Inquiry Sent
           </Button>
         );
-      case 'CANCELLED':
+      case "CANCELLED":
         return (
           <Button
             variant="contained"
@@ -494,7 +508,7 @@ const SummaryPage: React.FC = () => {
             Booking Cancelled
           </Button>
         );
-      case 'INCOMPLETE':
+      case "INCOMPLETE":
       default:
         return (
           <Button
@@ -504,7 +518,7 @@ const SummaryPage: React.FC = () => {
             onClick={handleSendInquiry}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} /> : 'Send Inquiry'}
+            {loading ? <CircularProgress size={24} /> : "Send Inquiry"}
           </Button>
         );
     }
@@ -513,7 +527,7 @@ const SummaryPage: React.FC = () => {
   if (loading) {
     return (
       <Container maxWidth="lg">
-        <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ mt: 4, mb: 4, display: "flex", justifyContent: "center" }}>
           <CircularProgress />
         </Box>
       </Container>
@@ -527,8 +541,8 @@ const SummaryPage: React.FC = () => {
           <Typography color="error" variant="h6" gutterBottom>
             {error}
           </Typography>
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             onClick={fetchBookingData}
             startIcon={<RefreshIcon />}
           >
@@ -543,23 +557,21 @@ const SummaryPage: React.FC = () => {
     return (
       <Container maxWidth="lg">
         <Box sx={{ mt: 4, mb: 4 }}>
-          <Typography variant="h6">
-            No booking data found
-          </Typography>
+          <Typography variant="h6">No booking data found</Typography>
         </Box>
       </Container>
     );
   }
 
   // Add null checks for booking and packages
-  const selectedPackage = booking?.packageDetails?.id 
+  const selectedPackage = booking?.packageDetails?.id
     ? packages.find((pkg) => pkg.id === booking.packageDetails.id)
     : null;
 
   if (!booking || !selectedPackage) {
     return (
       <Container maxWidth="lg">
-        <Box sx={{ mt: 4, mb: 4, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ mt: 4, mb: 4, display: "flex", justifyContent: "center" }}>
           <CircularProgress />
         </Box>
       </Container>
@@ -568,49 +580,60 @@ const SummaryPage: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-
       {/* Main Content Grid */}
       <Grid container spacing={3}>
         {/* Left Column - 70% */}
         <Grid item xs={12} md={8}>
           {/* Booking ID and Package Name Section */}
           <Box sx={{ mb: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
               Booking ID: #{booking?.bookingId}
             </Typography>
             <Typography variant="h4" sx={{ mb: 2 }}>
               Package: {getPackageName(booking?.packageDetails)}
             </Typography>
-            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
+            <Divider
+              sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1 }}
+            />
           </Box>
 
           {/* Package Description Section */}
           <Box sx={{ mb: 3 }}>
             {selectedPackage?.description && (
               <>
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    mb: 2,
-                    fontSize: '1.1rem',
-                    color: 'black',
-                    lineHeight: 1.7
-                  }}
-                >
-                  Embark on an unforgettable fishing adventure with RhuMuda Boat Charter. Our experienced captains will take you to the best fishing spots, where you can cast your line and reel in a variety of fish species. Whether you're a seasoned angler or a beginner, we'll provide you with all the necessary equipment and expert guidance.
-                </Typography>
-                <Typography 
+                <Typography
                   variant="body1"
-                  sx={{ 
+                  sx={{
                     mb: 2,
-                    fontSize: '1.1rem',
-                    color: 'black',
-                    lineHeight: 1.7
+                    fontSize: "1.1rem",
+                    color: "black",
+                    lineHeight: 1.7,
                   }}
                 >
-                  Our fishing charters offer a unique opportunity to relax, unwind, and enjoy the thrill of the catch. We cater to both inshore, offshore, and night fishing - depending on your preferences and the season.
+                  Embark on an unforgettable fishing adventure with RhuMuda Boat
+                  Charter. Our experienced captains will take you to the best
+                  fishing spots, where you can cast your line and reel in a
+                  variety of fish species. Whether you're a seasoned angler or a
+                  beginner, we'll provide you with all the necessary equipment
+                  and expert guidance.
                 </Typography>
-                <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    mb: 2,
+                    fontSize: "1.1rem",
+                    color: "black",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Our fishing charters offer a unique opportunity to relax,
+                  unwind, and enjoy the thrill of the catch. We cater to both
+                  inshore, offshore, and night fishing - depending on your
+                  preferences and the season.
+                </Typography>
+                <Divider
+                  sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1 }}
+                />
               </>
             )}
           </Box>
@@ -620,31 +643,35 @@ const SummaryPage: React.FC = () => {
             <Typography variant="h4" sx={{ mb: 2 }}>
               Customer Details
             </Typography>
-            <Box sx={{ 
-              border: '1px solid rgba(0, 0, 0, 0.12)', 
-              borderRadius: '4px',
-              p: 3,
-              mb: 3
-            }}>
+            <Box
+              sx={{
+                border: "1px solid rgba(0, 0, 0, 0.12)",
+                borderRadius: "4px",
+                p: 3,
+                mb: 3,
+              }}
+            >
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
-                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                  <Typography sx={{ fontSize: "1rem", color: "black", mb: 1 }}>
                     <strong>Name:</strong>{" "}
                     {`${booking?.firstName} ${booking?.lastName}`}
                   </Typography>
-                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                  <Typography sx={{ fontSize: "1rem", color: "black", mb: 1 }}>
                     <strong>Email:</strong> {booking?.email}
                   </Typography>
-                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                  <Typography sx={{ fontSize: "1rem", color: "black", mb: 1 }}>
                     <strong>Phone:</strong> {booking?.phoneNumber}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} md={6}>
-                  <Typography sx={{ fontSize: '1rem', color: 'black', mb: 1 }}>
+                  <Typography sx={{ fontSize: "1rem", color: "black", mb: 1 }}>
                     <strong>Address:</strong>{" "}
                     {`${booking?.addressLine1}${
                       booking?.addressLine2 ? ` ${booking.addressLine2}` : ""
-                    }, ${booking?.postalCode} ${booking?.city}, ${booking?.country}`}
+                    }, ${booking?.postalCode} ${booking?.city}, ${
+                      booking?.country
+                    }`}
                   </Typography>
                 </Grid>
               </Grid>
@@ -652,19 +679,21 @@ const SummaryPage: React.FC = () => {
                 <Button
                   variant="contained"
                   onClick={handleEditClick}
-                  sx={{ 
-                    bgcolor: "#0384BD", 
+                  sx={{
+                    bgcolor: "#0384BD",
                     "&:hover": { bgcolor: "#026994" },
-                    textTransform: 'none',
-                    borderRadius: '4px',
-                    px: 3
+                    textTransform: "none",
+                    borderRadius: "4px",
+                    px: 3,
                   }}
                 >
                   Edit Details
                 </Button>
               </Box>
             </Box>
-            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
+            <Divider
+              sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1 }}
+            />
           </Box>
 
           {/* Services Section */}
@@ -678,37 +707,48 @@ const SummaryPage: React.FC = () => {
                 <Stack spacing={2}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-                    <Typography sx={{ fontSize: '1rem', color: 'black' }}>
+                    <Typography sx={{ fontSize: "1rem", color: "black" }}>
                       Duration: {selectedPackage?.durationMinutes || 0} minutes
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <GroupsIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-                    <Typography sx={{ fontSize: '1rem', color: 'black' }}>
+                    <Typography sx={{ fontSize: "1rem", color: "black" }}>
                       Max Capacity: {selectedPackage?.maxCapacity || 0} persons
                     </Typography>
                   </Stack>
-                  {selectedPackage?.distanceMinKm && selectedPackage?.distanceMaxKm && (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <DirectionsBoatIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-                      <Typography sx={{ fontSize: '1rem', color: 'black' }}>
-                        Distance: {selectedPackage.distanceMinKm} - {selectedPackage.distanceMaxKm} km
-                      </Typography>
-                    </Stack>
-                  )}
+                  {selectedPackage?.distanceMinKm &&
+                    selectedPackage?.distanceMaxKm && (
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <DirectionsBoatIcon
+                          sx={{ color: "#0384BD", fontSize: 20 }}
+                        />
+                        <Typography sx={{ fontSize: "1rem", color: "black" }}>
+                          Distance: {selectedPackage.distanceMinKm} -{" "}
+                          {selectedPackage.distanceMaxKm} km
+                        </Typography>
+                      </Stack>
+                    )}
                 </Stack>
               </Grid>
 
               {/* Included Services - Moved to right side */}
               <Grid item xs={12} md={6}>
-                <Typography sx={{ fontSize: '1rem', color: 'black', fontWeight: 'bold', mb: 1 }}>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    color: "black",
+                    fontWeight: "bold",
+                    mb: 1,
+                  }}
+                >
                   Services Included:
                 </Typography>
                 <Stack spacing={0.5}>
                   {selectedPackage?.services?.map((service) => (
                     <Typography
                       key={service.id}
-                      sx={{ fontSize: '1rem', color: 'black' }}
+                      sx={{ fontSize: "1rem", color: "black" }}
                     >
                       {service.name || service.serviceName}
                     </Typography>
@@ -716,7 +756,9 @@ const SummaryPage: React.FC = () => {
                 </Stack>
               </Grid>
             </Grid>
-            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1, mt: 3 }} />
+            <Divider
+              sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1, mt: 3 }}
+            />
           </Box>
 
           {/* Location Section */}
@@ -749,7 +791,9 @@ const SummaryPage: React.FC = () => {
                 }}
               />
             </Box>
-            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1, mt: 3 }} />
+            <Divider
+              sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1, mt: 3 }}
+            />
           </Box>
 
           {/* Cancellation Policy Section */}
@@ -757,68 +801,85 @@ const SummaryPage: React.FC = () => {
             <Typography variant="h4" sx={{ mb: 2 }}>
               Cancellation Policy
             </Typography>
-            <Typography sx={{ fontSize: '1rem', color: 'black', mb: 2 }}>
+            <Typography sx={{ fontSize: "1rem", color: "black", mb: 2 }}>
               Full refund up to 7 days prior
             </Typography>
-            <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.1)', borderWidth: 1 }} />
+            <Divider
+              sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1 }}
+            />
           </Box>
         </Grid>
 
         {/* Right Column - 30% */}
         <Grid item xs={12} md={4}>
           {/* Booking Status Section */}
-          <Paper elevation={3} sx={{ p: 3, mb: 3, position: 'sticky', top: 24 }}>
+          <Paper
+            elevation={3}
+            sx={{ p: 3, mb: 3, position: "sticky", top: 24 }}
+          >
             <Typography variant="h6" gutterBottom>
               Booking Status
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <Chip
                 icon={getStatusDetails(booking?.status).icon}
                 label={getStatusDetails(booking?.status).label}
                 color={getStatusDetails(booking?.status).color}
-                sx={{ fontSize: '1rem', py: 2, px: 1 }}
+                sx={{ fontSize: "1rem", py: 2, px: 1 }}
               />
             </Box>
             {/* <Typography color="text.secondary">
               {getStatusDetails(booking?.status).description}
             </Typography> */}
-            {booking?.status === 'PENDING' && (
+            {booking?.status === "PENDING" && (
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                Submitted on: {dayjs(booking?.createdAt).format('DD MMM YYYY, HH:mm')}
+                Submitted on:{" "}
+                {dayjs(booking?.createdAt).format("DD MMM YYYY, HH:mm")}
               </Typography>
             )}
           </Paper>
 
           {/* Estimated Cost Section */}
-          <Paper sx={{ 
-            p: 3, 
-            mb: 3,
-            maxWidth: '400px',
-            mx: 'auto'
-          }}>
-            <Typography variant="subtitle1" sx={{ mb: 1, color: 'text.secondary' }}>
+          <Paper
+            sx={{
+              p: 3,
+              mb: 3,
+              maxWidth: "400px",
+              mx: "auto",
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{ mb: 1, color: "text.secondary" }}
+            >
               Estimated Cost
             </Typography>
             {/* Total Cost Display */}
-            <Typography variant="h4" sx={{ 
-              mb: 4,
-              fontWeight: 'bold'
-            }}>
-              MYR {(() => {
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 4,
+                fontWeight: "bold",
+              }}
+            >
+              MYR{" "}
+              {(() => {
                 const hasFixedPrice = selectedPackage?.priceTiers.some(
                   (tier) => tier.type === "FIXED"
                 );
 
-                const baseCost = selectedPackage ? (
-                  hasFixedPrice
+                const baseCost = selectedPackage
+                  ? hasFixedPrice
                     ? selectedPackage.basePrice
                     : selectedPackage.basePrice * (booking?.passengers || 0)
-                ) : 0;
+                  : 0;
 
-                const addOnsCost = booking?.addOns ? booking.addOns.reduce(
-                  (total, addon) => total + addon.price,
-                  0
-                ) : 0;
+                const addOnsCost = booking?.addOns
+                  ? booking.addOns.reduce(
+                      (total, addon) => total + addon.price,
+                      0
+                    )
+                  : 0;
 
                 return (baseCost + addOnsCost).toFixed(2);
               })()}
@@ -826,49 +887,64 @@ const SummaryPage: React.FC = () => {
 
             {/* Details Grid */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ mb: 1, color: "text.secondary" }}
+              >
                 Jetty Location
               </Typography>
-              <Box sx={{ 
-                border: '1px solid rgba(0, 0, 0, 0.12)', 
-                borderRadius: '4px',
-                p: 1.5,
-                minHeight: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                mb: 2
-              }}>
+              <Box
+                sx={{
+                  border: "1px solid rgba(0, 0, 0, 0.12)",
+                  borderRadius: "4px",
+                  p: 1.5,
+                  minHeight: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
                 {getJettyPointName(booking?.jettyPoint)}
               </Box>
 
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, color: "text.secondary" }}
+                  >
                     Date
                   </Typography>
-                  <Box sx={{ 
-                    border: '1px solid rgba(0, 0, 0, 0.12)', 
-                    borderRadius: '4px',
-                    p: 1.5,
-                    minHeight: '40px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
+                  <Box
+                    sx={{
+                      border: "1px solid rgba(0, 0, 0, 0.12)",
+                      borderRadius: "4px",
+                      p: 1.5,
+                      minHeight: "40px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     {formatDate(booking?.bookingDate)}
                   </Box>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, color: "text.secondary" }}
+                  >
                     Group Size
                   </Typography>
-                  <Box sx={{ 
-                    border: '1px solid rgba(0, 0, 0, 0.12)', 
-                    borderRadius: '4px',
-                    p: 1.5,
-                    minHeight: '40px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
+                  <Box
+                    sx={{
+                      border: "1px solid rgba(0, 0, 0, 0.12)",
+                      borderRadius: "4px",
+                      p: 1.5,
+                      minHeight: "40px",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     {booking?.passengers} persons
                   </Box>
                 </Grid>
@@ -877,72 +953,104 @@ const SummaryPage: React.FC = () => {
 
             {/* Cost Breakdown */}
             <Box sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
                 <Typography variant="body2">Base Cost</Typography>
-                <Typography variant="body2">RM {selectedPackage?.basePrice.toFixed(2)}</Typography>
+                <Typography variant="body2">
+                  RM {selectedPackage?.basePrice.toFixed(2)}
+                </Typography>
               </Box>
-              <Typography variant="body2" sx={{ mb: 1 }}>Add On:</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Add On:
+              </Typography>
               {booking?.addOns && booking.addOns.length > 0 ? (
                 booking.addOns.map((addon) => (
-                  <Box key={addon.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5, pl: 2 }}>
+                  <Box
+                    key={addon.id}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 0.5,
+                      pl: 2,
+                    }}
+                  >
                     <Typography variant="body2">{addon.name}</Typography>
-                    <Typography variant="body2">RM {addon.price.toFixed(2)}</Typography>
+                    <Typography variant="body2">
+                      RM {addon.price.toFixed(2)}
+                    </Typography>
                   </Box>
                 ))
               ) : (
-                <Typography variant="body2" sx={{ pl: 2, color: 'text.secondary' }}>None</Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ pl: 2, color: "text.secondary" }}
+                >
+                  None
+                </Typography>
               )}
             </Box>
 
             {/* Total and Action Button */}
             <Box>
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                borderTop: '1px solid rgba(0, 0, 0, 0.12)',
-                pt: 2,
-                mb: 3
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+                  pt: 2,
+                  mb: 3,
+                }}
+              >
                 <Typography>Total</Typography>
                 <Typography>
-                  RM {(() => {
+                  RM{" "}
+                  {(() => {
                     const hasFixedPrice = selectedPackage?.priceTiers.some(
                       (tier) => tier.type === "FIXED"
                     );
 
-                    const baseCost = selectedPackage ? (
-                      hasFixedPrice
+                    const baseCost = selectedPackage
+                      ? hasFixedPrice
                         ? selectedPackage.basePrice
                         : selectedPackage.basePrice * (booking?.passengers || 0)
-                    ) : 0;
+                      : 0;
 
-                    const addOnsCost = booking?.addOns ? booking.addOns.reduce(
-                      (total, addon) => total + addon.price,
-                      0
-                    ) : 0;
+                    const addOnsCost = booking?.addOns
+                      ? booking.addOns.reduce(
+                          (total, addon) => total + addon.price,
+                          0
+                        )
+                      : 0;
 
                     return (baseCost + addOnsCost).toFixed(2);
                   })()}
                 </Typography>
               </Box>
-              <Box sx={{ display: "flex", justifyContent: "center", width: '100%' }}>
-                {booking?.status === 'PENDING' && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                {booking?.status === "PENDING" && (
                   <Button
                     variant="contained"
                     disabled
                     fullWidth
                     sx={{
-                      bgcolor: 'rgba(0, 0, 0, 0.12)',
-                      color: 'rgba(0, 0, 0, 0.38)',
-                      '&:hover': {
-                        bgcolor: 'rgba(0, 0, 0, 0.12)'
-                      }
+                      bgcolor: "rgba(0, 0, 0, 0.12)",
+                      color: "rgba(0, 0, 0, 0.38)",
+                      "&:hover": {
+                        bgcolor: "rgba(0, 0, 0, 0.12)",
+                      },
                     }}
                   >
                     Inquiry Sent
                   </Button>
                 )}
-                {booking?.status !== 'PENDING' && renderActionButton()}
+                {booking?.status !== "PENDING" && renderActionButton()}
               </Box>
             </Box>
           </Paper>
@@ -950,10 +1058,10 @@ const SummaryPage: React.FC = () => {
       </Grid>
 
       {/* Dialogs and Snackbars - Keep these outside the grid */}
-      <BookingEditDialog 
+      <BookingEditDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        bookingId={booking?.bookingId || ''}
+        bookingId={booking?.bookingId || ""}
         onUpdate={handleBookingUpdate}
       />
       <CompletionDialog

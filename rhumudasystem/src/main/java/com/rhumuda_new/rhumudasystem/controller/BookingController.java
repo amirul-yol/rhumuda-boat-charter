@@ -9,6 +9,8 @@ import com.rhumuda_new.rhumudasystem.repository.AddOnRepository;
 import com.rhumuda_new.rhumudasystem.repository.BookingRepository;
 import com.rhumuda_new.rhumudasystem.repository.JettyPointRepository;
 import com.rhumuda_new.rhumudasystem.repository.PackageRepository;
+import com.rhumuda_new.rhumudasystem.service.BookingService;
+import com.rhumuda_new.rhumudasystem.service.EmailService;
 
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -45,6 +47,12 @@ public class BookingController {
 
     @Autowired
     private AddOnRepository addOnRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private BookingService bookingService;
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<?> getBooking(@PathVariable String bookingId) {
@@ -236,19 +244,19 @@ public class BookingController {
     @PutMapping("/{bookingId}/submit")
     public ResponseEntity<?> submitBooking(@PathVariable String bookingId) {
         try {
-            Optional<Booking> bookingOpt = bookingRepository.findByBookingId(bookingId);
-            if (!bookingOpt.isPresent()) {
-                return ResponseEntity.notFound().build();
-            }
+            // Get booking data
+            BookingDTO booking = bookingService.getBookingById(bookingId);
             
-            Booking booking = bookingOpt.get();
-            booking.setStatus(BookingStatus.PENDING);
-            bookingRepository.save(booking);
+            // Update booking status to PENDING
+            bookingService.updateBookingStatus(bookingId, "PENDING");
             
-            return ResponseEntity.ok(booking);
+            // Send emails
+            emailService.sendBookingEmails(booking);
+            
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Error updating booking status", Arrays.asList(e.getMessage())));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to submit booking", e.getMessage()));
         }
     }
 }
