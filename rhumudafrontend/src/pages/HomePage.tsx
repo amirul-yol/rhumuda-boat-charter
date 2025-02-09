@@ -26,35 +26,39 @@ const ServicesSection = () => {
     {
       icon: yachtIcon,
       title: "Private Boat",
-      description: "Experience the serenity of the open waters with our private boat rentals. Explore hidden coves, fish, or simply cruise. Our modern boats prioritize safety and an exciting journey.",
+      description:
+        "Experience the serenity of the open waters with our private boat rentals. Explore hidden coves, fish, or simply cruise. Our modern boats prioritize safety and an exciting journey.",
     },
     {
       icon: summerIcon,
       title: "Island Day Trip",
-      description: "Escape city life with our serene island day trips to Pulau Kapas. Enjoy crystal-clear waters, pristine beaches, and vibrant marine life. Snorkel, swim, or relax - our experienced crew will guide you.",
+      description:
+        "Escape city life with our serene island day trips to Pulau Kapas. Enjoy crystal-clear waters, pristine beaches, and vibrant marine life. Snorkel, swim, or relax - our experienced crew will guide you.",
     },
     {
       icon: fishingIcon,
       title: "Fishing",
-      description: "Thrill seeking fishing with us. Expert guides, prime spots, all skill levels welcome, inshore, offshore, night fishing options.",
+      description:
+        "Thrill seeking fishing with us. Expert guides, prime spots, all skill levels welcome, inshore, offshore, night fishing options.",
     },
     {
       icon: boatIcon,
       title: "Round Island",
-      description: "Explore the island's beauty on our Round-Island Excursion. Discover breathtaking views, hidden beaches, and stunning landscapes. Experience wonder and tranquility.",
+      description:
+        "Explore the island's beauty on our Round-Island Excursion. Discover breathtaking views, hidden beaches, and stunning landscapes. Experience wonder and tranquility.",
     },
   ];
 
   return (
     <Container maxWidth="lg">
-      <Typography 
-        variant="h4" 
-        align="center" 
-        gutterBottom 
-        sx={{ 
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{
           mb: 6,
           fontWeight: 500,
-          color: 'text.primary'
+          color: "text.primary",
         }}
       >
         Services Offered
@@ -62,24 +66,24 @@ const ServicesSection = () => {
       <Grid container spacing={4} sx={{ mb: 6 }}>
         {services.map((service, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card 
+            <Card
               elevation={0}
-              sx={{ 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                bgcolor: 'transparent',
+              sx={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
+                bgcolor: "transparent",
               }}
             >
               <Box
                 sx={{
                   width: 80,
                   height: 80,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   mb: 2,
                 }}
               >
@@ -87,27 +91,27 @@ const ServicesSection = () => {
                   src={service.icon}
                   alt={service.title}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
                   }}
                 />
               </Box>
               <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                <Typography 
-                  variant="h6" 
+                <Typography
+                  variant="h6"
                   gutterBottom
-                  sx={{ 
+                  sx={{
                     fontWeight: 500,
                     mb: 2,
                   }}
                 >
                   {service.title}
                 </Typography>
-                <Typography 
-                  variant="body2" 
+                <Typography
+                  variant="body2"
                   color="text.secondary"
-                  sx={{ 
+                  sx={{
                     lineHeight: 1.6,
                     mb: 2,
                   }}
@@ -119,17 +123,17 @@ const ServicesSection = () => {
           </Grid>
         ))}
       </Grid>
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Button 
-          variant="contained" 
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Button
+          variant="contained"
           color="primary"
           href="/services"
-          sx={{ 
+          sx={{
             borderRadius: 28,
             px: 4,
             py: 1,
-            textTransform: 'none',
-            fontSize: '1rem',
+            textTransform: "none",
+            fontSize: "1rem",
           }}
         >
           Learn more about our services
@@ -262,51 +266,94 @@ const HomePage: React.FC = () => {
         alignItems="center"
         sx={{ mt: 4 }}
       >
-        <Box
-          component="img"
-          src={boatIcon}
-          alt="Boat Charter"
-          onClick={() => handleCategorySelect("boat")}
-          sx={{
-            width: 80,
-            height: 80,
-            cursor: "pointer",
-            transition: "transform 0.2s",
-            "&:hover": {
-              transform: "scale(1.1)",
-            },
-          }}
-        />
-        <Box
-          component="img"
-          src={islandIcon}
-          alt="Island Trips"
-          onClick={() => handleCategorySelect("island")}
-          sx={{
-            width: 80,
-            height: 80,
-            cursor: "pointer",
-            transition: "transform 0.2s",
-            "&:hover": {
-              transform: "scale(1.1)",
-            },
-          }}
-        />
-        <Box
-          component="img"
-          src={fishingIcon}
-          alt="Fishing Trips"
-          onClick={() => handleCategorySelect("fishing")}
-          sx={{
-            width: 80,
-            height: 80,
-            cursor: "pointer",
-            transition: "transform 0.2s",
-            "&:hover": {
-              transform: "scale(1.1)",
-            },
-          }}
-        />
+        <Box sx={{ position: "relative" }}>
+          <Box
+            component="img"
+            src={boatIcon}
+            alt="Boat Charter"
+            onClick={() => handleCategorySelect("boat")}
+            sx={{
+              width: 80,
+              height: 80,
+              cursor: "pointer",
+              transition: "transform 0.2s",
+              "&:hover": {
+                transform: "scale(1.1)",
+              },
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: -8,
+              left: 0,
+              right: 0,
+              height: 3,
+              bgcolor: selectedCategory === "boat" ? "#06FB07" : "transparent",
+              transition: "background-color 0.3s",
+            }}
+          />
+        </Box>
+
+        <Box sx={{ position: "relative" }}>
+          <Box
+            component="img"
+            src={islandIcon}
+            alt="Island Trips"
+            onClick={() => handleCategorySelect("island")}
+            sx={{
+              width: 80,
+              height: 80,
+              cursor: "pointer",
+              transition: "transform 0.2s",
+              "&:hover": {
+                transform: "scale(1.1)",
+              },
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: -8,
+              left: 0,
+              right: 0,
+              height: 3,
+              bgcolor:
+                selectedCategory === "island" ? "#06FB07" : "transparent",
+              transition: "background-color 0.3s",
+            }}
+          />
+        </Box>
+
+        <Box sx={{ position: "relative" }}>
+          <Box
+            component="img"
+            src={fishingIcon}
+            alt="Fishing Trips"
+            onClick={() => handleCategorySelect("fishing")}
+            sx={{
+              width: 80,
+              height: 80,
+              cursor: "pointer",
+              transition: "transform 0.2s",
+              "&:hover": {
+                transform: "scale(1.1)",
+              },
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: -8,
+              left: 0,
+              right: 0,
+              height: 3,
+              bgcolor:
+                selectedCategory === "fishing" ? "#06FB07" : "transparent",
+              transition: "background-color 0.3s",
+            }}
+          />
+        </Box>
       </Stack>
 
       {/* Package Title */}
@@ -338,38 +385,38 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Explore Pulau Kapas Section */}
-      <Box sx={{ py: 8, bgcolor: 'background.paper' }}>
+      <Box sx={{ py: 8, bgcolor: "background.paper" }}>
         <Container maxWidth="lg">
-          <Typography 
-            variant="h4" 
-            align="center" 
-            gutterBottom 
-            sx={{ 
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
+            sx={{
               mb: 4,
               fontWeight: 500,
-              color: 'primary.main'
+              color: "primary.main",
             }}
           >
             Explore Pulau Kapas
           </Typography>
           <Box
             sx={{
-              position: 'relative',
-              width: '100%',
-              paddingTop: '56.25%', // 16:9 aspect ratio
-              borderRadius: '16px',
-              overflow: 'hidden',
+              position: "relative",
+              width: "100%",
+              paddingTop: "56.25%", // 16:9 aspect ratio
+              borderRadius: "16px",
+              overflow: "hidden",
               boxShadow: 3,
             }}
           >
             <iframe
               src="https://www.youtube.com/embed/iR8MHSyERTk"
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 0,
                 left: 0,
-                width: '100%',
-                height: '100%',
+                width: "100%",
+                height: "100%",
                 border: 0,
               }}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -381,7 +428,7 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Services Offered Section */}
-      <Box sx={{ py: 8, bgcolor: 'background.default' }}>
+      <Box sx={{ py: 8, bgcolor: "background.default" }}>
         <ServicesSection />
       </Box>
     </Box>
