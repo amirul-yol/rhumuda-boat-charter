@@ -1,5 +1,6 @@
 package com.rhumuda_new.rhumudasystem.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
