@@ -38,6 +38,7 @@ import dayjs from "dayjs";
 import ReservationDatePicker from "../components/ReservationDatePicker";
 import ReservationJettyPoint from "../components/ReservationJettyPoint";
 import ReservationPassengers from "../components/ReservationPassengers";
+import { BOOKING_SELECTION_KEY, BookingSelection } from "../types/booking";
 // import Description from "../components/Description";
 
 interface CustomerInfo {
@@ -162,7 +163,9 @@ const InquiryPage: React.FC = () => {
     passengers: 1,
   };
 
-  const [activeSection, setActiveSection] = React.useState<number>(0);
+  const [activeSection, setActiveSection] = React.useState<number>(
+    (location.state as any)?.activeSection ?? 0
+  );
   const [customerInfo, setCustomerInfo] = React.useState<CustomerInfo>({
     firstName: "",
     lastName: "",
@@ -294,6 +297,37 @@ const InquiryPage: React.FC = () => {
           specialRemarks: "",
         },
       });
+    }
+  }, []);
+
+  useEffect(() => {
+    // Try router state first
+    const routerSelection = location.state as BookingSelection;
+
+    if (routerSelection?.categoryId && routerSelection?.packageId) {
+      setSelectedCategory(routerSelection.categoryId);
+      setReservationDetails((prev) => ({
+        ...prev,
+        packageId: routerSelection.packageId,
+      }));
+      return;
+    }
+
+    // Fallback to localStorage
+    const storedSelection = localStorage.getItem(BOOKING_SELECTION_KEY);
+    if (storedSelection) {
+      const selection: BookingSelection = JSON.parse(storedSelection);
+
+      // Check if data is not stale (24 hours)
+      if (Date.now() - selection.timestamp < 24 * 60 * 60 * 1000) {
+        setSelectedCategory(selection.categoryId);
+        setReservationDetails((prev) => ({
+          ...prev,
+          packageId: selection.packageId,
+        }));
+      } else {
+        localStorage.removeItem(BOOKING_SELECTION_KEY);
+      }
     }
   }, []);
 
@@ -671,7 +705,7 @@ const InquiryPage: React.FC = () => {
         specialRemarks: otherOptions.specialRemarks || null,
       };
 
-      console.log('Sending booking data:', bookingData);
+      console.log("Sending booking data:", bookingData);
 
       const response = await fetch("http://localhost:8080/api/bookings", {
         method: "POST",
@@ -687,10 +721,10 @@ const InquiryPage: React.FC = () => {
       }
 
       const savedBooking = await response.json();
-      
+
       // Clear the form data from localStorage since we've successfully saved
       localStorage.removeItem(STORAGE_KEY);
-      
+
       return savedBooking.bookingId || bookingId;
     } catch (error) {
       console.error("Error saving booking:", error);
@@ -924,7 +958,7 @@ const InquiryPage: React.FC = () => {
         <Grid container spacing={3}>
           {/* Package Name and Description */}
           {/* <Grid item xs={12}> */}
-            {/* <Typography variant="subtitle1" fontWeight={500}>
+          {/* <Typography variant="subtitle1" fontWeight={500}>
               {selectedPackage.name}
             </Typography>
             <Description text={selectedPackage.description} /> */}

@@ -5,8 +5,11 @@ import PriceDisplay from "./PriceDisplay";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import StraightenIcon from "@mui/icons-material/Straighten";
+import { useNavigate } from "react-router-dom";
+import { BOOKING_SELECTION_KEY, BookingSelection } from "../../types/booking";
 
 const PackageCard: React.FC<Package> = ({
+  id,
   title,
   name,
   categoryId,
@@ -18,6 +21,26 @@ const PackageCard: React.FC<Package> = ({
   distanceMinKm,
   distanceMaxKm,
 }) => {
+  const navigate = useNavigate();
+
+  const handleBookNow = () => {
+    // Store in localStorage
+    const selection: BookingSelection = {
+      categoryId,
+      packageId: id.toString(),
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(BOOKING_SELECTION_KEY, JSON.stringify(selection));
+
+    // Navigate with state, explicitly setting activeSection to 0
+    navigate("/inquiry", {
+      state: {
+        ...selection,
+        activeSection: 0, // Force start at customerInfo
+      },
+    });
+  };
+
   const renderAdditionalInfo = () => {
     const items = [];
 
@@ -181,6 +204,7 @@ const PackageCard: React.FC<Package> = ({
               bgcolor: "#026994",
             },
           }}
+          onClick={handleBookNow}
         >
           Book Now
         </Button>
