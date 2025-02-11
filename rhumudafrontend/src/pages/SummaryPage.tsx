@@ -223,16 +223,13 @@ const SummaryPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!bookingId) {
+      setError("No booking ID provided");
+      setLoading(false);
+      return;
+    }
     fetchBookingData();
   }, [bookingId]);
-
-  useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      console.log("Loaded data:", JSON.parse(savedData));
-      setData(JSON.parse(savedData));
-    }
-  }, []);
 
   useEffect(() => {
     const fetchJettyPoints = async () => {
@@ -264,21 +261,6 @@ const SummaryPage: React.FC = () => {
 
     fetchAddOns();
   }, []);
-
-  useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      if (parsedData.bookingId === bookingId) {
-        // Use saved data
-        setBooking(parsedData);
-        setLoading(false);
-        return;
-      }
-    }
-
-    fetchBookingData();
-  }, [bookingId]);
 
   const getJettyPointName = (jettyPoint: any) => {
     return jettyPoint?.name || "Unknown Jetty Point";

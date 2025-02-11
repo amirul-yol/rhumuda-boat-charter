@@ -574,19 +574,21 @@ const InquiryPage: React.FC = () => {
       if (hasErrors) {
         return;
       }
+
+      // Save to localStorage before proceeding
+      saveToLocalStorage({
+        customerInfo,
+        activeSection: activeSection + 1,
+        reservationDetails,
+        otherOptions,
+      });
     }
 
     if (activeSection === 2) {
       try {
         const bookingId = await saveBooking();
-        // Save to localStorage with the booking ID
-        saveToLocalStorage({
-          customerInfo,
-          activeSection,
-          reservationDetails,
-          otherOptions,
-          bookingId,
-        });
+        // Clear form data but keep bookingId
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ bookingId }));
         // Navigate to summary page with the booking ID
         navigate(`/summary/${bookingId}`);
       } catch (error) {
@@ -697,11 +699,11 @@ const InquiryPage: React.FC = () => {
         country: customerInfo.country,
         jettyPoint: reservationDetails.jettyPoint,
         packageId: reservationDetails.packageId,
-        bookingDate: reservationDetails.bookingDate,
+        bookingDate: dayjs(reservationDetails.bookingDate).format("YYYY-MM-DD"),
         passengers: reservationDetails.passengers,
         addOns: reservationDetails.addOns,
-        alternativeDate1: otherOptions.alternativeDate1 || null,
-        alternativeDate2: otherOptions.alternativeDate2 || null,
+        alternativeDate1: otherOptions.alternativeDate1 ? dayjs(otherOptions.alternativeDate1).format("YYYY-MM-DD") : null,
+        alternativeDate2: otherOptions.alternativeDate2 ? dayjs(otherOptions.alternativeDate2).format("YYYY-MM-DD") : null,
         specialRemarks: otherOptions.specialRemarks || null,
       };
 
@@ -715,17 +717,18 @@ const InquiryPage: React.FC = () => {
         body: JSON.stringify(bookingData),
       });
 
+      const responseData = await response.json();
+      console.log("Server response:", responseData);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save booking");
+        throw new Error(
+          responseData.message ||
+          (responseData.errors && responseData.errors.join(", ")) ||
+          "Failed to save booking"
+        );
       }
 
-      const savedBooking = await response.json();
-
-      // Clear the form data from localStorage since we've successfully saved
-      localStorage.removeItem(STORAGE_KEY);
-
-      return savedBooking.bookingId || bookingId;
+      return responseData.bookingId || bookingId;
     } catch (error) {
       console.error("Error saving booking:", error);
       throw error;
