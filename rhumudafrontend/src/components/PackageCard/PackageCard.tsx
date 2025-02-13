@@ -92,7 +92,7 @@ const PackageCard: React.FC<Package> = ({
       elevation={0}
       sx={{
         width: 280,
-        height: 620,
+        height: 560,
         border: "1px solid black",
         borderRadius: 2,
         overflow: "hidden",
@@ -100,12 +100,12 @@ const PackageCard: React.FC<Package> = ({
         flexDirection: "column",
       }}
     >
-      <Box sx={{ flex: "0 0 auto", pt: 2 }}>
+      <Box sx={{ flex: "0 0 auto" }}>
         <Typography
           variant="h6"
           sx={{
-            p: 2,
-            pb: 1,
+            pt: 2,
+            pb: 0.5,
             textAlign: "center",
             color: "black",
             fontWeight: 500,
@@ -118,7 +118,7 @@ const PackageCard: React.FC<Package> = ({
         <Typography
           variant="h6"
           sx={{
-            pb: 2,
+            pb: 1.5,
             textAlign: "center",
             color: "black",
             fontWeight: 500,
@@ -129,7 +129,7 @@ const PackageCard: React.FC<Package> = ({
         </Typography>
       </Box>
 
-      <Box sx={{ flex: "0 0 160px", position: "relative" }}>
+      <Box sx={{ flex: "0 0 160px", position: "relative", mb: 1 }}>
         <Box
           component="img"
           src={imageUrl}
@@ -151,7 +151,9 @@ const PackageCard: React.FC<Package> = ({
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          p: 2,
+          px: 2,
+          pt: 0,
+          pb: 2,
         }}
       >
         <PriceDisplay priceTiers={priceTiers} categoryId={categoryId} />
@@ -160,10 +162,10 @@ const PackageCard: React.FC<Package> = ({
 
         <Box
           sx={{
-            mt: 2,
-            mb: 3,
-            borderTop: "1px solid #e0e0e0",
-            pt: 2,
+            // mt: 1,
+            mb: 2,
+            borderTop: "1px solid #000000",
+            pt: 1.5,
           }}
         >
           <Typography

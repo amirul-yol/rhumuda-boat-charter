@@ -132,27 +132,41 @@ const Header: React.FC = () => {
               )}
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Button
-                color="inherit"
-                sx={{
-                  color: "black",
-                  textTransform: "none",
-                  fontSize: "1rem",
-                }}
-              >
-                List your Boat
-              </Button>
-              <Button
-                color="inherit"
-                sx={{
-                  color: "black",
-                  textTransform: "none",
-                  fontSize: "1rem",
-                }}
-                onClick={handleOpenBookingDialog}
-              >
-                Manage Booking
-              </Button>
+              {!isScrolled && (
+                <>
+                  <Button
+                    color="inherit"
+                    sx={{
+                      color: "black",
+                      textTransform: "none",
+                      fontSize: "1rem",
+                      transition: "color 0.2s ease-in-out",
+                      "&:hover": {
+                        color: "#0384BD",
+                        backgroundColor: "transparent"
+                      }
+                    }}
+                  >
+                    List your Boat
+                  </Button>
+                  <Button
+                    color="inherit"
+                    sx={{
+                      color: "black",
+                      textTransform: "none",
+                      fontSize: "1rem",
+                      transition: "color 0.2s ease-in-out",
+                      "&:hover": {
+                        color: "#0384BD",
+                        backgroundColor: "transparent"
+                      }
+                    }}
+                    onClick={handleOpenBookingDialog}
+                  >
+                    Manage Booking
+                  </Button>
+                </>
+              )}
               <IconButton
                 onClick={handleMenuClick}
                 sx={{
@@ -171,17 +185,34 @@ const Header: React.FC = () => {
                   sx: {
                     mt: 1.5,
                     minWidth: 180,
+                    border: "1px solid black",
                     borderRadius: "16px",
                     boxShadow: "0px 4px 20px 0px rgba(0, 0, 0, 0.15)",
                     "& .MuiMenuItem-root": {
                       fontSize: "1rem",
                       padding: "12px 24px",
+                      transition: "color 0.2s ease-in-out",
+                      "&:hover": {
+                        color: "#0384BD",
+                        backgroundColor: "transparent"
+                      }
                     },
                   },
                 }}
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
+                {isScrolled && (
+                  <>
+                    <MenuItem onClick={() => handleNavigation("/list-boat")}>
+                      List your Boat
+                    </MenuItem>
+                    <MenuItem onClick={handleOpenBookingDialog}>
+                      Manage Booking
+                    </MenuItem>
+                    <Divider sx={{ my: 1 }} />
+                  </>
+                )}
                 <MenuItem onClick={() => handleNavigation("/about")}>
                   About Us
                 </MenuItem>

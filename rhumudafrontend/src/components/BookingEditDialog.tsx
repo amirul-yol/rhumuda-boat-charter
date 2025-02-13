@@ -27,6 +27,7 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  ListSubheader,
 } from "@mui/material";
 import {
   AdapterDayjs
@@ -423,10 +424,73 @@ const BookingEditDialog: React.FC<BookingEditDialogProps> = ({
                       }
                     }}
                   >
-                    {packages.map((pkg) => (
-                      <MenuItem key={pkg.id} value={pkg.id.toString()}>
-                        {pkg.name}
-                      </MenuItem>
+                    <ListSubheader 
+                      sx={{ 
+                        bgcolor: '#e3f2fd', 
+                        lineHeight: '32px', 
+                        fontWeight: 'bold',
+                        color: '#0384BD',
+                        borderTop: '1px solid #90caf9',
+                        borderBottom: '1px solid #90caf9',
+                        fontSize: '0.95rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}
+                    >
+                      Boat Charter
+                    </ListSubheader>
+                    {packages
+                      .filter(pkg => pkg.categoryId === 1)
+                      .map((pkg) => (
+                        <MenuItem key={pkg.id} value={pkg.id.toString()}>
+                          {pkg.name}
+                        </MenuItem>
+                    ))}
+                    
+                    <ListSubheader 
+                      sx={{ 
+                        bgcolor: '#e3f2fd', 
+                        lineHeight: '32px', 
+                        fontWeight: 'bold',
+                        color: '#0384BD',
+                        borderTop: '1px solid #90caf9',
+                        borderBottom: '1px solid #90caf9',
+                        fontSize: '0.95rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}
+                    >
+                      Island Trip
+                    </ListSubheader>
+                    {packages
+                      .filter(pkg => pkg.categoryId === 2)
+                      .map((pkg) => (
+                        <MenuItem key={pkg.id} value={pkg.id.toString()}>
+                          {pkg.name}
+                        </MenuItem>
+                    ))}
+                    
+                    <ListSubheader 
+                      sx={{ 
+                        bgcolor: '#e3f2fd', 
+                        lineHeight: '32px', 
+                        fontWeight: 'bold',
+                        color: '#0384BD',
+                        borderTop: '1px solid #90caf9',
+                        borderBottom: '1px solid #90caf9',
+                        fontSize: '0.95rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}
+                    >
+                      Fishing Trip
+                    </ListSubheader>
+                    {packages
+                      .filter(pkg => pkg.categoryId === 3)
+                      .map((pkg) => (
+                        <MenuItem key={pkg.id} value={pkg.id.toString()}>
+                          {pkg.name}
+                        </MenuItem>
                     ))}
                   </Select>
                 </FormControl>

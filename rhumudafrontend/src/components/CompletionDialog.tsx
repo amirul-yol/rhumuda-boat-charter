@@ -8,7 +8,6 @@ import {
   Button,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { useNavigate } from "react-router-dom";
 
 interface CompletionDialogProps {
   open: boolean;
@@ -19,13 +18,10 @@ const CompletionDialog: React.FC<CompletionDialogProps> = ({
   open,
   onClose,
 }) => {
-  const navigate = useNavigate();
-
   const handleClose = () => {
     // Clear localStorage
     localStorage.removeItem("rhumuda_inquiry_form");
     onClose();
-    navigate("/");
   };
 
   return (

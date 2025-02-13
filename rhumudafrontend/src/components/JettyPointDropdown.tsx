@@ -71,13 +71,13 @@ const JettyPointDropdown: React.FC<JettyPointDropdownProps> = ({
             display: "flex",
             alignItems: "center",
             gap: isCompact ? 0.5 : 1,
-            mb: isCompact ? 0.25 : 0.5,
+            mb: isCompact ? 0 : 0.25,
           }}
         >
           <LocationOnIcon
             sx={{
               fontSize: isCompact ? "1rem" : "1.2rem",
-              color: "text.secondary",
+              color: "black",
               transition: "all 0.3s ease-in-out",
             }}
           />
@@ -98,10 +98,21 @@ const JettyPointDropdown: React.FC<JettyPointDropdownProps> = ({
         <TextField
           select
           value={value}
-          onChange={handleChange}
+          onChange={(e) => onChange(e.target.value)}
           disabled={loading}
           variant="standard"
           sx={{
+            minWidth: isCompact ? 150 : 200,
+            transition: "all 0.3s ease-in-out",
+            "& .MuiInput-underline:before": {
+              borderBottom: "none"
+            },
+            "& .MuiInput-underline:after": {
+              borderBottom: "none"
+            },
+            "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
+              borderBottom: "none"
+            },
             "& .MuiInput-input": {
               fontSize: isCompact ? "0.875rem" : "1rem",
               py: isCompact ? 0.25 : 1,

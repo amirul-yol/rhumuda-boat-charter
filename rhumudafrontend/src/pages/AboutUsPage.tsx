@@ -105,12 +105,10 @@ const AboutUsPage: React.FC = () => {
         <Grid item xs={12} md={4}>
           <Box
             sx={{
-              position: 'sticky',
-              top: 200,
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center',
-              height: 'calc(100vh - 200px)', // Subtract the top offset
+              alignItems: 'flex-start',
+              pt: 8,
             }}
           >
             <Box

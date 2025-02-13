@@ -139,14 +139,14 @@ const ServiceContent2 = ({ service }: { service: ServiceContent }) => (
     <Grid container spacing={4} sx={{ mt: 2 }}>
       {/* Features */}
       <Grid item xs={12} md={service.images ? 6 : 12}>
-        <Typography variant="h6" gutterBottom color="primary">
+        <Typography variant="h6" gutterBottom sx={{ color: '#06FB07' }}>
           What We Offer
         </Typography>
         <List>
           {service.features?.map((feature, index) => (
             <ListItem key={index}>
               <ListItemIcon>
-                <CheckCircleOutlineIcon color="primary" />
+                <CheckCircleOutlineIcon sx={{ color: '#06FB07' }} />
               </ListItemIcon>
               <ListItemText primary={feature} />
             </ListItem>
@@ -158,9 +158,10 @@ const ServiceContent2 = ({ service }: { service: ServiceContent }) => (
             sx={{ 
               mt: 3,
               p: 2,
-              bgcolor: 'primary.light',
-              color: 'white',
-              borderRadius: 2
+              bgcolor: 'background.paper',
+              color: 'text.primary',
+              borderRadius: 2,
+              border: '1px solid #06FB07',
             }}
           >
             <Typography variant="body1">
@@ -242,19 +243,30 @@ const ServicesPage = () => {
                 sx={{
                   p: 2,
                   cursor: 'pointer',
-                  bgcolor: selectedService === key ? 'primary.main' : 'background.paper',
-                  color: selectedService === key ? 'white' : 'text.primary',
+                  bgcolor: 'background.paper',
+                  color: 'text.primary',
                   transition: 'all 0.2s ease-in-out',
+                  border: selectedService === key ? '2px solid #06FB07' : '2px solid transparent',
                   '&:hover': {
-                    bgcolor: selectedService === key ? 'primary.dark' : 'action.hover',
+                    color: '#06FB07',
+                    bgcolor: 'background.paper',
                     transform: 'translateY(-2px)',
                     boxShadow: 2,
+                    border: '2px solid #06FB07',
                   },
                 }}
                 onClick={() => handleServiceChange(key as ServiceKey)}
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {service.icon}
+                  {React.cloneElement(service.icon, {
+                    sx: { 
+                      color: selectedService === key ? 'text.primary' : 'text.primary',
+                      transition: 'color 0.2s ease-in-out',
+                      '.MuiCard-root:hover &': {
+                        color: '#06FB07'
+                      }
+                    }
+                  })}
                   <Typography
                     variant="body2"
                     sx={{
@@ -262,6 +274,10 @@ const ServicesPage = () => {
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px',
                       fontWeight: selectedService === key ? 600 : 400,
+                      transition: 'color 0.2s ease-in-out',
+                      '.MuiCard-root:hover &': {
+                        color: '#06FB07'
+                      }
                     }}
                   >
                     {key}

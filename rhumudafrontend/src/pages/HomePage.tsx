@@ -385,16 +385,16 @@ const HomePage: React.FC = () => {
       </Box>
 
       {/* Explore Pulau Kapas Section */}
-      <Box sx={{ py: 8, bgcolor: "background.paper" }}>
+      <Box sx={{ py: 8, bgcolor: "background.default" }}>
         <Container maxWidth="lg">
           <Typography
             variant="h4"
             align="center"
             gutterBottom
             sx={{
-              mb: 4,
+              mb: 6,
               fontWeight: 500,
-              color: "primary.main",
+              color: "text.primary",
             }}
           >
             Explore Pulau Kapas

@@ -27,17 +27,21 @@ const SearchBar: React.FC<SearchBarProps> = ({ isCompact = false }) => {
   return (
     <Paper
       sx={{
-        p: isCompact ? "6px 12px" : "12px",
-        borderRadius: "30px",
-        border: "2px solid black",
+        p: isCompact ? "6px 12px" : "8px",
+        borderRadius: "40px",
+        border: "1px solid black",
         width: isCompact ? "600px" : "750px",
         margin: "0 auto",
-        height: isCompact ? "35px" : "45px",
+        height: isCompact ? "40px" : "50px",
         display: "flex",
         alignItems: "center",
         transition: "all 0.3s ease-in-out",
         backgroundColor: "white",
         position: "relative",
+        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+        "&:hover": {
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+        },
       }}
     >
       <Box
@@ -73,9 +77,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isCompact = false }) => {
           orientation="vertical"
           flexItem
           sx={{
-            height: isCompact ? "24px" : "32px",
+            height: isCompact ? "28px" : "35px",
             my: "auto",
-            borderColor: "rgba(0, 0, 0, 0.12)",
+            borderColor: "black",
             alignSelf: "center",
           }}
         />
@@ -95,9 +99,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isCompact = false }) => {
           orientation="vertical"
           flexItem
           sx={{
-            height: isCompact ? "24px" : "32px",
+            height: isCompact ? "28px" : "35px",
             my: "auto",
-            borderColor: "rgba(0, 0, 0, 0.12)",
+            borderColor: "black",
             alignSelf: "center",
           }}
         />
@@ -118,19 +122,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ isCompact = false }) => {
       <IconButton
         onClick={handleSearch}
         sx={{
-          backgroundColor: "black",
+          backgroundColor: "#0384BD",
           color: "white",
           position: "absolute",
-          right: isCompact ? "4px" : "8px",
-          height: isCompact ? "27px" : "35px",
-          width: isCompact ? "27px" : "35px",
+          right: isCompact ? "6px" : "8px",
+          height: isCompact ? "35px" : "45px",
+          width: isCompact ? "35px" : "45px",
           transition: "all 0.3s ease-in-out",
           "&:hover": {
-            backgroundColor: "black",
+            backgroundColor: "#026994",
           },
         }}
       >
-        <SearchIcon sx={{ fontSize: isCompact ? "1rem" : "1.2rem" }} />
+        <SearchIcon sx={{ fontSize: isCompact ? "1.2rem" : "1.4rem" }} />
       </IconButton>
     </Paper>
   );

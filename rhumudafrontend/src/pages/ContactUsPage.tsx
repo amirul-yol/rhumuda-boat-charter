@@ -13,11 +13,11 @@ const ContactUsPage: React.FC = () => {
     <Container maxWidth="xl" sx={{ mt: 8, mb: 8 }}>
       <Box sx={{ textAlign: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1" sx={{ mb: 1, color: '#2C3E50', fontWeight: 500 }}>
-          Contact Us
-        </Typography>
-        <Typography variant="h6" sx={{ color: '#34495E' }}>
           Reach out to us with any questions, we'll try to help!
         </Typography>
+        {/* <Typography variant="h6" sx={{ color: '#34495E' }}>
+          Reach out to us with any questions, we'll try to help!
+        </Typography> */}
       </Box>
 
       <Grid container spacing={3} justifyContent="center">
