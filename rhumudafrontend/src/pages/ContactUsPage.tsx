@@ -21,7 +21,7 @@ const ContactUsPage: React.FC = () => {
       </Box>
 
       <Grid container spacing={3} justifyContent="center">
-        {/* WhatsApp Contact */}
+        {/* WhatsApp Contact Section */}
         <Grid item xs={12} sm={6} md={4}>
           <Paper
             elevation={0}
