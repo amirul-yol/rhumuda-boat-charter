@@ -13,9 +13,9 @@ Phone Number: [phone_number]
 Address: [address_line1], [address_line2], [postal_code] [city], [country]
 
 Reservation Details:
-Category: [name]
-Package: [name]
-Jetty: [name]
+Category: [category_name]
+Package: [package_name]
+Jetty: [jetty_name]
 Booking Date: [booking_date]
 Passengers: [passengers]
 

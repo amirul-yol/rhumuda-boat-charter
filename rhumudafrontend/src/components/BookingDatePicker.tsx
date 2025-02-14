@@ -58,10 +58,12 @@ const BookingDatePicker: React.FC<BookingDatePickerProps> = ({
         <DatePicker
           value={value ? dayjs(value) : null}
           onChange={(newValue) => {
+            // Keep the backend format as YYYY-MM-DD
             onChange(newValue ? newValue.format("YYYY-MM-DD") : "");
           }}
           minDate={minDate}
           maxDate={maxDate}
+          format="DD/MM/YYYY" // Display format for the user
           slotProps={{
             textField: {
               variant: "standard",

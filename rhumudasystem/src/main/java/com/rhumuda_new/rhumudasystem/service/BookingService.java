@@ -32,6 +32,8 @@ public class BookingService {
         dto.setPassengers(booking.getPassengers());
         dto.setJettyPoint(booking.getJettyPoint().getId().toString());
         dto.setPackageId(booking.getPackageDetails().getId().toString());
+        dto.setPackageName(booking.getPackageDetails().getName());
+        dto.setCategoryName(booking.getPackageDetails().getCategory().getName());
         dto.setStatus(booking.getStatus().name());
         
         return dto;

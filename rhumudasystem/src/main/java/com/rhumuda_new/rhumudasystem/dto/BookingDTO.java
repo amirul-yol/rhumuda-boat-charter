@@ -60,6 +60,9 @@ public class BookingDTO {
     @NotBlank(message = "Package is required")
     private String packageId;
 
+    private String categoryName;
+    private String packageName;
+
     private List<String> addOns;
 
     // Other Options
@@ -186,6 +189,22 @@ public class BookingDTO {
 
     public void setPackageId(String packageId) {
         this.packageId = packageId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     public List<String> getAddOns() {
