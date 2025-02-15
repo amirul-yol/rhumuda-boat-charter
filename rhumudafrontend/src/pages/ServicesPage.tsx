@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Box, Container, Typography, Card, IconButton, useTheme, useMediaQuery, Grid, Paper, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import DirectionsBoatIcon from '@mui/icons-material/DirectionsBoat';
 import TerrainIcon from '@mui/icons-material/Terrain';
@@ -213,87 +214,93 @@ const ServicesPage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', gap: 4 }}>
-        {/* Service Navigation - Sticky */}
-        <Box sx={{ 
-          width: 200,
-          position: 'sticky',
-          top: 80, 
-          alignSelf: 'flex-start',
-          maxHeight: 'calc(100vh - 100px)', 
-          overflowY: 'auto',
-          bgcolor: 'background.default',
-          p: 2,
-          borderRadius: 2,
-          boxShadow: 1,
-          zIndex: 1,
-        }}>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 500 }}>
-            Our Services
-          </Typography>
+    <>
+      <Helmet>
+        <title>Our Services | Rhumuda Boat Charter</title>
+        <meta name="description" content="Discover our range of boat charter services - from fishing trips to island hopping adventures at Rhumuda Boat Charter" />
+      </Helmet>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', gap: 4 }}>
+          {/* Service Navigation - Sticky */}
           <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 1,
+            width: 200,
+            position: 'sticky',
+            top: 80, 
+            alignSelf: 'flex-start',
+            maxHeight: 'calc(100vh - 100px)', 
+            overflowY: 'auto',
+            bgcolor: 'background.default',
+            p: 2,
+            borderRadius: 2,
+            boxShadow: 1,
+            zIndex: 1,
           }}>
-            {Object.entries(serviceContent).map(([key, service]) => (
-              <Card
-                key={key}
-                sx={{
-                  p: 2,
-                  cursor: 'pointer',
-                  bgcolor: 'background.paper',
-                  color: 'text.primary',
-                  transition: 'all 0.2s ease-in-out',
-                  border: selectedService === key ? '2px solid #06FB07' : '2px solid transparent',
-                  '&:hover': {
-                    color: '#06FB07',
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 500 }}>
+              Our Services
+            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 1,
+            }}>
+              {Object.entries(serviceContent).map(([key, service]) => (
+                <Card
+                  key={key}
+                  sx={{
+                    p: 2,
+                    cursor: 'pointer',
                     bgcolor: 'background.paper',
-                    transform: 'translateY(-2px)',
-                    boxShadow: 2,
-                    border: '2px solid #06FB07',
-                  },
-                }}
-                onClick={() => handleServiceChange(key as ServiceKey)}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {React.cloneElement(service.icon, {
-                    sx: { 
-                      color: selectedService === key ? 'text.primary' : 'text.primary',
-                      transition: 'color 0.2s ease-in-out',
-                      '.MuiCard-root:hover &': {
-                        color: '#06FB07'
+                    color: 'text.primary',
+                    transition: 'all 0.2s ease-in-out',
+                    border: selectedService === key ? '2px solid #06FB07' : '2px solid transparent',
+                    '&:hover': {
+                      color: '#06FB07',
+                      bgcolor: 'background.paper',
+                      transform: 'translateY(-2px)',
+                      boxShadow: 2,
+                      border: '2px solid #06FB07',
+                    },
+                  }}
+                  onClick={() => handleServiceChange(key as ServiceKey)}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {React.cloneElement(service.icon, {
+                      sx: { 
+                        color: selectedService === key ? 'text.primary' : 'text.primary',
+                        transition: 'color 0.2s ease-in-out',
+                        '.MuiCard-root:hover &': {
+                          color: '#06FB07'
+                        }
                       }
-                    }
-                  })}
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontSize: '0.9rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                      fontWeight: selectedService === key ? 600 : 400,
-                      transition: 'color 0.2s ease-in-out',
-                      '.MuiCard-root:hover &': {
-                        color: '#06FB07'
-                      }
-                    }}
-                  >
-                    {key}
-                  </Typography>
-                </Box>
-              </Card>
-            ))}
+                    })}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontSize: '0.9rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        fontWeight: selectedService === key ? 600 : 400,
+                        transition: 'color 0.2s ease-in-out',
+                        '.MuiCard-root:hover &': {
+                          color: '#06FB07'
+                        }
+                      }}
+                    >
+                      {key}
+                    </Typography>
+                  </Box>
+                </Card>
+              ))}
+            </Box>
+          </Box>
+
+          {/* Service Content */}
+          <Box sx={{ flex: 1 }}>
+            <ServiceContent2 service={serviceContent[selectedService]} />
           </Box>
         </Box>
-
-        {/* Service Content */}
-        <Box sx={{ flex: 1 }}>
-          <ServiceContent2 service={serviceContent[selectedService]} />
-        </Box>
-      </Box>
-    </Container>
+      </Container>
+    </>
   );
 };
 

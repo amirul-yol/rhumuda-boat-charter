@@ -20,6 +20,7 @@ import summerIcon from "../assets/icons/summer-holidays.png";
 import { Package } from "../types/package";
 import PackageCard from "../components/PackageCard/PackageCard";
 import FishingCategoryHeader from "../components/FishingCategoryHeader";
+import { Helmet } from 'react-helmet-async';
 
 const ServicesSection = () => {
   const services = [
@@ -257,181 +258,187 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <Box>
-      {/* Category Selector Section */}
-      <Stack
-        direction="row"
-        spacing={4}
-        justifyContent="left"
-        alignItems="center"
-        sx={{ mt: 4 }}
-      >
-        <Box sx={{ position: "relative" }}>
-          <Box
-            component="img"
-            src={boatIcon}
-            alt="Boat Charter"
-            onClick={() => handleCategorySelect("boat")}
-            sx={{
-              width: 80,
-              height: 80,
-              cursor: "pointer",
-              transition: "transform 0.2s",
-              "&:hover": {
-                transform: "scale(1.1)",
-              },
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: -8,
-              left: 0,
-              right: 0,
-              height: 3,
-              bgcolor: selectedCategory === "boat" ? "#06FB07" : "transparent",
-              transition: "background-color 0.3s",
-            }}
-          />
-        </Box>
-
-        <Box sx={{ position: "relative" }}>
-          <Box
-            component="img"
-            src={islandIcon}
-            alt="Island Trips"
-            onClick={() => handleCategorySelect("island")}
-            sx={{
-              width: 80,
-              height: 80,
-              cursor: "pointer",
-              transition: "transform 0.2s",
-              "&:hover": {
-                transform: "scale(1.1)",
-              },
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: -8,
-              left: 0,
-              right: 0,
-              height: 3,
-              bgcolor:
-                selectedCategory === "island" ? "#06FB07" : "transparent",
-              transition: "background-color 0.3s",
-            }}
-          />
-        </Box>
-
-        <Box sx={{ position: "relative" }}>
-          <Box
-            component="img"
-            src={fishingIcon}
-            alt="Fishing Trips"
-            onClick={() => handleCategorySelect("fishing")}
-            sx={{
-              width: 80,
-              height: 80,
-              cursor: "pointer",
-              transition: "transform 0.2s",
-              "&:hover": {
-                transform: "scale(1.1)",
-              },
-            }}
-          />
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: -8,
-              left: 0,
-              right: 0,
-              height: 3,
-              bgcolor:
-                selectedCategory === "fishing" ? "#06FB07" : "transparent",
-              transition: "background-color 0.3s",
-            }}
-          />
-        </Box>
-      </Stack>
-
-      {/* Package Title */}
-      <Typography
-        variant="h4"
-        component="h1"
-        sx={{
-          mt: 4,
-          mb: 3,
-          textAlign: "left",
-          fontWeight: 500,
-          color: "text.primary",
-        }}
-      >
-        {categoryName}
-      </Typography>
-
-      <Box
-        sx={{
-          mt: 4,
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-        }}
-      >
-        {loading && <CircularProgress />}
-        {error && <Alert severity="error">{error}</Alert>}
-        {!loading && !error && renderPackages()}
-      </Box>
-
-      {/* Explore Pulau Kapas Section */}
-      <Box sx={{ py: 8, bgcolor: "background.default" }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h4"
-            align="center"
-            gutterBottom
-            sx={{
-              mb: 6,
-              fontWeight: 500,
-              color: "text.primary",
-            }}
-          >
-            Explore Pulau Kapas
-          </Typography>
-          <Box
-            sx={{
-              position: "relative",
-              width: "100%",
-              paddingTop: "56.25%", // 16:9 aspect ratio
-              borderRadius: "16px",
-              overflow: "hidden",
-              boxShadow: 3,
-            }}
-          >
-            <iframe
-              src="https://www.youtube.com/embed/iR8MHSyERTk"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                border: 0,
+    <>
+      <Helmet>
+        <title>Rhumuda Boat Charter</title>
+        <meta name="description" content="Welcome to Rhumuda Boat Charter - Your premier destination for boat charters in Malaysia" />
+      </Helmet>
+      <Box>
+        {/* Category Selector Section */}
+        <Stack
+          direction="row"
+          spacing={4}
+          justifyContent="left"
+          alignItems="center"
+          sx={{ mt: 4 }}
+        >
+          <Box sx={{ position: "relative" }}>
+            <Box
+              component="img"
+              src={boatIcon}
+              alt="Boat Charter"
+              onClick={() => handleCategorySelect("boat")}
+              sx={{
+                width: 80,
+                height: 80,
+                cursor: "pointer",
+                transition: "transform 0.2s",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                },
               }}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title="Explore Pulau Kapas"
+            />
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: -8,
+                left: 0,
+                right: 0,
+                height: 3,
+                bgcolor: selectedCategory === "boat" ? "#06FB07" : "transparent",
+                transition: "background-color 0.3s",
+              }}
             />
           </Box>
-        </Container>
-      </Box>
 
-      {/* Services Offered Section */}
-      <Box sx={{ py: 8, bgcolor: "background.default" }}>
-        <ServicesSection />
+          <Box sx={{ position: "relative" }}>
+            <Box
+              component="img"
+              src={islandIcon}
+              alt="Island Trips"
+              onClick={() => handleCategorySelect("island")}
+              sx={{
+                width: 80,
+                height: 80,
+                cursor: "pointer",
+                transition: "transform 0.2s",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                },
+              }}
+            />
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: -8,
+                left: 0,
+                right: 0,
+                height: 3,
+                bgcolor:
+                  selectedCategory === "island" ? "#06FB07" : "transparent",
+                transition: "background-color 0.3s",
+              }}
+            />
+          </Box>
+
+          <Box sx={{ position: "relative" }}>
+            <Box
+              component="img"
+              src={fishingIcon}
+              alt="Fishing Trips"
+              onClick={() => handleCategorySelect("fishing")}
+              sx={{
+                width: 80,
+                height: 80,
+                cursor: "pointer",
+                transition: "transform 0.2s",
+                "&:hover": {
+                  transform: "scale(1.1)",
+                },
+              }}
+            />
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: -8,
+                left: 0,
+                right: 0,
+                height: 3,
+                bgcolor:
+                  selectedCategory === "fishing" ? "#06FB07" : "transparent",
+                transition: "background-color 0.3s",
+              }}
+            />
+          </Box>
+        </Stack>
+
+        {/* Package Title */}
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{
+            mt: 4,
+            mb: 3,
+            textAlign: "left",
+            fontWeight: 500,
+            color: "text.primary",
+          }}
+        >
+          {categoryName}
+        </Typography>
+
+        <Box
+          sx={{
+            mt: 4,
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+          }}
+        >
+          {loading && <CircularProgress />}
+          {error && <Alert severity="error">{error}</Alert>}
+          {!loading && !error && renderPackages()}
+        </Box>
+
+        {/* Explore Pulau Kapas Section */}
+        <Box sx={{ py: 8, bgcolor: "background.default" }}>
+          <Container maxWidth="lg">
+            <Typography
+              variant="h4"
+              align="center"
+              gutterBottom
+              sx={{
+                mb: 6,
+                fontWeight: 500,
+                color: "text.primary",
+              }}
+            >
+              Explore Pulau Kapas
+            </Typography>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                paddingTop: "56.25%", // 16:9 aspect ratio
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: 3,
+              }}
+            >
+              <iframe
+                src="https://www.youtube.com/embed/iR8MHSyERTk"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: 0,
+                }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title="Explore Pulau Kapas"
+              />
+            </Box>
+          </Container>
+        </Box>
+
+        {/* Services Offered Section */}
+        <Box sx={{ py: 8, bgcolor: "background.default" }}>
+          <ServicesSection />
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

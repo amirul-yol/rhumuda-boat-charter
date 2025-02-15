@@ -1,5 +1,6 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Header from "./components/Header";
@@ -94,9 +95,11 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <RouterProvider router={router} />
-    </LocalizationProvider>
+    <HelmetProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <RouterProvider router={router} />
+      </LocalizationProvider>
+    </HelmetProvider>
   );
 }
 

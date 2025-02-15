@@ -40,6 +40,7 @@ import ReservationJettyPoint from "../components/ReservationJettyPoint";
 import ReservationPassengers from "../components/ReservationPassengers";
 import { BOOKING_SELECTION_KEY, BookingSelection } from "../types/booking";
 // import Description from "../components/Description";
+import { Helmet } from 'react-helmet-async';
 
 interface CustomerInfo {
   firstName: string;
@@ -1166,110 +1167,116 @@ const InquiryPage: React.FC = () => {
   );
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
-          Booking Inquiry
-        </Typography>
+    <>
+      <Helmet>
+        <title>Make an Inquiry | Rhumuda Boat Charter</title>
+        <meta name="description" content="Book your boat charter experience with Rhumuda. Make an inquiry for our boat charter services, fishing trips, or island hopping adventures" />
+      </Helmet>
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <Typography variant="h4" component="h1" sx={{ mb: 4 }}>
+            Booking Inquiry
+          </Typography>
 
-        {activeSection === 0 && renderCustomerInfo()}
-        {activeSection === 1 && renderReservationDetails()}
-        {activeSection === 2 && renderOtherOptions()}
-      </Box>
+          {activeSection === 0 && renderCustomerInfo()}
+          {activeSection === 1 && renderReservationDetails()}
+          {activeSection === 2 && renderOtherOptions()}
+        </Box>
 
-      <Dialog
-        open={clearDialogOpen}
-        onClose={() => setClearDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            width: "400px",
-            borderRadius: "12px",
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            bgcolor: "#0384BD",
-            color: "white",
-            py: 2,
+        <Dialog
+          open={clearDialogOpen}
+          onClose={() => setClearDialogOpen(false)}
+          PaperProps={{
+            sx: {
+              width: "400px",
+              borderRadius: "12px",
+            },
           }}
         >
-          Clear Sections
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
-          <Typography sx={{ mb: 2 }}>
-            Are you sure you want to clear your progress? Please select which
-            section you want to clear:
-          </Typography>
-          <Box
+          <DialogTitle
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              mb: 2,
+              bgcolor: "#0384BD",
+              color: "white",
+              py: 2,
             }}
           >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={sectionsToDelete.customerInfo}
-                  onChange={handleSectionChange("customerInfo")}
-                />
-              }
-              label="Customer Information"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={sectionsToDelete.reservationDetails}
-                  onChange={handleSectionChange("reservationDetails")}
-                />
-              }
-              label="Reservation Details"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={sectionsToDelete.otherOptions}
-                  onChange={handleSectionChange("otherOptions")}
-                />
-              }
-              label="Other Options"
-            />
-          </Box>
-          <Divider sx={{ my: 2 }} />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={
-                  sectionsToDelete.customerInfo &&
-                  sectionsToDelete.reservationDetails &&
-                  sectionsToDelete.otherOptions
+            Clear Sections
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
+            <Typography sx={{ mb: 2 }}>
+              Are you sure you want to clear your progress? Please select which
+              section you want to clear:
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+                mb: 2,
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionsToDelete.customerInfo}
+                    onChange={handleSectionChange("customerInfo")}
+                  />
                 }
-                onChange={handleSelectAllSections}
+                label="Customer Information"
               />
-            }
-            label="All of the above"
-          />
-        </DialogContent>
-        <DialogActions sx={{ p: 2, gap: 1 }}>
-          <Button
-            onClick={() => setClearDialogOpen(false)}
-            variant="outlined"
-            sx={{ color: "#0384BD", borderColor: "#0384BD" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleClearConfirm}
-            variant="contained"
-            sx={{ bgcolor: "#FF0000", "&:hover": { bgcolor: "#D32F2F" } }}
-          >
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionsToDelete.reservationDetails}
+                    onChange={handleSectionChange("reservationDetails")}
+                  />
+                }
+                label="Reservation Details"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={sectionsToDelete.otherOptions}
+                    onChange={handleSectionChange("otherOptions")}
+                  />
+                }
+                label="Other Options"
+              />
+            </Box>
+            <Divider sx={{ my: 2 }} />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={
+                    sectionsToDelete.customerInfo &&
+                    sectionsToDelete.reservationDetails &&
+                    sectionsToDelete.otherOptions
+                  }
+                  onChange={handleSelectAllSections}
+                />
+              }
+              label="All of the above"
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 2, gap: 1 }}>
+            <Button
+              onClick={() => setClearDialogOpen(false)}
+              variant="outlined"
+              sx={{ color: "#0384BD", borderColor: "#0384BD" }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleClearConfirm}
+              variant="contained"
+              sx={{ bgcolor: "#FF0000", "&:hover": { bgcolor: "#D32F2F" } }}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </>
   );
 };
 
