@@ -12,6 +12,7 @@ import {
   Snackbar,
   Chip,
   Divider,
+  Theme,
 } from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -26,10 +27,15 @@ import CompletionDialog from "../components/CompletionDialog";
 import BookingEditDialog from "../components/BookingEditDialog";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import PendingIcon from "@mui/icons-material/Pending";
 import ErrorIcon from "@mui/icons-material/Error";
 import SendIcon from "@mui/icons-material/Send";
 import InfoIcon from "@mui/icons-material/Info";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
+import CancelIcon from "@mui/icons-material/Cancel";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import ErrorAlert from "../components/ErrorAlert/ErrorAlert";
+import { getErrorConfig } from "../utils/errorUtils";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -69,6 +75,7 @@ interface AddOn {
   name: string;
   price: number;
   isActive: boolean;
+  perPerson: boolean;
 }
 
 interface PriceTier {
@@ -133,6 +140,7 @@ interface BookingData {
     basePrice: number;
     maxCapacity: number;
     durationMinutes: number;
+    imageUrl: string;
     services: Array<{
       id: number;
       name: string;
@@ -147,6 +155,7 @@ interface BookingData {
     id: number;
     name: string;
     price: number;
+    perPerson: boolean;
   }>;
   createdAt: string;
   updatedAt: string;
@@ -167,12 +176,15 @@ const SummaryPage: React.FC = () => {
   const [completionDialogOpen, setCompletionDialogOpen] = useState(false);
   const [clearLocalStorage, setClearLocalStorage] = useState(false);
   const { bookingId } = useParams<{ bookingId: string }>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
   const [booking, setBooking] = useState<BookingData | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const fetchBookingData = async () => {
     if (!bookingId) {
@@ -213,13 +225,12 @@ const SummaryPage: React.FC = () => {
 
       setBooking(bookingData);
       setPackages(packagesData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(
-        error instanceof Error ? error.message : "An unexpected error occurred"
-      );
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err);
     } finally {
       setLoading(false);
+      setIsInitialLoad(false);
     }
   };
 
@@ -413,14 +424,14 @@ const SummaryPage: React.FC = () => {
         return {
           label: "Inquiry Sent",
           color: "warning" as const,
-          icon: <PendingIcon />,
+          icon: <HourglassEmptyIcon />,
           // description: 'Your inquiry has been sent and is awaiting approval from our team.'
         };
       case "CANCELLED":
         return {
           label: "Booking Cancelled",
           color: "error" as const,
-          icon: <ErrorIcon />,
+          icon: <CancelIcon />,
           // description: 'This booking has been cancelled.'
         };
       case "INCOMPLETE":
@@ -428,7 +439,7 @@ const SummaryPage: React.FC = () => {
         return {
           label: "Incomplete",
           color: "error" as const,
-          icon: <ErrorIcon />,
+          icon: <ReportProblemIcon />,
           // description: 'Please review your booking details and click "Send Inquiry" to submit your booking.'
         };
     }
@@ -454,16 +465,11 @@ const SummaryPage: React.FC = () => {
         throw new Error(errorData.message || "Failed to submit inquiry");
       }
 
-      setSuccessMessage(
-        "Your inquiry has been sent successfully! Please check your email for confirmation."
-      );
       setShowCompletionDialog(true);
       fetchBookingData(); // Refresh to get updated status
-    } catch (error) {
-      console.error("Error sending inquiry:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to send inquiry"
-      );
+    } catch (err) {
+      console.error("Error sending inquiry:", err);
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -471,6 +477,11 @@ const SummaryPage: React.FC = () => {
 
   const handleCloseDialog = () => {
     setShowCompletionDialog(false);
+    setShowSuccessAlert(true); // Show the alert when dialog is closed
+  };
+
+  const handleCloseAlert = () => {
+    setShowSuccessAlert(false);
   };
 
   const renderActionButton = () => {
@@ -520,7 +531,113 @@ const SummaryPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  const handleRetry = () => {
+    setRetryCount((prev) => prev + 1);
+    if (error.message?.includes("Failed to submit inquiry")) {
+      handleSendInquiry();
+    } else {
+      fetchBookingData();
+    }
+  };
+
+  const handleCloseError = () => {
+    setError(null);
+  };
+
+  const shouldShowOnlyError = () => {
+    if (!error) return false;
+    const errorConfig = getErrorConfig(error);
+    return isInitialLoad && errorConfig.severity === 'critical';
+  };
+
+  const simulateError = (errorType: string) => {
+    switch (errorType) {
+      case 'timeout':
+        setError(new Error('Request timed out after 30 seconds'));
+        break;
+      case 'network':
+        setError(new Error('Failed to fetch: network offline'));
+        break;
+      case 'server':
+        setError({ status: 500, message: 'internal server error' });
+        break;
+      case 'database':
+        setError(new Error('database connection failed'));
+        break;
+      case 'auth':
+        setError({ status: 401, message: 'unauthorized' });
+        break;
+      case 'rate':
+        setError({ status: 429, message: 'too many requests' });
+        break;
+    }
+  };
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const testDiv = document.createElement('div');
+      testDiv.style.position = 'fixed';
+      testDiv.style.bottom = '20px';
+      testDiv.style.right = '20px';
+      testDiv.style.zIndex = '9999';
+      testDiv.style.display = 'flex';
+      testDiv.style.flexDirection = 'column';
+      testDiv.style.gap = '5px';
+      
+      const createButton = (label: string, errorType: string) => {
+        const button = document.createElement('button');
+        button.textContent = `Test ${label} Error`;
+        button.style.padding = '5px 10px';
+        button.style.cursor = 'pointer';
+        button.onclick = () => simulateError(errorType);
+        return button;
+      };
+
+      const buttons = [
+        createButton('Timeout', 'timeout'),
+        createButton('Network', 'network'),
+        createButton('Server', 'server'),
+        createButton('Database', 'database'),
+        createButton('Auth', 'auth'),
+        createButton('Rate Limit', 'rate')
+      ];
+
+      buttons.forEach(button => testDiv.appendChild(button));
+      document.body.appendChild(testDiv);
+
+      return () => {
+        document.body.removeChild(testDiv);
+      };
+    }
+  }, []);
+
+  // Loading state
+  if (loading && isInitialLoad) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4, mb: 4, display: "flex", justifyContent: "center" }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  // Critical error during initial load
+  if (shouldShowOnlyError()) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ mt: 4, mb: 4 }}>
+          <ErrorAlert
+            {...getErrorConfig(error)}
+            onRetry={handleRetry}
+            onClose={handleCloseError}
+          />
+        </Box>
+      </Container>
+    );
+  }
+
+  if (loading && !booking) {
     return (
       <Container maxWidth="lg">
         <Box sx={{ mt: 4, mb: 4, display: "flex", justifyContent: "center" }}>
@@ -534,16 +651,11 @@ const SummaryPage: React.FC = () => {
     return (
       <Container maxWidth="lg">
         <Box sx={{ mt: 4, mb: 4 }}>
-          <Typography color="error" variant="h6" gutterBottom>
-            {error}
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={fetchBookingData}
-            startIcon={<RefreshIcon />}
-          >
-            Retry
-          </Button>
+          <ErrorAlert
+            {...getErrorConfig(error)}
+            onRetry={handleRetry}
+            onClose={handleCloseError}
+          />
         </Box>
       </Container>
     );
@@ -576,6 +688,31 @@ const SummaryPage: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
+      {error && (
+        <Box sx={{ mb: 3 }}>
+          <ErrorAlert
+            {...getErrorConfig(error)}
+            onRetry={handleRetry}
+            onClose={handleCloseError}
+          />
+        </Box>
+      )}
+      {showSuccessAlert && (
+        <Alert
+          severity="success"
+          onClose={handleCloseAlert}
+          sx={{
+            mb: 3,
+            borderRadius: 1,
+            "& .MuiAlert-message": {
+              fontSize: "0.875rem",
+            },
+          }}
+        >
+          Your inquiry has been sent successfully! Please check your email for
+          confirmation.
+        </Alert>
+      )}
       {/* Main Content Grid */}
       <Grid container spacing={1.5}>
         {/* Left Column - 70% */}
@@ -619,6 +756,41 @@ const SummaryPage: React.FC = () => {
                 />
               </>
             )}
+          </Box>
+
+          {/* Package Picture Section */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              Package Picture
+            </Typography>
+            <Box
+              sx={{
+                width: "100%",
+                height: "300px",
+                position: "relative",
+                borderRadius: "8px",
+                overflow: "hidden",
+                boxShadow: (theme) =>
+                  `0 2px 12px 0 ${
+                    theme.palette.mode === "dark"
+                      ? "rgba(0,0,0,0.3)"
+                      : "rgba(0,0,0,0.1)"
+                  }`,
+              }}
+            >
+              <img
+                src={booking?.packageDetails?.imageUrl}
+                alt={`${booking?.packageDetails?.name} Package`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            </Box>
+            <Divider
+              sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1, mt: 3 }}
+            />
           </Box>
 
           {/* Customer Details Section */}
@@ -855,10 +1027,25 @@ const SummaryPage: React.FC = () => {
               pb: 2,
               borderBottom: '1px solid rgba(0, 0, 0, 0.08)'
             }}>
-              {getStatusDetails(booking?.status).icon}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                width: 40,
+                height: 40,
+                bgcolor: (theme: Theme) => `${theme.palette[getStatusDetails(booking?.status).color].main}15`
+              }}>
+                {React.cloneElement(getStatusDetails(booking?.status).icon, { 
+                  sx: { 
+                    fontSize: '24px',
+                    color: (theme: Theme) => theme.palette[getStatusDetails(booking?.status).color].main
+                  }
+                })}
+              </Box>
               <Box sx={{ flex: 1 }}>
                 <Typography sx={{ 
-                  color: (theme) => theme.palette[getStatusDetails(booking?.status).color].main,
+                  color: (theme: Theme) => theme.palette[getStatusDetails(booking?.status).color].main,
                   fontSize: '0.95rem',
                   lineHeight: 1.2
                 }}>
@@ -869,7 +1056,7 @@ const SummaryPage: React.FC = () => {
                   fontSize: '0.85rem',
                   mt: 0.5
                 }}>
-                  Submitted on {dayjs(booking?.createdAt).format("DD MMM YYYY at HH:mm")}
+                  Submitted on {dayjs(booking?.createdAt).format("DD MMM YYYY")}
                 </Typography>
               </Box>
             </Box>
@@ -908,10 +1095,10 @@ const SummaryPage: React.FC = () => {
                     : 0;
 
                   const addOnsCost = booking?.addOns
-                    ? booking.addOns.reduce(
-                        (total, addon) => total + addon.price,
-                        0
-                      )
+                    ? booking.addOns.reduce((total, addon) => {
+                        const basePrice = addon.price;
+                        return total + (addon.perPerson ? basePrice * (booking?.passengers || 0) : basePrice);
+                      }, 0)
                     : 0;
 
                   return (baseCost + addOnsCost).toFixed(2);
@@ -1006,9 +1193,10 @@ const SummaryPage: React.FC = () => {
               </Grid>
             </Box>
 
-            {/* Cost Breakdown */}
-            <Box sx={{ mb: 2 }}>
-              <Box
+            {/* Add-ons List */}
+            {booking?.addOns && booking.addOns.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Box
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -1016,7 +1204,7 @@ const SummaryPage: React.FC = () => {
                 }}
               >
                 <Typography variant="subtitle2" sx={{ fontSize: '0.875rem' }}>
-                  Base Cost{" "}
+                  Package Price{" "}
                   {(() => {
                     const hasFixedPrice = selectedPackage?.priceTiers.some(
                       (tier) => tier.type === "FIXED"
@@ -1047,41 +1235,66 @@ const SummaryPage: React.FC = () => {
                   })()}
                 </Typography>
               </Box>
-              <Typography variant="subtitle2" sx={{ 
-                mb: 0.75,
-                fontSize: '0.875rem'
-              }}>
-                Add On:
-              </Typography>
-              {booking?.addOns && booking.addOns.length > 0 ? (
-                booking.addOns.map((addon) => (
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    mb: 1,
+                    color: "text.secondary",
+                    fontSize: "0.875rem",
+                  }}
+                >
+                  Add On:
+                </Typography>
+                {booking.addOns.map((addon) => (
                   <Box
                     key={addon.id}
                     sx={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      mb: 0.5,
-                      pl: 2,
+                      flexDirection: "column",
+                      mb: 1,
                     }}
                   >
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                      {addon.name}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-                      RM {addon.price.toFixed(2)}
-                    </Typography>
+                    <Box sx={{ 
+                      display: "flex", 
+                      justifyContent: "space-between",
+                      alignItems: "flex-start"
+                    }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "text.secondary" }}
+                      >
+                        {addon.name}
+                        {addon.perPerson && (
+                          <Typography
+                            component="span"
+                            sx={{ 
+                              display: "block",
+                              color: "text.secondary",
+                              fontSize: "0.85rem",
+                              mt: 0.25,
+                              ml: 2
+                            }}
+                          >
+                            - RM {addon.price}/person
+                          </Typography>
+                        )}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "text.secondary", ml: 2 }}
+                      >
+                        {addon.perPerson ? (
+                          <>RM {addon.price * booking.passengers}.00</>
+                        ) : (
+                          <>RM {addon.price.toFixed(2)}</>
+                        )}
+                      </Typography>
+                    </Box>
                   </Box>
-                ))
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{ pl: 2, color: "text.secondary", fontStyle: 'italic', fontSize: '0.875rem' }}
-                >
-                  None
-                </Typography>
-              )}
-            </Box>
-
+                ))}
+              </Box>
+            )}
+            
             <Box
                 sx={{
                   display: "flex",
@@ -1110,18 +1323,6 @@ const SummaryPage: React.FC = () => {
       <CompletionDialog
         open={showCompletionDialog}
         onClose={handleCloseDialog}
-      />
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={6000}
-        onClose={() => setSuccessMessage(null)}
-        message={successMessage}
-      />
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={() => setError(null)}
-        message={error}
       />
     </Container>
   );

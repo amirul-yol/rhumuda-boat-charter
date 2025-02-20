@@ -13,16 +13,19 @@ interface AddOn {
   description: string;
   price: number;
   isActive: boolean;
+  perPerson: boolean;
 }
 
 interface AddOnSelectionProps {
   selectedAddOns: string[];
   onAddOnChange: (addOnId: string) => void;
+  passengers: number;
 }
 
 const AddOnSelection: React.FC<AddOnSelectionProps> = ({
   selectedAddOns,
   onAddOnChange,
+  passengers,
 }) => {
   const [addOns, setAddOns] = useState<AddOn[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +50,15 @@ const AddOnSelection: React.FC<AddOnSelectionProps> = ({
     return <Typography color="error">{error}</Typography>;
   }
 
+  const getAddOnPriceLabel = (addon: AddOn) => {
+    const basePrice = addon.price;
+    if (addon.perPerson) {
+      const totalPrice = basePrice * passengers;
+      return `${addon.name} (RM${basePrice}/person × ${passengers} = RM${totalPrice})`;
+    }
+    return `${addon.name} (RM${basePrice})`;
+  };
+
   return (
     <Box>
       <Typography variant="subtitle1" sx={{ mb: 2 }}>
@@ -62,7 +74,7 @@ const AddOnSelection: React.FC<AddOnSelectionProps> = ({
                 onChange={() => onAddOnChange(addon.id.toString())}
               />
             }
-            label={`${addon.name} (RM${addon.price})`}
+            label={getAddOnPriceLabel(addon)}
           />
         ))}
       </FormGroup>

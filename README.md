@@ -38,16 +38,20 @@ Current implementation includes:
     - Support for multiple pricing types (Fixed, Adult, Child, Infant)
     - Dynamic price calculation based on group size
     - Special pricing for fishing packages
-- Booking Management System
-  - Comprehensive booking status system (INCOMPLETE, PENDING, COMPLETE, CANCELLED)
-  - Booking summary page with detailed information
-  - Real-time status updates
-  - Inquiry submission system
-  - Booking modification capabilities
+- Add-on Pricing System
+  - Flexible pricing model supporting:
+    - Per-person pricing (e.g., Life jacket, Snorkeling, Lunch Set)
+    - Fixed-price options (e.g., Tourist Guide, Boat Tours)
+  - Dynamic calculation based on passenger count
+  - Clear pricing breakdown in booking summary
+  - Real-time total cost updates
 - Enhanced UI Components
   - Two-column layout for better information organization
   - Responsive status indicators
-  - Compact pricing displays
+  - Modern pricing displays:
+    - Package base price with passenger multiplier
+    - Per-person add-on costs with clear breakdown
+    - Fixed-price add-ons with transparent pricing
   - Interactive form elements
   - Modern card-based design
 
@@ -361,6 +365,29 @@ logging.file.name=logs/application.log
 3. Ensure all tests pass
 4. Update changelog if applicable
 5. Request review from maintainers
+
+## Email Notification System
+
+The system implements automated email notifications using Spring Mail with the following features:
+
+- Booking Status Updates:
+  - New booking confirmations
+  - Status change notifications
+  - Cancellation confirmations
+- HTML Email Templates:
+  - Professionally designed layouts
+  - Dynamic content insertion
+  - Booking details formatting
+- Configuration:
+  ```properties
+  # Email Configuration
+  spring.mail.host=smtp.gmail.com
+  spring.mail.port=587
+  spring.mail.username=${MAIL_USERNAME}
+  spring.mail.password=${MAIL_PASSWORD}
+  spring.mail.properties.mail.smtp.auth=true
+  spring.mail.properties.mail.smtp.starttls.enable=true
+  ```
 
 ## System Configuration
 

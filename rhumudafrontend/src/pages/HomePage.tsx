@@ -220,9 +220,20 @@ const HomePage: React.FC = () => {
           {deepSeaPackages.length > 0 && (
             <Box>
               <FishingCategoryHeader type="DEEP_SEA" />
-              <Grid container spacing={3}>
+              <Grid 
+                container 
+                spacing={0}
+                sx={{
+                  m: 0,
+                  width: '100%',
+                  '& > .MuiGrid-item': {
+                    p: 0,
+                    width: 'auto'
+                  }
+                }}
+              >
                 {deepSeaPackages.map((pkg) => (
-                  <Grid item xs={12} sm={6} md={4} key={pkg.id}>
+                  <Grid item key={pkg.id}>
                     <PackageCard {...pkg} />
                   </Grid>
                 ))}
@@ -233,9 +244,20 @@ const HomePage: React.FC = () => {
           {squidPackages.length > 0 && (
             <Box>
               <FishingCategoryHeader type="SQUID" />
-              <Grid container spacing={3}>
+              <Grid 
+                container 
+                spacing={0}
+                sx={{
+                  m: 0,
+                  width: '100%',
+                  '& > .MuiGrid-item': {
+                    p: 0,
+                    width: 'auto'
+                  }
+                }}
+              >
                 {squidPackages.map((pkg) => (
-                  <Grid item xs={12} sm={6} md={4} key={pkg.id}>
+                  <Grid item key={pkg.id}>
                     <PackageCard {...pkg} />
                   </Grid>
                 ))}
@@ -247,13 +269,26 @@ const HomePage: React.FC = () => {
     }
 
     return (
-      <Grid container spacing={3}>
-        {packages.map((pkg) => (
-          <Grid item xs={12} sm={6} md={4} key={pkg.id}>
-            <PackageCard {...pkg} />
-          </Grid>
-        ))}
-      </Grid>
+      <Box sx={{ mt: 2 }}>
+        <Grid 
+          container 
+          spacing={0}
+          sx={{
+            m: 0,
+            width: '100%',
+            '& > .MuiGrid-item': {
+              p: 0,
+              width: 'auto'
+            }
+          }}
+        >
+          {packages.map((pkg) => (
+            <Grid item key={pkg.id}>
+              <PackageCard {...pkg} />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     );
   };
 

@@ -27,6 +27,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useLocation, useNavigate } from "react-router-dom";
 import JettyPointDropdown from "../components/JettyPointDropdown";
 import BookingDatePicker from "../components/BookingDatePicker";
@@ -92,9 +93,9 @@ interface ReservationValidationErrors {
 interface AddOn {
   id: number;
   name: string;
-  // description: string | null;
   price: number;
   isActive: boolean;
+  perPerson: boolean;  // indicates if the price should be multiplied by number of passengers
 }
 
 interface IncludedService {
@@ -960,16 +961,8 @@ const InquiryPage: React.FC = () => {
         </Typography>
 
         <Grid container spacing={3}>
-          {/* Package Name and Description */}
-          {/* <Grid item xs={12}> */}
-          {/* <Typography variant="subtitle1" fontWeight={500}>
-              {selectedPackage.name}
-            </Typography>
-            <Description text={selectedPackage.description} /> */}
-          {/* </Grid> */}
-
           {/* Duration, Capacity, and Distance */}
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={4}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <AccessTimeIcon sx={{ color: "#0384BD", fontSize: 20 }} />
@@ -999,29 +992,41 @@ const InquiryPage: React.FC = () => {
           </Grid>
 
           {/* Price Tiers */}
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={4}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <PaidIcon sx={{ color: "#0384BD", fontSize: 20 }} />
-                <Stack>
-                  {selectedPackage.priceTiers.map((tier) => (
-                    <Typography key={tier.id} variant="body2">
-                      {tier.price === 0 ? "FREE" : `RM${tier.price}`} |{" "}
-                      {tier.type}
-                    </Typography>
-                  ))}
-                </Stack>
+                <Typography variant="body2">Pricing:</Typography>
+              </Stack>
+              <Stack spacing={0.5} sx={{ pl: 3.5 }}>
+                {selectedPackage.priceTiers.map((tier) => (
+                  <Typography
+                    key={tier.id}
+                    variant="body2"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      color: tier.price === 0 ? '#00C853' : 'inherit',
+                      lineHeight: 1.2
+                    }}
+                  >
+                    {tier.price === 0 ? 'FREE' : `RM${tier.price}`} | {tier.label || tier.type}
+                  </Typography>
+                ))}
               </Stack>
             </Stack>
           </Grid>
 
-          {/* Included Services */}
-          {selectedPackage.services && selectedPackage.services.length > 0 && (
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Services Included:
-              </Typography>
-              <Stack spacing={0.5}>
+          {/* Services Included */}
+          <Grid item xs={12} sm={4}>
+            <Stack spacing={2}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <CheckCircleIcon sx={{ color: "#0384BD", fontSize: 20 }} />
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  Services Included:
+                </Typography>
+              </Stack>
+              <Stack spacing={0.5} sx={{ pl: 3.5 }}>
                 {selectedPackage.services.map((service) => (
                   <Typography
                     key={service.id}
@@ -1032,8 +1037,8 @@ const InquiryPage: React.FC = () => {
                   </Typography>
                 ))}
               </Stack>
-            </Grid>
-          )}
+            </Stack>
+          </Grid>
         </Grid>
       </Box>
     );
@@ -1116,6 +1121,7 @@ const InquiryPage: React.FC = () => {
           <AddOnSelection
             selectedAddOns={reservationDetails.addOns}
             onAddOnChange={handleAddOnChange}
+            passengers={reservationDetails.passengers}
           />
         </Grid>
       </Grid>
