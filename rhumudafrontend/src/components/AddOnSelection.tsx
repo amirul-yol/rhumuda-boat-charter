@@ -51,12 +51,7 @@ const AddOnSelection: React.FC<AddOnSelectionProps> = ({
   }
 
   const getAddOnPriceLabel = (addon: AddOn) => {
-    const basePrice = addon.price;
-    if (addon.perPerson) {
-      const totalPrice = basePrice * passengers;
-      return `${addon.name} (RM${basePrice}/person × ${passengers} = RM${totalPrice})`;
-    }
-    return `${addon.name} (RM${basePrice})`;
+    return `${addon.name}${addon.perPerson ? ' (RM10/pax)' : ' (RM10)'}`;
   };
 
   return (
@@ -65,18 +60,27 @@ const AddOnSelection: React.FC<AddOnSelectionProps> = ({
         Add-ons
       </Typography>
       <FormGroup>
-        {addOns.map((addon) => (
-          <FormControlLabel
-            key={addon.id}
-            control={
-              <Checkbox
-                checked={selectedAddOns.includes(addon.id.toString())}
-                onChange={() => onAddOnChange(addon.id.toString())}
-              />
+        {[...addOns]
+          .sort((a, b) => {
+            // Sort by perPerson (false comes first)
+            if (a.perPerson !== b.perPerson) {
+              return a.perPerson ? 1 : -1;
             }
-            label={getAddOnPriceLabel(addon)}
-          />
-        ))}
+            // If both have same perPerson value, sort by name
+            return a.name.localeCompare(b.name);
+          })
+          .map((addon) => (
+            <FormControlLabel
+              key={addon.id}
+              control={
+                <Checkbox
+                  checked={selectedAddOns.includes(addon.id.toString())}
+                  onChange={() => onAddOnChange(addon.id.toString())}
+                />
+              }
+              label={getAddOnPriceLabel(addon)}
+            />
+          ))}
       </FormGroup>
     </Box>
   );

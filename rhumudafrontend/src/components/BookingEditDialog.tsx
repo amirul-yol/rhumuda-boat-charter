@@ -59,6 +59,7 @@ interface AddOn {
   name: string;
   price: number;
   isActive: boolean;
+  perPerson: boolean;
 }
 
 function TabPanel(props: TabPanelProps) {
@@ -713,26 +714,35 @@ const BookingEditDialog: React.FC<BookingEditDialogProps> = ({
                   Add-ons
                 </Typography>
                 <FormGroup>
-                  {addOns.map((addon) => (
-                    <FormControlLabel
-                      key={addon.id}
-                      control={
-                        <Checkbox
-                          checked={formData.addOns.some((a: any) => a.id === addon.id)}
-                          onChange={(e) => {
-                            const isChecked = e.target.checked;
-                            setFormData((prev: any) => ({
-                              ...prev,
-                              addOns: isChecked
-                                ? [...prev.addOns, { id: addon.id, name: addon.name, price: addon.price }]
-                                : prev.addOns.filter((a: any) => a.id !== addon.id),
-                            }));
-                          }}
-                        />
+                  {[...addOns]
+                    .sort((a, b) => {
+                      // Sort by perPerson (false comes first)
+                      if (a.perPerson !== b.perPerson) {
+                        return a.perPerson ? 1 : -1;
                       }
-                      label={`${addon.name} (RM${addon.price})`}
-                    />
-                  ))}
+                      // If both have same perPerson value, sort by name
+                      return a.name.localeCompare(b.name);
+                    })
+                    .map((addon) => (
+                      <FormControlLabel
+                        key={addon.id}
+                        control={
+                          <Checkbox
+                            checked={formData.addOns.some((a: any) => a.id === addon.id)}
+                            onChange={(e) => {
+                              const isChecked = e.target.checked;
+                              setFormData((prev: any) => ({
+                                ...prev,
+                                addOns: isChecked
+                                  ? [...prev.addOns, { id: addon.id, name: addon.name, price: addon.price, perPerson: addon.perPerson }]
+                                  : prev.addOns.filter((a: any) => a.id !== addon.id),
+                              }));
+                            }}
+                          />
+                        }
+                        label={`${addon.name}${addon.perPerson ? ' (RM10/pax)' : ' (RM10)'}`}
+                      />
+                    ))}
                 </FormGroup>
               </Grid>
             </Grid>

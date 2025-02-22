@@ -952,8 +952,9 @@ const InquiryPage: React.FC = () => {
           p: 3,
           border: "1px solid #e0e0e0",
           borderRadius: 2,
-          bgcolor: "#f8f8f8",
+          bgcolor: "#E5F6FD",
           mb: 3,
+          color: "#014361"
         }}
       >
         <Typography variant="h6" sx={{ mb: 2 }}>

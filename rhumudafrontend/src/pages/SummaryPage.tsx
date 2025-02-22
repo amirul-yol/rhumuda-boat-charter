@@ -186,6 +186,36 @@ const SummaryPage: React.FC = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'info' | 'warning';
+  }>({
+    open: false,
+    message: '',
+    severity: 'info'
+  });
+
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity
+    });
+  };
+
+  const handleContactSupport = () => {
+    navigate('/contact');
+    handleCloseSnackbar();
+  };
+
   const fetchBookingData = async () => {
     if (!bookingId) {
       setError("No booking ID provided");
@@ -467,9 +497,25 @@ const SummaryPage: React.FC = () => {
 
       setShowCompletionDialog(true);
       fetchBookingData(); // Refresh to get updated status
-    } catch (err) {
-      console.error("Error sending inquiry:", err);
-      setError(err);
+      showNotification('Your inquiry has been sent successfully! Please check your email for confirmation.', 'success');
+    } catch (error: any) {
+      let errorMessage = 'An error occurred while sending your inquiry.';
+      
+      if (error.name === 'TimeoutError') {
+        errorMessage = 'Request timed out. Please try again.';
+      } else if (error.name === 'NetworkError') {
+        errorMessage = 'Network error. Please check your connection.';
+      } else if (error.name === 'ServerError') {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.name === 'DatabaseError') {
+        errorMessage = 'Database error. Please try again later.';
+      } else if (error.name === 'AuthError') {
+        errorMessage = 'Authentication error. Please log in again.';
+      } else if (error.name === 'RateLimitError') {
+        errorMessage = 'Too many requests. Please try again later.';
+      }
+      
+      showNotification(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -531,12 +577,13 @@ const SummaryPage: React.FC = () => {
     }
   };
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
     setRetryCount((prev) => prev + 1);
-    if (error.message?.includes("Failed to submit inquiry")) {
-      handleSendInquiry();
-    } else {
-      fetchBookingData();
+    try {
+      await fetchBookingData();
+      showNotification('Data refreshed successfully', 'success');
+    } catch (error) {
+      showNotification('Failed to refresh data', 'error');
     }
   };
 
@@ -549,67 +596,6 @@ const SummaryPage: React.FC = () => {
     const errorConfig = getErrorConfig(error);
     return isInitialLoad && errorConfig.severity === 'critical';
   };
-
-  const simulateError = (errorType: string) => {
-    switch (errorType) {
-      case 'timeout':
-        setError(new Error('Request timed out after 30 seconds'));
-        break;
-      case 'network':
-        setError(new Error('Failed to fetch: network offline'));
-        break;
-      case 'server':
-        setError({ status: 500, message: 'internal server error' });
-        break;
-      case 'database':
-        setError(new Error('database connection failed'));
-        break;
-      case 'auth':
-        setError({ status: 401, message: 'unauthorized' });
-        break;
-      case 'rate':
-        setError({ status: 429, message: 'too many requests' });
-        break;
-    }
-  };
-
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const testDiv = document.createElement('div');
-      testDiv.style.position = 'fixed';
-      testDiv.style.bottom = '20px';
-      testDiv.style.right = '20px';
-      testDiv.style.zIndex = '9999';
-      testDiv.style.display = 'flex';
-      testDiv.style.flexDirection = 'column';
-      testDiv.style.gap = '5px';
-      
-      const createButton = (label: string, errorType: string) => {
-        const button = document.createElement('button');
-        button.textContent = `Test ${label} Error`;
-        button.style.padding = '5px 10px';
-        button.style.cursor = 'pointer';
-        button.onclick = () => simulateError(errorType);
-        return button;
-      };
-
-      const buttons = [
-        createButton('Timeout', 'timeout'),
-        createButton('Network', 'network'),
-        createButton('Server', 'server'),
-        createButton('Database', 'database'),
-        createButton('Auth', 'auth'),
-        createButton('Rate Limit', 'rate')
-      ];
-
-      buttons.forEach(button => testDiv.appendChild(button));
-      document.body.appendChild(testDiv);
-
-      return () => {
-        document.body.removeChild(testDiv);
-      };
-    }
-  }, []);
 
   // Loading state
   if (loading && isInitialLoad) {
@@ -697,7 +683,7 @@ const SummaryPage: React.FC = () => {
           />
         </Box>
       )}
-      {showSuccessAlert && (
+      {/* {showSuccessAlert && (
         <Alert
           severity="success"
           onClose={handleCloseAlert}
@@ -712,9 +698,9 @@ const SummaryPage: React.FC = () => {
           Your inquiry has been sent successfully! Please check your email for
           confirmation.
         </Alert>
-      )}
+      )} */}
       {/* Main Content Grid */}
-      <Grid container spacing={1.5}>
+      <Grid container spacing={5}>
         {/* Left Column - 70% */}
         <Grid item xs={12} md={8}>
           {/* Booking ID and Package Name Section */}
@@ -751,18 +737,18 @@ const SummaryPage: React.FC = () => {
                     {paragraph.trim()}
                   </Typography>
                 ))}
-                <Divider
+                {/* <Divider
                   sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1 }}
-                />
+                /> */}
               </>
             )}
           </Box>
 
           {/* Package Picture Section */}
           <Box sx={{ mb: 2 }}>
-            <Typography variant="h4" sx={{ mb: 2 }}>
+            {/* <Typography variant="h4" sx={{ mb: 2 }}>
               Package Picture
-            </Typography>
+            </Typography> */}
             <Box
               sx={{
                 width: "100%",
@@ -993,9 +979,9 @@ const SummaryPage: React.FC = () => {
             <Typography sx={{ fontSize: "1rem", color: "black", mb: 2 }}>
               Full refund up to 7 days prior
             </Typography>
-            <Divider
+            {/* <Divider
               sx={{ borderColor: "rgba(0, 0, 0, 0.1)", borderWidth: 1 }}
-            />
+            /> */}
           </Box>
         </Grid>
 
@@ -1113,7 +1099,7 @@ const SummaryPage: React.FC = () => {
                 sx={{ 
                   mb: 0.75,
                   color: 'text.secondary',
-                  fontSize: '0.875rem',
+                  fontSize: '0.775rem',
                   letterSpacing: '0.5px'
                 }}
               >
@@ -1124,12 +1110,12 @@ const SummaryPage: React.FC = () => {
                   border: "1px solid rgba(0, 0, 0, 0.08)",
                   borderRadius: "6px",
                   p: "6px 10px",
-                  minHeight: "28px",
+                  minHeight: "20px",
                   display: "flex",
                   alignItems: "center",
                   mb: 1.5,
                   bgcolor: 'rgba(0, 0, 0, 0.02)',
-                  fontSize: '0.875rem'
+                  fontSize: '0.775rem'
                 }}
               >
                 {getJettyPointName(booking?.jettyPoint)}
@@ -1142,7 +1128,7 @@ const SummaryPage: React.FC = () => {
                     sx={{ 
                       mb: 0.75,
                       color: 'text.secondary',
-                      fontSize: '0.875rem',
+                      fontSize: '0.775rem',
                       letterSpacing: '0.5px'
                     }}
                   >
@@ -1153,11 +1139,11 @@ const SummaryPage: React.FC = () => {
                       border: "1px solid rgba(0, 0, 0, 0.08)",
                       borderRadius: "6px",
                       p: "6px 10px",
-                      minHeight: "28px",
+                      minHeight: "20px",
                       display: "flex",
                       alignItems: "center",
                       bgcolor: 'rgba(0, 0, 0, 0.02)',
-                      fontSize: '0.875rem'
+                      fontSize: '0.775rem'
                     }}
                   >
                     {formatDate(booking?.bookingDate)}
@@ -1169,7 +1155,7 @@ const SummaryPage: React.FC = () => {
                     sx={{ 
                       mb: 0.75,
                       color: 'text.secondary',
-                      fontSize: '0.875rem',
+                      fontSize: '0.775rem',
                       letterSpacing: '0.5px'
                     }}
                   >
@@ -1180,11 +1166,11 @@ const SummaryPage: React.FC = () => {
                       border: "1px solid rgba(0, 0, 0, 0.08)",
                       borderRadius: "6px",
                       p: "6px 10px",
-                      minHeight: "28px",
+                      minHeight: "20px",
                       display: "flex",
                       alignItems: "center",
                       bgcolor: 'rgba(0, 0, 0, 0.02)',
-                      fontSize: '0.875rem'
+                      fontSize: '0.775rem'
                     }}
                   >
                     {booking?.passengers} persons
@@ -1203,7 +1189,7 @@ const SummaryPage: React.FC = () => {
                   mb: 1,
                 }}
               >
-                <Typography variant="subtitle2" sx={{ fontSize: '0.875rem' }}>
+                <Typography variant="subtitle2" sx={{ fontSize: '0.775rem' }}>
                   Package Price{" "}
                   {(() => {
                     const hasFixedPrice = selectedPackage?.priceTiers.some(
@@ -1218,10 +1204,11 @@ const SummaryPage: React.FC = () => {
 
                     return booking?.passengers === 1 
                       ? "(price starts)" 
-                      : `(${booking?.passengers} persons × RM${selectedPackage?.basePrice.toFixed(2)})`;
+                      // : `(${booking?.passengers} persons × RM${selectedPackage?.basePrice.toFixed(2)})`;
+                      : `(RM${selectedPackage?.basePrice.toFixed(0)}/pax)`;
                   })()}
                 </Typography>
-                <Typography variant="subtitle2" sx={{ fontSize: '0.875rem' }}>
+                <Typography variant="subtitle2" sx={{ fontSize: '0.775rem' }}>
                   RM {(() => {
                     const hasFixedPrice = selectedPackage?.priceTiers.some(
                       (tier) => tier.type === "FIXED"
@@ -1240,58 +1227,53 @@ const SummaryPage: React.FC = () => {
                   sx={{
                     mb: 1,
                     color: "text.secondary",
-                    fontSize: "0.875rem",
+                    fontSize: "0.775rem",
                   }}
                 >
                   Add On:
                 </Typography>
-                {booking.addOns.map((addon) => (
-                  <Box
-                    key={addon.id}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      mb: 1,
-                    }}
-                  >
-                    <Box sx={{ 
-                      display: "flex", 
-                      justifyContent: "space-between",
-                      alignItems: "flex-start"
-                    }}>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "text.secondary" }}
-                      >
-                        {addon.name}
-                        {addon.perPerson && (
-                          <Typography
-                            component="span"
-                            sx={{ 
-                              display: "block",
-                              color: "text.secondary",
-                              fontSize: "0.85rem",
-                              mt: 0.25,
-                              ml: 2
-                            }}
-                          >
-                            - RM {addon.price}/person
-                          </Typography>
-                        )}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "text.secondary", ml: 2 }}
-                      >
-                        {addon.perPerson ? (
-                          <>RM {addon.price * booking.passengers}.00</>
-                        ) : (
-                          <>RM {addon.price.toFixed(2)}</>
-                        )}
-                      </Typography>
+                {[...booking.addOns]
+                  .sort((a, b) => {
+                    // Sort by perPerson (false comes first)
+                    if (a.perPerson !== b.perPerson) {
+                      return a.perPerson ? 1 : -1;
+                    }
+                    // If both have same perPerson value, sort by name
+                    return a.name.localeCompare(b.name);
+                  })
+                  .map((addon) => (
+                    <Box
+                      key={addon.id}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        mb: 1,
+                      }}
+                    >
+                      <Box sx={{ 
+                        display: "flex", 
+                        justifyContent: "space-between",
+                        alignItems: "flex-start"
+                      }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "text.secondary", fontSize: "0.775rem" }}
+                        >
+                          {addon.name}{addon.perPerson ? " (per pax)" : ""}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "text.secondary", ml: 2, fontSize: "0.775rem" }}
+                        >
+                          {addon.perPerson ? (
+                            <>RM {addon.price * booking.passengers}.00</>
+                          ) : (
+                            <>RM {addon.price}.00</>
+                          )}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                ))}
+                  ))}
               </Box>
             )}
             
@@ -1324,6 +1306,61 @@ const SummaryPage: React.FC = () => {
         open={showCompletionDialog}
         onClose={handleCloseDialog}
       />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={20000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        sx={{
+          width: '100%',
+          maxWidth: '600px',
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{
+            width: '100%',
+            '& .MuiAlert-message': {
+              fontSize: '0.875rem'
+            },
+            boxShadow: 3
+          }}
+          action={
+            <>
+              {snackbar.severity === 'error' && (
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={handleContactSupport}
+                  sx={{ 
+                    fontSize: '0.8125rem',
+                    mr: 1,
+                    textTransform: 'none'
+                  }}
+                >
+                  Contact Support
+                </Button>
+              )}
+              <Button 
+                color="inherit" 
+                size="small" 
+                onClick={handleCloseSnackbar}
+                sx={{ 
+                  fontSize: '0.8125rem',
+                  textTransform: 'none'
+                }}
+              >
+                Close
+              </Button>
+            </>
+          }
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
