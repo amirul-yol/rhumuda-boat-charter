@@ -6,6 +6,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import { API_CONFIG, getApiUrl } from "../config/api";
 
 interface AddOn {
   id: number;
@@ -33,8 +34,10 @@ const AddOnSelection: React.FC<AddOnSelectionProps> = ({
   useEffect(() => {
     const fetchAddOns = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/addons");
-        if (!response.ok) throw new Error("Failed to fetch add-ons");
+        const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ADD_ONS));
+        if (!response.ok) {
+          throw new Error("Failed to fetch add-ons");
+        }
         const data = await response.json();
         setAddOns(data);
       } catch (error) {

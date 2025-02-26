@@ -7,4 +7,9 @@ DEPLOYMENT_HOST_GUIDE.md
 # Environment variables
 .env
 .env.local
-.env.*
+.env.*.local
+
+# Allow example and environment-specific files
+!.env.example
+!.env.development
+!.env.production
