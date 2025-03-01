@@ -36,6 +36,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import ErrorAlert from "../components/ErrorAlert/ErrorAlert";
 import { getErrorConfig } from "../utils/errorUtils";
+import { API_CONFIG, getApiUrl } from "../config/api";
 
 // Import interfaces from InquiryPage
 interface CustomerInfo {
@@ -229,10 +230,10 @@ const SummaryPage: React.FC = () => {
 
       // Fetch booking data and all packages from all categories
       const [bookingResponse, ...packageResponses] = await Promise.all([
-        fetch(`http://localhost:8080/api/bookings/${bookingId}`),
-        fetch("http://localhost:8080/api/packages/category/1"),
-        fetch("http://localhost:8080/api/packages/category/2"),
-        fetch("http://localhost:8080/api/packages/category/3"),
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.BOOKINGS) + `/${bookingId}`),
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.PACKAGES, { categoryId: 1 })),
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.PACKAGES, { categoryId: 2 })),
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.PACKAGES, { categoryId: 3 })),
       ]);
 
       if (!bookingResponse.ok) {
@@ -276,7 +277,7 @@ const SummaryPage: React.FC = () => {
   useEffect(() => {
     const fetchJettyPoints = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/jetty-points");
+        const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.JETTY_POINTS));
         const data = await response.json();
         setJettyPoints(data);
       } catch (error) {
@@ -290,7 +291,7 @@ const SummaryPage: React.FC = () => {
   useEffect(() => {
     const fetchAddOns = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/addons");
+        const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ADD_ONS));
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -481,7 +482,7 @@ const SummaryPage: React.FC = () => {
 
       // First, update the booking status
       const response = await fetch(
-        `http://localhost:8080/api/bookings/${bookingId}/submit`,
+        getApiUrl(API_CONFIG.ENDPOINTS.BOOKINGS) + `/${bookingId}/submit`,
         {
           method: "PUT",
           headers: {

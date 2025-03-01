@@ -41,6 +41,8 @@ import GroupIcon from "@mui/icons-material/Group";
 import PaidIcon from "@mui/icons-material/Paid";
 import CheckIcon from "@mui/icons-material/Check";
 
+import { API_CONFIG, getApiUrl } from "../config/api";
+
 interface BookingEditDialogProps {
   open: boolean;
   onClose: () => void;
@@ -270,7 +272,7 @@ const BookingEditDialog: React.FC<BookingEditDialogProps> = ({
       // Log the prepared update data
       console.log("Sending update data:", updateData);
 
-      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.BOOKINGS), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -313,14 +315,14 @@ const BookingEditDialog: React.FC<BookingEditDialogProps> = ({
     try {
       // Fetch all required data in parallel
       const [bookingResponse, jettyResponse, packagesResponses, addOnsResponse] = await Promise.all([
-        fetch(`http://localhost:8080/api/bookings/${bookingId}`),
-        fetch("http://localhost:8080/api/jetty-points"),
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.BOOKINGS) + `/${bookingId}`),
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.JETTY_POINTS)),
         Promise.all([
-          fetch("http://localhost:8080/api/packages/category/1"),
-          fetch("http://localhost:8080/api/packages/category/2"),
-          fetch("http://localhost:8080/api/packages/category/3"),
+          fetch(getApiUrl(API_CONFIG.ENDPOINTS.PACKAGES, { categoryId: 1 })),
+          fetch(getApiUrl(API_CONFIG.ENDPOINTS.PACKAGES, { categoryId: 2 })),
+          fetch(getApiUrl(API_CONFIG.ENDPOINTS.PACKAGES, { categoryId: 3 })),
         ]),
-        fetch("http://localhost:8080/api/addons")
+        fetch(getApiUrl(API_CONFIG.ENDPOINTS.ADD_ONS))
       ]);
 
       const bookingData = await bookingResponse.json();

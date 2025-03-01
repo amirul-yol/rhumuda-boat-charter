@@ -42,6 +42,7 @@ import ReservationPassengers from "../components/ReservationPassengers";
 import { BOOKING_SELECTION_KEY, BookingSelection } from "../types/booking";
 // import Description from "../components/Description";
 import { Helmet } from 'react-helmet-async';
+import { API_CONFIG, getApiUrl } from "../config/api";
 
 interface CustomerInfo {
   firstName: string;
@@ -226,7 +227,7 @@ const InquiryPage: React.FC = () => {
   useEffect(() => {
     const fetchAddOns = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/addons");
+        const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ADD_ONS));
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -245,7 +246,9 @@ const InquiryPage: React.FC = () => {
     const fetchPackages = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/packages/category/${selectedCategory}`
+          getApiUrl(API_CONFIG.ENDPOINTS.PACKAGES, {
+            categoryId: selectedCategory,
+          })
         );
         const data = await response.json();
         console.log("Raw Package Data:", data);
@@ -711,7 +714,7 @@ const InquiryPage: React.FC = () => {
 
       console.log("Sending booking data:", bookingData);
 
-      const response = await fetch("http://localhost:8080/api/bookings", {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.BOOKINGS), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
