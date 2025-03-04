@@ -13,6 +13,7 @@ import {
   Chip,
   Divider,
   Theme,
+  IconButton
 } from "@mui/material";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -23,7 +24,7 @@ import locationMap from "../assets/images/location-rhumuda.png";
 import Description from "../components/Description";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
-import CompletionDialog from "../components/CompletionDialog";
+// import CompletionDialog from "../components/CompletionDialog";
 import BookingEditDialog from "../components/BookingEditDialog";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -182,7 +183,7 @@ const SummaryPage: React.FC = () => {
   const [booking, setBooking] = useState<BookingData | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+  // const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -496,7 +497,7 @@ const SummaryPage: React.FC = () => {
         throw new Error(errorData.message || "Failed to submit inquiry");
       }
 
-      setShowCompletionDialog(true);
+      // setShowCompletionDialog(true);
       fetchBookingData(); // Refresh to get updated status
       showNotification('Your inquiry has been sent successfully! Please check your email for confirmation.', 'success');
     } catch (error: any) {
@@ -522,10 +523,10 @@ const SummaryPage: React.FC = () => {
     }
   };
 
-  const handleCloseDialog = () => {
-    setShowCompletionDialog(false);
-    setShowSuccessAlert(true); // Show the alert when dialog is closed
-  };
+  // const handleCloseDialog = () => {
+  //   setShowCompletionDialog(false);
+  //   setShowSuccessAlert(true); // Show the alert when dialog is closed
+  // };
 
   const handleCloseAlert = () => {
     setShowSuccessAlert(false);
@@ -706,7 +707,7 @@ const SummaryPage: React.FC = () => {
         <Grid item xs={12} md={8}>
           {/* Booking ID and Package Name Section */}
           <Box sx={{ mb: 2 }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "#0384BD" }}>
               Booking ID: #{booking?.bookingId}
             </Typography>
             <Typography variant="h4" sx={{ mb: 1 }}>
@@ -1227,7 +1228,6 @@ const SummaryPage: React.FC = () => {
                   variant="subtitle2"
                   sx={{
                     mb: 1,
-                    color: "text.secondary",
                     fontSize: "0.775rem",
                   }}
                 >
@@ -1258,13 +1258,13 @@ const SummaryPage: React.FC = () => {
                       }}>
                         <Typography
                           variant="body2"
-                          sx={{ color: "text.secondary", fontSize: "0.775rem" }}
+                          sx={{ fontSize: "0.775rem" }}
                         >
                           {addon.name}{addon.perPerson ? " (per pax)" : ""}
                         </Typography>
                         <Typography
                           variant="body2"
-                          sx={{ color: "text.secondary", ml: 2, fontSize: "0.775rem" }}
+                          sx={{ ml: 2, fontSize: "0.775rem" }}
                         >
                           {addon.perPerson ? (
                             <>RM {addon.price * booking.passengers}.00</>
@@ -1303,10 +1303,10 @@ const SummaryPage: React.FC = () => {
         bookingId={booking?.bookingId || ""}
         onUpdate={handleBookingUpdate}
       />
-      <CompletionDialog
+      {/* <CompletionDialog
         open={showCompletionDialog}
         onClose={handleCloseDialog}
-      />
+      /> */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={20000}
@@ -1345,17 +1345,18 @@ const SummaryPage: React.FC = () => {
                   Contact Support
                 </Button>
               )}
-              <Button 
-                color="inherit" 
-                size="small" 
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
                 onClick={handleCloseSnackbar}
                 sx={{ 
-                  fontSize: '0.8125rem',
-                  textTransform: 'none'
+                  ml: 1,
+                  padding: '4px'
                 }}
               >
-                Close
-              </Button>
+                <CancelIcon fontSize="small" />
+              </IconButton>
             </>
           }
         >

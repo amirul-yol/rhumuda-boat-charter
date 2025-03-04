@@ -28,6 +28,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import PaidIcon from "@mui/icons-material/Paid";
 import DirectionsBoatIcon from "@mui/icons-material/DirectionsBoat";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import InfoIcon from "@mui/icons-material/Info";
 import { useLocation, useNavigate } from "react-router-dom";
 import JettyPointDropdown from "../components/JettyPointDropdown";
 import BookingDatePicker from "../components/BookingDatePicker";
@@ -742,6 +743,7 @@ const InquiryPage: React.FC = () => {
 
   const renderButtons = () => (
     <Box sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}>
+      {/* Clear button commented out
       <Button
         variant="outlined"
         onClick={handleClearClick}
@@ -756,6 +758,8 @@ const InquiryPage: React.FC = () => {
       >
         Clear
       </Button>
+      */}
+      <div /> {/* Empty div to maintain spacing */}
       <Box sx={{ display: "flex", gap: 2 }}>
         {activeSection > 0 && (
           <Button
@@ -961,7 +965,10 @@ const InquiryPage: React.FC = () => {
         }}
       >
         <Typography variant="h6" sx={{ mb: 2 }}>
-          Package Info
+          <Stack direction="row" spacing={1} alignItems="center">
+            <InfoIcon sx={{ color: "#0384BD", fontSize: 24 }} />
+            <span>Package Info</span>
+          </Stack>
         </Typography>
 
         <Grid container spacing={3}>
@@ -1035,7 +1042,12 @@ const InquiryPage: React.FC = () => {
                   <Typography
                     key={service.id}
                     variant="body2"
-                    color="text.secondary"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      lineHeight: 1.2,
+                      fontWeight: 500
+                    }}
                   >
                     {service.name || service.serviceName}
                   </Typography>
